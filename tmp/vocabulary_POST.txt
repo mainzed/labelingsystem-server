@@ -1,0 +1,9 @@
+{
+	"vocabulary": {
+		"title": ["value@lang"],
+		"description": ["value@lang"],
+		"retcats": ["false"],
+		"releaseType": ["hidden"],
+		"theme": ["http://example.com/theme1","http://example.com/theme1"]
+	}
+}
