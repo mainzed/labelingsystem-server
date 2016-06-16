@@ -8,6 +8,7 @@ import de.i3mainz.ls.rdfutils.exceptions.Logging;
 import de.i3mainz.ls.rdfutils.exceptions.RdfException;
 import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
 import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
+import info.labeling.v1.utils.JSONtoRDFJSON;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -412,16 +413,16 @@ public class VocabResource {
 			// get variables
 			String item = "ls_voc";
 			String itemID = UniqueIdentifier.getUUID();
-			RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 			// create triples
-			json = json.replace("#uri#", rdf.getPrefixItem(item + ":" + itemID));
+			//json = json.replace("#uri#", rdf.getPrefixItem(item + ":" + itemID));
+			json = JSONtoRDFJSON.vocabulary_POST(json,itemID);
 			String triples = createVocabularySPARQLUPDATE(item, itemID, user);
 			// input triples
 			Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
 			Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
 			return Response.status(Response.Status.CREATED).entity(json).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
