@@ -98,7 +98,7 @@ public class Transformer {
 		return jsonObject.toJSONString();
 	}
 	
-	public static String vocabulary_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
+	public static JSONObject vocabulary_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
 		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 		// parse json
@@ -247,7 +247,7 @@ public class Transformer {
 		vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
 		vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
 		// return
-		return jsonObject.toJSONString();
+		return jsonObject;
 	}
 
 }

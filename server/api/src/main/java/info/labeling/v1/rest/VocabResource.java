@@ -30,6 +30,8 @@ import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.jdom.JDOMException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.openrdf.query.BindingSet;
 
 /**
@@ -43,134 +45,40 @@ import org.openrdf.query.BindingSet;
 public class VocabResource {
 
 	@GET
-	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8"})
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getVocabularies(@HeaderParam("Accept") String acceptHeader) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
 			RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 			String query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { "
-					+ "?s a ?type . "
+					+ "?s a ls:Vocabulary . "
 					+ "?s ls:identifier ?identifier . "
-					+ "?s skos:changeNote ?changeNote . "
-					+ "?s ls:hasStatusType ?hasStatusType . "
-					+ "OPTIONAL { ?s skos:hasTopConcept ?hasTopConcept . } "
-					+ "OPTIONAL { ?s dct:creator ?creatorURI . } "
-					+ "OPTIONAL { ?s dc:creator ?creator . } "
-					+ "OPTIONAL { ?s dct:contributor ?contributorURI . } "
-					+ "OPTIONAL { ?s dc:contributor ?contributor . } "
-					+ "OPTIONAL { ?s dct:date ?date . } "
-					+ "OPTIONAL { ?s dct:identifier ?identifierDC . } "
-					+ "OPTIONAL { ?s dct:license ?license . } "
-					+ "OPTIONAL { ?s dct:title ?title . } "
-					+ "OPTIONAL { ?s dct:description ?description . } "
-					+ "OPTIONAL { ?s ls:hasReleaseType ?hasReleaseType . } "
-					+ "OPTIONAL { ?s dcat:theme ?theme . } "
-					+ "OPTIONAL { ?s ls:isRetcatsItem ?isRetcatsItem . } "
-					+ "OPTIONAL { ?s dc:created ?created . } "
-					+ "OPTIONAL { ?s dc:modified ?modified . } "
-					+ "OPTIONAL { ?s ls:sameAs ?sameAs . } "
-					+ "FILTER (?type=ls:Vocabulary) . "
 					+ "}";
 			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
-			// DEFAULT
 			List<String> uris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-			List<String> types = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "type");
-			List<String> identifiers = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "identifier");
-			List<String> changenotes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "changeNote");
-			List<String> hasstatustypes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "hasStatusType");
-			// OPTIONAL
-			List<String> belongstoprojects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "belongsToProject");
-			List<String> hastopconcepts = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "hasTopConcept");
-			List<String> creatoruris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "creatorURI");
-			List<String> creators = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "creator");
-			List<String> contributoruris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "contributorURI");
-			List<String> contributors = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "contributor");
-			List<String> dates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "date");
-			List<String> identifiersdc = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "identifierDC");
-			List<String> licenses = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "license");
-			List<String> titles = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "title");
-			List<String> descriptions = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "description");
-			List<String> hasreleasetypes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "hasReleaseType");
-			List<String> themes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "theme");
-			List<String> isretcatsitems = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "isRetcatsItem");
-			List<String> createds = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "created");
-			List<String> modifieds = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "modified");
-			List<String> sameass = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "sameAs");
+			List<String> ids = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "identifier");
 			if (result.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
+			JSONObject out = new JSONObject();
+			JSONArray outArray = new JSONArray();
 			for (int i = 0; i < uris.size(); i++) {
-				rdf.setModelTriple(uris.get(i), "rdf:type", types.get(i));
-				rdf.setModelTriple(uris.get(i), "ls:identifier", identifiers.get(i));
-				rdf.setModelTriple(uris.get(i), "skos:changeNote", changenotes.get(i));
-				rdf.setModelTriple(uris.get(i), "ls:hasStatusType", hasstatustypes.get(i));
-				if (belongstoprojects.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "ls:belongsToProject", belongstoprojects.get(i));
+				String item = "ls_voc";
+				query = getVocabularySPARQL(item, ids.get(i));
+				result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+				List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+				List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+				if (result.size() < 1) {
+					throw new ResourceNotAvailableException();
 				}
-				if (hastopconcepts.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "skos:hasTopConcept", hastopconcepts.get(i));
+				for (int j = 0; j < predicates.size(); j++) {
+					rdf.setModelTriple(item + ":" + ids.get(i), predicates.get(j), objects.get(j));
 				}
-				if (creatoruris.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:creator", creatoruris.get(i));
-				}
-				if (creators.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dc:creator", creators.get(i));
-				}
-				if (contributoruris.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:contributor", contributoruris.get(i));
-				}
-				if (contributors.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dc:contributor", contributors.get(i));
-				}
-				if (dates.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:date", dates.get(i));
-				}
-				if (identifiersdc.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:identifier", identifiersdc.get(i));
-				}
-				if (licenses.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:license", licenses.get(i));
-				}
-				if (titles.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:title", titles.get(i));
-				}
-				if (descriptions.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dct:description", descriptions.get(i));
-				}
-				if (hasreleasetypes.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "ls:hasReleaseType", hasreleasetypes.get(i));
-				}
-				if (themes.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dcat:theme", themes.get(i));
-				}
-				if (isretcatsitems.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "ls:isRetcatsItem", isretcatsitems.get(i));
-				}
-				if (createds.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dc:created", createds.get(i));
-				}
-				if (modifieds.get(i) != null) {
-					rdf.setModelTriple(uris.get(i), "dc:modified", modifieds.get(i));
-				}
-				rdf.setModelTriple(uris.get(i), "ls:sameAs", sameass.get(i));
+				JSONObject outObject = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), ids.get(i));
+				outArray.add(outObject);
 			}
-			if (acceptHeader.contains("application/json")) {
-				return Response.ok(rdf.getModel("RDF/JSON")).build();
-			} else if (acceptHeader.contains("text/html")) {
-				return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
-			} else if (acceptHeader.contains("application/xml")) {
-				return Response.ok(rdf.getModel("RDF/XML")).build();
-			} else if (acceptHeader.contains("application/rdf+xml")) {
-				return Response.ok(rdf.getModel("RDF/XML")).build();
-			} else if (acceptHeader.contains("text/turtle")) {
-				return Response.ok(rdf.getModel("Turtle")).build();
-			} else if (acceptHeader.contains("text/n3")) {
-				return Response.ok(rdf.getModel("N-Triples")).build();
-			} else if (acceptHeader.contains("application/ld+json")) {
-				return Response.ok(rdf.getModel("JSON-LD")).build();
-			} else {
-				return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+			out.put("vocabs", outArray);
+			return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
 				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
@@ -200,7 +108,7 @@ public class VocabResource {
 				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
 			}
 			if (acceptHeader.contains("application/json")) {
-				String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary);
+				String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary).toJSONString();
 				return Response.ok(out).build();
 			} else if (acceptHeader.contains("text/html")) {
 				return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -245,7 +153,7 @@ public class VocabResource {
 			for (int i = 0; i < predicates.size(); i++) {
 				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
 			}
-			String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary);
+			String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary).toJSONString();
 			return Response.ok(out).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
