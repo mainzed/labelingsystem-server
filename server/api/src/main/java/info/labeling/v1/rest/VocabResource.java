@@ -8,7 +8,7 @@ import de.i3mainz.ls.rdfutils.exceptions.Logging;
 import de.i3mainz.ls.rdfutils.exceptions.RdfException;
 import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
 import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
-import info.labeling.v1.utils.JSONtoRDFJSON;
+import info.labeling.v1.utils.Transformer;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -38,7 +37,7 @@ import org.openrdf.query.BindingSet;
  *
  * @author Florian Thiery M.Sc.
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 07.04.2016
+ * @version 17.06.2016
  */
 @Path("/v1/vocabs")
 public class VocabResource {
@@ -174,10 +173,10 @@ public class VocabResource {
 			}
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -201,7 +200,8 @@ public class VocabResource {
 				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
 			}
 			if (acceptHeader.contains("application/json")) {
-				return Response.ok(rdf.getModel("RDF/JSON")).build();
+				String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary);
+				return Response.ok(out).build();
 			} else if (acceptHeader.contains("text/html")) {
 				return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
 			} else if (acceptHeader.contains("application/xml")) {
@@ -219,10 +219,10 @@ public class VocabResource {
 			}
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -245,13 +245,14 @@ public class VocabResource {
 			for (int i = 0; i < predicates.size(); i++) {
 				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
 			}
-			return Response.ok(rdf.getModel("RDF/JSON")).build();
+			String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary);
+			return Response.ok(out).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -278,10 +279,10 @@ public class VocabResource {
 			return Response.ok(RDFoutput).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -308,10 +309,10 @@ public class VocabResource {
 			return Response.ok(RDFoutput).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -337,10 +338,10 @@ public class VocabResource {
 			return Response.ok(rdf.getModel("Turtle")).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -366,15 +367,44 @@ public class VocabResource {
 			return Response.ok(rdf.getModel("N-Triples")).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
 	}
 
+	@GET
+	@Path("/{vocabulary}.jsonrdf")
+	@Produces("application/json;charset=UTF-8")
+	public Response getVocabularyRDF_JSONRDF(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+		try {
+			RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+			String item = "ls_voc";
+			String query = getVocabularySPARQL(item, vocabulary);
+			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+			List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < predicates.size(); i++) {
+				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
+			}
+			return Response.ok(rdf.getModel("RDF/JSON")).build();
+		} catch (Exception e) {
+			if (e.toString().contains("ResourceNotAvailableException")) {
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
+						.header("Content-Type", "application/json;charset=UTF-8").build();
+			} else {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
+						.header("Content-Type", "application/json;charset=UTF-8").build();
+			}
+		}
+	}
+	
 	@GET
 	@Path("/{vocabulary}.jsonld")
 	@Produces("application/ld+json;charset=UTF-8")
@@ -395,10 +425,10 @@ public class VocabResource {
 			return Response.ok(rdf.getModel("JSON-LD")).build();
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		}
@@ -414,13 +444,24 @@ public class VocabResource {
 			String item = "ls_voc";
 			String itemID = UniqueIdentifier.getUUID();
 			// create triples
-			//json = json.replace("#uri#", rdf.getPrefixItem(item + ":" + itemID));
-			json = JSONtoRDFJSON.vocabulary_POST(json,itemID);
+			json = Transformer.vocabulary_POST(json,itemID);
 			String triples = createVocabularySPARQLUPDATE(item, itemID, user);
 			// input triples
 			Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
 			Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
-			return Response.status(Response.Status.CREATED).entity(json).header("Content-Type", "application/json;charset=UTF-8").build();
+			// get result als json
+			RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+			String query = getVocabularySPARQL(item, itemID);
+			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+			List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < predicates.size(); i++) {
+				rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
+			}
+			return Response.status(Response.Status.CREATED).entity(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -440,7 +481,7 @@ public class VocabResource {
 			Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
 			return Response.status(Response.Status.CREATED).entity(json).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
@@ -456,7 +497,7 @@ public class VocabResource {
 			Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
 			return Response.status(Response.Status.NO_CONTENT).build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.VocabResource"))
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
