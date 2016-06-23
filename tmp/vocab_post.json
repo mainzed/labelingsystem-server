@@ -1,0 +1,11 @@
+{
+	"vocab": {
+		"title": ["Elefant@de"],
+		"description": ["Das ist ein graues Tier.@de"],
+		"retcats": ["false"],
+		"releaseType": ["hidden"],
+		"theme": ["http://example.com/elefant", "http://example.com/tier"],
+		"topConcept": [],
+		"contributor": []
+	}
+}
