@@ -12,6 +12,7 @@ import de.i3mainz.ls.rdfutils.exceptions.Logging;
 import de.i3mainz.ls.rdfutils.exceptions.RdfException;
 import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
 import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
+import info.labeling.v1.restconfig.PATCH;
 import info.labeling.v1.utils.Transformer;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.IOException;
@@ -39,7 +40,6 @@ import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openrdf.query.BindingSet;
-import info.labeling.v1.restconfig.PATCH;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
