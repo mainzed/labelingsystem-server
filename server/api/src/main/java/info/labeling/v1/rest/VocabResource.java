@@ -39,13 +39,16 @@ import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openrdf.query.BindingSet;
+import info.labeling.v1.restconfig.PATCH;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * REST API for Vocabularies
  *
  * @author Florian Thiery M.Sc.
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 20.06.2016
+ * @version 23.06.2016
  */
 @Path("/v1/vocabs")
 public class VocabResource {
@@ -559,6 +562,38 @@ public class VocabResource {
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
+	
+	@PATCH
+	@Path("/{vocabulary}/user/{user}/type/{type}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response updateVocabularyPATCH(@PathParam("vocabulary") String vocabulary, @PathParam("user") String user, @PathParam("type") String type, String json)
+			throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+		try {
+			String item = "ls_voc";
+			json = Transformer.vocabulary_POST(json, vocabulary);
+			Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
+			Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchVocabularySPARQLUPDATE(vocabulary, json));
+			Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
+			// get result als json
+			RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+			String query = getVocabularySPARQL(item, vocabulary);
+			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+			List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < predicates.size(); i++) {
+				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
+			}
+			String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary).toJSONString();
+			return Response.status(Response.Status.CREATED).entity(out).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
 
 	@DELETE
 	@Path("/{vocabulary}/user/{user}")
@@ -694,6 +729,59 @@ public class VocabResource {
 				+ "FILTER (?identifier=\"$identifier\") "
 				+ "FILTER (?p IN (skos:hasTopConcept,dct:contributor,dc:contributor,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:isRetcatsItem)) "
 				+ "}";
+		update = update.replace("$identifier", id);
+		return update;
+	}
+	
+	private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
+		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+        JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_voc" + ":" + id));
+		List<String> deleteList = new ArrayList<String>();
+        JSONArray titleArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:title"));
+        if (titleArray != null && !titleArray.isEmpty()) {
+			deleteList.add("dc:title");
+		}
+		JSONArray descriptionArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:description"));
+        if (descriptionArray != null && !descriptionArray.isEmpty()) {
+			deleteList.add("dc:description");
+		}
+		JSONArray hasTopConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
+        if (hasTopConceptArray != null && !hasTopConceptArray.isEmpty()) {
+			deleteList.add("skos:hasTopConcept");
+		}
+		JSONArray contributorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:contributor"));
+        if (contributorArray != null && !contributorArray.isEmpty()) {
+			deleteList.add("dct:contributor");
+			deleteList.add("dc:contributor");
+		}
+		JSONArray hasReleaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
+        if (hasReleaseTypeArray != null && !hasReleaseTypeArray.isEmpty()) {
+			deleteList.add("ls:hasReleaseType");
+		}
+		JSONArray themenArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dcat:theme"));
+        if (themenArray != null && !themenArray.isEmpty()) {
+			deleteList.add("dcat:theme");
+		}
+		JSONArray isRetcatsItemArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:isRetcatsItem"));
+        if (isRetcatsItemArray != null && !isRetcatsItemArray.isEmpty()) {
+			deleteList.add("ls:isRetcatsItem");
+		}
+		// SEND DELETE
+		String prefixes = rdf.getPREFIXSPARQL();
+		String update = prefixes
+				+ "DELETE { ?vocabulary ?p ?o. } "
+				+ "WHERE { "
+				+ "?vocabulary ?p ?o. "
+				+ "?vocabulary dc:identifier ?identifier. "
+				+ "FILTER (?identifier=\"$identifier\") ";
+		
+		update += "FILTER (?p IN (";
+		for (String element : deleteList) {
+			update += element + ",";
+		}
+		update = update.substring(0, update.length()-1);
+		update += ")) }";
 		update = update.replace("$identifier", id);
 		return update;
 	}
