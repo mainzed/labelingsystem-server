@@ -1,23 +1,34 @@
 package info.labeling.v1.rest;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import de.i3mainz.ls.rdfutils.RDF;
 import de.i3mainz.ls.rdfutils.Sesame2714;
 import de.i3mainz.ls.rdfutils.exceptions.ConfigException;
 import de.i3mainz.ls.rdfutils.exceptions.Logging;
 import de.i3mainz.ls.rdfutils.exceptions.RdfException;
 import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
+import info.labeling.v1.utils.Transformer;
 import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.util.List;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.jdom.JDOMException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.openrdf.query.BindingSet;
 
 /**
@@ -25,55 +36,73 @@ import org.openrdf.query.BindingSet;
  *
  * @author Florian Thiery M.Sc.
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 05.04.2016
+ * @version 27.06.2016
  */
 @Path("/v1/revisions")
 public class RevisionsResource {
 
     @GET
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8"})
-    public Response getRevision(@HeaderParam("Accept") String acceptHeader) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
+    public Response getRevisions(
+            @HeaderParam("Accept") String acceptHeader,
+            @QueryParam("pretty") boolean pretty)
+            throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
+            // QUERY STRING
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
-                    + "?s a ?type . "
-                    + "?s ls:identifier ?identifier . "
-                    + "?s dct:creator ?creatorURI . "
-                    + "?s dc:creator ?creator . "
-                    + "?s dct:date ?date . "
-                    + "?s dc:description ?description . "
-                    + "?s dct:type ?revisiontype . "
-                    + "?s prov:startedAtTime ?startedAtTime . "
-                    + "FILTER (?type=ls:Revision) . "
-                    + "}";
+                    + "?s a ls:Revision . "
+                    + "?s dc:identifier ?identifier . "
+                    + " } ";
+            // QUERY TRIPLESTORE
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> uris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-            List<String> types = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "type");
-            List<String> identifiers = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "identifier");
-            List<String> creatoruris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "creatorURI");
-            List<String> creators = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "creator");
-            List<String> dates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "date");
-            List<String> descriptions = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "description");
-            List<String> revisiontypes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "revisiontype");
-            List<String> startedattimes = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "startedAtTime");
+            List<String> ids = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "identifier");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
+            JSONObject out = new JSONObject();
+            JSONObject outObject = new JSONObject();
+            JSONArray outArray = new JSONArray();
             for (int i = 0; i < uris.size(); i++) {
-                rdf.setModelTriple(uris.get(i), "rdf:type", types.get(i));
-                rdf.setModelTriple(uris.get(i), "ls:identifier", identifiers.get(i));
-                rdf.setModelTriple(uris.get(i), "dct:creator", creatoruris.get(i));
-                rdf.setModelTriple(uris.get(i), "dc:creator", creators.get(i));
-                rdf.setModelTriple(uris.get(i), "dct:date", dates.get(i));
-                rdf.setModelTriple(uris.get(i), "dc:description", descriptions.get(i));
-                rdf.setModelTriple(uris.get(i), "dct:type", revisiontypes.get(i));
-                rdf.setModelTriple(uris.get(i), "prov:startedAtTime", startedattimes.get(i));
+                String item = "ls_rev";
+                query = Utils.getAllElementsForItemID(item, ids.get(i));
+                result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+                List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+                List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+                if (result.size() < 1) {
+                    throw new ResourceNotAvailableException();
+                }
+                for (int j = 0; j < predicates.size(); j++) {
+                    rdf.setModelTriple(item + ":" + ids.get(i), predicates.get(j), objects.get(j));
+                }
+                if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
+                    outObject = Transformer.revision_GET(rdf.getModel("RDF/JSON"), ids.get(i));
+                    outArray.add(outObject);
+                }
+                out.put("revisions", outArray);
             }
             if (acceptHeader.contains("application/json")) {
-                return Response.ok(rdf.getModel("RDF/JSON")).build();
-            } else if (acceptHeader.contains("text/html")) {
+                if (pretty) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    return Response.ok(gson.toJson(json)).build();
+                } else {
+                    return Response.ok(out).build();
+                }
+            } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
+            } else if (acceptHeader.contains("text/html")) {
+                if (pretty) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+                } else {
+                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                }
             } else if (acceptHeader.contains("application/xml")) {
                 return Response.ok(rdf.getModel("RDF/XML")).build();
             } else if (acceptHeader.contains("application/rdf+xml")) {
@@ -84,28 +113,33 @@ public class RevisionsResource {
                 return Response.ok(rdf.getModel("N-Triples")).build();
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
+            } else if (pretty) {
+                JsonParser parser = new JsonParser();
+                JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
+                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
     @GET
     @Path("/{revision}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8"})
-    public Response getRevision(@PathParam("revision") String revision, @HeaderParam("Accept") String acceptHeader) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
+    public Response getRevision(@PathParam("revision") String revision, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -116,9 +150,27 @@ public class RevisionsResource {
                 rdf.setModelTriple(item + ":" + revision, predicates.get(i), objects.get(i));
             }
             if (acceptHeader.contains("application/json")) {
-                return Response.ok(rdf.getModel("RDF/JSON")).build();
-            } else if (acceptHeader.contains("text/html")) {
+                String out = Transformer.revision_GET(rdf.getModel("RDF/JSON"), revision).toJSONString();
+                if (pretty) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(out).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    return Response.ok(gson.toJson(json)).build();
+                } else {
+                    return Response.ok(out).build();
+                }
+            } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
+            } else if (acceptHeader.contains("text/html")) {
+                String out = Transformer.revision_GET(rdf.getModel("RDF/JSON"), revision).toJSONString();
+                if (pretty) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(out).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+                } else {
+                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                }
             } else if (acceptHeader.contains("application/xml")) {
                 return Response.ok(rdf.getModel("RDF/XML")).build();
             } else if (acceptHeader.contains("application/rdf+xml")) {
@@ -130,27 +182,35 @@ public class RevisionsResource {
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else {
-                return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
+                String out = Transformer.revision_GET(rdf.getModel("RDF/JSON"), revision).toJSONString();
+                if (pretty) {
+                    JsonParser parser = new JsonParser();
+                    JsonObject json = parser.parse(out).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+                } else {
+                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                }
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
     @GET
     @Path("/{revision}.json")
     @Produces("application/json;charset=UTF-8")
-    public Response getRevision_JSON(@PathParam("revision") String revision) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRevision_JSON(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -160,15 +220,23 @@ public class RevisionsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + revision, predicates.get(i), objects.get(i));
             }
-            return Response.ok(rdf.getModel("RDF/JSON")).build();
+            String out = Transformer.revision_GET(rdf.getModel("RDF/JSON"), revision).toJSONString();
+            if (pretty) {
+                JsonParser parser = new JsonParser();
+                JsonObject json = parser.parse(out).getAsJsonObject();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
@@ -179,7 +247,7 @@ public class RevisionsResource {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -193,12 +261,12 @@ public class RevisionsResource {
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
@@ -209,7 +277,7 @@ public class RevisionsResource {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -223,12 +291,12 @@ public class RevisionsResource {
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
@@ -239,7 +307,7 @@ public class RevisionsResource {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -252,12 +320,12 @@ public class RevisionsResource {
             return Response.ok(rdf.getModel("Turtle")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
@@ -268,7 +336,7 @@ public class RevisionsResource {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -281,23 +349,23 @@ public class RevisionsResource {
             return Response.ok(rdf.getModel("N-Triples")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
     @GET
-    @Path("/{revision}.jsonld")
-    @Produces("application/ld+json;charset=UTF-8")
-    public Response getRevisionRDF_JSONLD(@PathParam("revision") String revision) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    @Path("/{revision}.jsonrdf")
+    @Produces("application/json;charset=UTF-8")
+    public Response getRevisionRDF_JSONRDF(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String item = "ls_rev";
-            String query = getRevisionSPARQL(item, revision);
+            String query = Utils.getAllElementsForItemID(item, revision);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -307,25 +375,91 @@ public class RevisionsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + revision, predicates.get(i), objects.get(i));
             }
-            return Response.ok(rdf.getModel("JSON-LD")).build();
+            String out = rdf.getModel("RDF/JSON");
+            if (pretty) {
+                JsonParser parser = new JsonParser();
+                JsonObject json = parser.parse(out).getAsJsonObject();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "de.i3mainz.rest.RevisionsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
         }
     }
 
-    private static String getRevisionSPARQL(String item, String itemid) throws ConfigException, IOException {
+    @GET
+    @Path("/{revision}.jsonld")
+    @Produces("application/ld+json;charset=UTF-8")
+    public Response getRevisionRDF_JSONLD(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+        try {
+            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            String item = "ls_rev";
+            String query = Utils.getAllElementsForItemID(item, revision);
+            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            if (result.size() < 1) {
+                throw new ResourceNotAvailableException();
+            }
+            for (int i = 0; i < predicates.size(); i++) {
+                rdf.setModelTriple(item + ":" + revision, predicates.get(i), objects.get(i));
+            }
+            String out = rdf.getModel("JSON-LD");
+            if (pretty) {
+                JsonParser parser = new JsonParser();
+                JsonObject json = parser.parse(out).getAsJsonObject();
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        } catch (Exception e) {
+            if (e.toString().contains("ResourceNotAvailableException")) {
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        }
+    }
+
+    @DELETE
+    @Path("/{revision}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response deleteRevision(@PathParam("revision") String revision) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+        try {
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteRevisionSPARQLUPDATE(revision));
+            // get result als json
+            String out = Transformer.empty_JSON("revision").toJSONString();
+            return Response.status(Response.Status.CREATED).entity(out).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RevisionsResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    private static String deleteRevisionSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
-        String query = prefixes + "SELECT * WHERE { ";
-        query += item + ":" + itemid + " ?p ?o. } ";
-        query += "ORDER BY ASC(?p)";
-        return query;
+        String update = prefixes
+                + "DELETE { ?revision ?p ?o. ?item skos:changeNote ?revision. } "
+                + "WHERE { "
+                + "?revision ?p ?o. "
+                + "?revision dc:identifier ?identifier. "
+                + "?item skos:changeNote ?revision . "
+                + "FILTER (?identifier=\"$identifier\") "
+                + "}";
+        update = update.replace("$identifier", id);
+        return update;
     }
 
 }

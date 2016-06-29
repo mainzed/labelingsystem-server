@@ -52,12 +52,12 @@ import org.json.simple.parser.ParseException;
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
  * @version 23.06.2016
  */
-@Path("/v1/labels")
-public class LabelsResource {
+@Path("/v1/vocabs")
+public class VocabsResource {
 
     @GET
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getLabels(
+    public Response getVocabularies(
             @HeaderParam("Accept") String acceptHeader,
             @QueryParam("pretty") boolean pretty,
             @QueryParam("sort") String sort,
@@ -66,23 +66,20 @@ public class LabelsResource {
             @QueryParam("limit") String limit,
             @QueryParam("creator") String creator,
             @QueryParam("contributor") String contributor,
-            @QueryParam("prefLabel") String prefLabel,
-            @QueryParam("vocab") String vocab,
-            @QueryParam("context") String context,
-            @QueryParam("statusType") String statusType)
+            @QueryParam("statusType") String statusType,
+            @QueryParam("releaseType") String releaseType)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
-                    + "?s a ls:Label . "
+                    + "?s a ls:Vocabulary . "
                     + "?s dc:identifier ?identifier . "
                     + "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:contributor ?contributor . } " // because of sorting, filtering
-                    + "OPTIONAL { ?s skos:prefLabel ?prefLabel . } " // because of sorting, filtering
-                    + "OPTIONAL { ?s skos:inScheme ?vocab . } " // because of filtering
-                    + "OPTIONAL { ?s ls:hasContext ?context . } " // because of filtering
+                    + "OPTIONAL { ?s dc:title ?title . } " // because of sorting
+                    + "OPTIONAL { ?s ls:hasReleaseType ?releaseType . } " // because of filtering
                     + "OPTIONAL { ?s ls:hasStatusType ?statusType . } "; // because of filtering
             // FILTERING
             if (creator != null) {
@@ -94,11 +91,8 @@ public class LabelsResource {
             if (statusType != null) {
                 query += "FILTER(?statusType=<" + rdf.getPrefixItem("ls:" + statusType) + ">) ";
             }
-            if (vocab != null) {
-                query += "FILTER(?vocab=<" + rdf.getPrefixItem("ls_voc:" + vocab) + ">) ";
-            }
-            if (context != null) {
-                query += "FILTER(?context=\"" + context + "\") ";
+            if (releaseType != null) {
+                query += "FILTER(?releaseType=<" + rdf.getPrefixItem("ls:" + releaseType) + ">) ";
             }
             query += " } ";
             // SORTING
@@ -136,7 +130,7 @@ public class LabelsResource {
             JSONObject outObject = new JSONObject();
             JSONArray outArray = new JSONArray();
             for (String element : ids) {
-                String item = "ls_lab";
+                String item = "ls_voc";
                 query = Utils.getAllElementsForItemID(item, element);
                 result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
                 List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -148,10 +142,10 @@ public class LabelsResource {
                     rdf.setModelTriple(item + ":" + element, predicates.get(j), objects.get(j));
                 }
                 if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
-                    outObject = Transformer.label_GET(rdf.getModel("RDF/JSON"), element, fields);
+                    outObject = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), element, fields);
                     outArray.add(outObject);
                 }
-                out.put("labels", outArray);
+                out.put("vocabs", outArray);
             }
             if (acceptHeader.contains("application/json")) {
                 if (pretty) {
@@ -193,23 +187,23 @@ public class LabelsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}")
+    @Path("/{vocabulary}")
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getLabel(@PathParam("label") String label, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getVocabulary(@PathParam("vocabulary") String vocabulary, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -217,10 +211,10 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             if (acceptHeader.contains("application/json")) {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -232,7 +226,7 @@ public class LabelsResource {
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -252,7 +246,7 @@ public class LabelsResource {
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -264,23 +258,23 @@ public class LabelsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.json")
+    @Path("/{vocabulary}.json")
     @Produces("application/json;charset=UTF-8")
-    public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabulary_JSON(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -288,9 +282,9 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             if (pretty) {
                 JsonParser parser = new JsonParser();
                 JsonObject json = parser.parse(out).getAsJsonObject();
@@ -301,23 +295,23 @@ public class LabelsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.xml")
+    @Path("/{vocabulary}.xml")
     @Produces("application/xml;charset=UTF-8")
-    public Response getLabel_XML(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabulary_XML(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -325,29 +319,29 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.rdf")
+    @Path("/{vocabulary}.rdf")
     @Produces("application/rdf+xml;charset=UTF-8")
-    public Response getLabelRDF_XML(@PathParam("label") String label) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getVocabularyRDF_XML(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -355,29 +349,29 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.ttl")
+    @Path("/{vocabulary}.ttl")
     @Produces("text/turtle;charset=UTF-8")
-    public Response getLabelRDF_Turtle(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabularyRDF_Turtle(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -385,28 +379,28 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             return Response.ok(rdf.getModel("Turtle")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.n3")
+    @Path("/{vocabulary}.n3")
     @Produces("text/n3;charset=UTF-8")
-    public Response getLabelRDF_N3(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabularyRDF_N3(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -414,28 +408,28 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             return Response.ok(rdf.getModel("N-Triples")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.jsonrdf")
+    @Path("/{vocabulary}.jsonrdf")
     @Produces("application/json;charset=UTF-8")
-    public Response getLabelRDF_JSONRDF(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabularyRDF_JSONRDF(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -443,7 +437,7 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             String out = rdf.getModel("RDF/JSON");
             if (pretty) {
@@ -456,23 +450,23 @@ public class LabelsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{label}.jsonld")
+    @Path("/{vocabulary}.jsonld")
     @Produces("application/ld+json;charset=UTF-8")
-    public Response getLabelRDF_JSONLD(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabularyRDF_JSONLD(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_lab";
-            String query = Utils.getAllElementsForItemID(item, label);
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -480,7 +474,7 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             String out = rdf.getModel("JSON-LD");
             if (pretty) {
@@ -493,10 +487,10 @@ public class LabelsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
@@ -506,14 +500,14 @@ public class LabelsResource {
     @Path("/user/{user}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response postLabel(@PathParam("user") String user, String json) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+    public Response postVocabulary(@PathParam("user") String user, String json) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // get variables
-            String item = "ls_lab";
+            String item = "ls_voc";
             String itemID = UniqueIdentifier.getUUID();
             // create triples
-            json = Transformer.label_POST(json, itemID);
-            String triples = createLabelSPARQLUPDATE(item, itemID, user);
+            json = Transformer.vocabulary_POST(json, itemID);
+            String triples = createVocabularySPARQLUPDATE(item, itemID, user);
             // input triples
             Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
@@ -529,36 +523,36 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), itemID, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), itemID, null).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @PUT
-    @Path("/{label}/user/{user}/type/{type}")
+    @Path("/{vocabulary}/user/{user}/type/{type}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateLabel(@PathParam("label") String label, @PathParam("user") String user, @PathParam("type") String type, String json)
+    public Response updateVocabulary(@PathParam("vocabulary") String vocabulary, @PathParam("user") String user, @PathParam("type") String type, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_lab";
+            String item = "ls_voc";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, label);
+            String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            json = Transformer.label_POST(json, label);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putLabelREVISION(item, label, user, type));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putLabelSPARQLUPDATE(label));
+            json = Transformer.vocabulary_POST(json, vocabulary);
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularySPARQLUPDATE(vocabulary));
             Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             // get result als json
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String query = Utils.getAllElementsForItemID(item, label);
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -566,40 +560,40 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @PATCH
-    @Path("/{label}/user/{user}/type/{type}")
+    @Path("/{vocabulary}/user/{user}/type/{type}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateLabelPATCH(@PathParam("label") String label, @PathParam("user") String user, @PathParam("type") String type, String json)
+    public Response updateVocabularyPATCH(@PathParam("vocabulary") String vocabulary, @PathParam("user") String user, @PathParam("type") String type, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_lab";
+            String item = "ls_voc";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, label);
+            String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            json = Transformer.label_POST(json, label);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putLabelREVISION(item, label, user, type));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchLabelSPARQLUPDATE(label, json));
+            json = Transformer.vocabulary_POST(json, vocabulary);
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchVocabularySPARQLUPDATE(vocabulary, json));
             if (!json.contains("flush")) {
                 Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             }
             // get result als json
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String query = Utils.getAllElementsForItemID(item, label);
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -607,35 +601,35 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @DELETE
-    @Path("/{label}/user/{user}")
+    @Path("/{vocabulary}/user/{user}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response deleteLabel(@PathParam("label") String label, @PathParam("user") String user) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response deleteVocabulary(@PathParam("vocabulary") String vocabulary, @PathParam("user") String user) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_lab";
+            String item = "ls_voc";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, label);
+            String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteLabelREVISION(item, label, user));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteLabelSPARQLUPDATE(label));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteLabelStatusTypeSPARQLUPDATE(label));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularyREVISION(item, vocabulary, user));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularySPARQLUPDATE(vocabulary));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
             // get result als json
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String query = Utils.getAllElementsForItemID(item, label);
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -643,17 +637,17 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
-    private static String createLabelSPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String createVocabularySPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
         String revID = UniqueIdentifier.getUUID();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
@@ -662,13 +656,13 @@ public class LabelsResource {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " a ls:Label . ";
+        triples += item + ":" + itemid + " a ls:Vocabulary . ";
         triples += item + ":" + itemid + " a skos:ConceptScheme . ";
         triples += item + ":" + itemid + " ls:hasStatusType ls:Active . ";
         triples += item + ":" + itemid + " ls:sameAs "
                 + "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
                 .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", itemid).replace("$item", "label") + ">" + " . ";
+                .replace("$itemid", itemid).replace("$item", "vocabulary") + ">" + " . ";
         triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
         triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
@@ -690,7 +684,7 @@ public class LabelsResource {
         return triples;
     }
 
-    private static String putLabelREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String putVocabularyREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
         String revID = UniqueIdentifier.getUUID();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
@@ -714,7 +708,7 @@ public class LabelsResource {
         return triples;
     }
 
-    private static String deleteLabelREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String deleteVocabularyREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
         String revID = UniqueIdentifier.getUUID();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
@@ -738,156 +732,73 @@ public class LabelsResource {
         return triples;
     }
 
-    private static String putLabelSPARQLUPDATE(String id) throws IOException {
+    private static String putVocabularySPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label .} "
+                + "DELETE { ?vocabulary ?p ?o. } "
                 + "WHERE { "
-                + "?label ?p ?o. "
-                + "?label dc:identifier ?identifier. "
-                // filter delete all broader/narrower wo ?label das OBJECT ist
-                + "OPTIONAL { ?resource skos:broader ?label . } "
-                + "OPTIONAL { ?resource skos:narrower ?label . } "
+                + "?vocabulary ?p ?o. "
+                + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:preferredLang,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,skos:inScheme)) "
+                + "FILTER (?p IN (skos:hasTopConcept,dct:contributor,dc:contributor,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:isRetcatsItem)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
     }
 
-    private static String patchLabelSPARQLUPDATE(String id, String json) throws IOException, ParseException {
+    private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        JSONObject labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_lab" + ":" + id));
+        JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_voc" + ":" + id));
         List<String> deleteList = new ArrayList<String>();
         // for patch
-        JSONArray flushArray = (JSONArray) labelObject.get(rdf.getPrefixItem("flush"));
+        JSONArray flushArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("flush"));
         if (flushArray != null && !flushArray.isEmpty()) {
             for (Object element : flushArray) {
                 // nur optional
-                if (element.equals("altLabel")) {
-                    deleteList.add("skos:altLabel");
-                } else if (element.equals("note")) {
-                    deleteList.add("skos:note");
-                } else if (element.equals("definition")) {
-                    deleteList.add("skos:definition");
-                } else if (element.equals("context")) {
-                    deleteList.add("ls:context");
-                } else if (element.equals("related")) {
-                    deleteList.add("skos:related");
-                } else if (element.equals("broader")) {
-                    deleteList.add("skos:broader");
-                } else if (element.equals("narrower")) {
-                    deleteList.add("skos:narrower");
-                } else if (element.equals("closeMatch")) {
-                    deleteList.add("skos:closeMatch");
-                } else if (element.equals("exactMatch")) {
-                    deleteList.add("skos:exactMatch");
-                } else if (element.equals("relatedMatch")) {
-                    deleteList.add("skos:relatedMatch");
-                } else if (element.equals("narrowMatch")) {
-                    deleteList.add("skos:narrowMatch");
-                } else if (element.equals("broadMatch")) {
-                    deleteList.add("skos:broadMatch");
-                } else if (element.equals("seeAlso")) {
-                    deleteList.add("rdfs:seeAlso");
-                } else if (element.equals("definedBy")) {
-                    deleteList.add("rdfs:isDefinedBy");
-                } else if (element.equals("sameAs")) {
-                    deleteList.add("owl:sameAs");
+                if (element.equals("topConcept")) {
+                    deleteList.add("skos:hasTopConcept");
                 }
             }
         }
         // for else
-        JSONArray contributorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:contributor"));
+        JSONArray titleArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:title"));
+        if (titleArray != null && !titleArray.isEmpty()) {
+            deleteList.add("dc:title");
+        }
+        JSONArray descriptionArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:description"));
+        if (descriptionArray != null && !descriptionArray.isEmpty()) {
+            deleteList.add("dc:description");
+        }
+        JSONArray hasTopConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
+        if (hasTopConceptArray != null && !hasTopConceptArray.isEmpty()) {
+            deleteList.add("skos:hasTopConcept");
+        }
+        JSONArray contributorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:contributor"));
         if (contributorArray != null && !contributorArray.isEmpty()) {
             deleteList.add("dct:contributor");
             deleteList.add("dc:contributor");
         }
-        JSONArray prefLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:prefLabel"));
-        if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
-            deleteList.add("skos:prefLabel");
+        JSONArray hasReleaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
+        if (hasReleaseTypeArray != null && !hasReleaseTypeArray.isEmpty()) {
+            deleteList.add("ls:hasReleaseType");
         }
-        JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
-        if (altLabelArray != null && !altLabelArray.isEmpty()) {
-            deleteList.add("skos:altLabel");
+        JSONArray themenArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dcat:theme"));
+        if (themenArray != null && !themenArray.isEmpty()) {
+            deleteList.add("dcat:theme");
         }
-        JSONArray noteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:note"));
-        if (noteArray != null && !noteArray.isEmpty()) {
-            deleteList.add("skos:note");
-        }
-        JSONArray definitionArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:definition"));
-        if (definitionArray != null && !definitionArray.isEmpty()) {
-            deleteList.add("skos:definition");
-        }
-        JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
-        if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-            deleteList.add("ls:preferredLabel");
-        }
-        JSONArray preferredLangArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLang"));
-        if (preferredLangArray != null && !preferredLangArray.isEmpty()) {
-            deleteList.add("ls:preferredLang");
-        }
-        JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:context"));
-        if (contextArray != null && !contextArray.isEmpty()) {
-            deleteList.add("ls:context");
-        }
-        JSONArray relatedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:related"));
-        if (relatedArray != null && !relatedArray.isEmpty()) {
-            deleteList.add("skos:related");
-        }
-        JSONArray broaderArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broader"));
-        if (broaderArray != null && !broaderArray.isEmpty()) {
-            deleteList.add("skos:broader");
-        }
-        JSONArray narrowerArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrower"));
-        if (narrowerArray != null && !narrowerArray.isEmpty()) {
-            deleteList.add("skos:narrower");
-        }
-        JSONArray closeMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:closeMatch"));
-        if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
-            deleteList.add("skos:closeMatch");
-        }
-        JSONArray exactMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:exactMatch"));
-        if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
-            deleteList.add("skos:exactMatch");
-        }
-        JSONArray relatedMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:relatedMatch"));
-        if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
-            deleteList.add("skos:relatedMatch");
-        }
-        JSONArray narrowMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrowMatch"));
-        if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
-            deleteList.add("skos:narrowMatch");
-        }
-        JSONArray broadMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broadMatch"));
-        if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
-            deleteList.add("skos:broadMatch");
-        }
-        JSONArray seeAlsoArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:seeAlso"));
-        if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
-            deleteList.add("rdfs:seeAlso");
-        }
-        JSONArray isDefinedByArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:isDefinedBy"));
-        if (isDefinedByArray != null && !isDefinedByArray.isEmpty()) {
-            deleteList.add("rdfs:isDefinedBy");
-        }
-        JSONArray sameAsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("owl:sameAs"));
-        if (sameAsArray != null && !sameAsArray.isEmpty()) {
-            deleteList.add("owl:sameAs");
+        JSONArray isRetcatsItemArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:isRetcatsItem"));
+        if (isRetcatsItemArray != null && !isRetcatsItemArray.isEmpty()) {
+            deleteList.add("ls:isRetcatsItem");
         }
         // SEND DELETE
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label .} "
+                + "DELETE { ?vocabulary ?p ?o. } "
                 + "WHERE { "
-                + "?label ?p ?o. "
-                + "?label dc:identifier ?identifier. "
-                + "?label dc:identifier ?identifier. "
-                // filter delete all broader/narrower wo ?label das OBJECT ist
-                + "OPTIONAL { ?resource skos:broader ?label . } "
-                + "OPTIONAL { ?resource skos:narrower ?label . } "
+                + "?vocabulary ?p ?o. "
+                + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") ";
 
         update += "FILTER (?p IN (";
@@ -900,29 +811,29 @@ public class LabelsResource {
         return update;
     }
 
-    private static String deleteLabelSPARQLUPDATE(String id) throws IOException {
+    private static String deleteVocabularySPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?label ?p ?o. } "
+                + "DELETE { ?vocabulary ?p ?o. } "
                 + "WHERE { "
-                + "?label ?p ?o. "
-                + "?label dc:identifier ?identifier. "
+                + "?vocabulary ?p ?o. "
+                + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:preferredLang,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,dc:created,dc:modified,ls:sameAs)) "
+                + "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:isRetcatsItem,ls:sameAs,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
     }
 
-    private static String deleteLabelStatusTypeSPARQLUPDATE(String id) throws IOException {
+    private static String deleteVocabularyStatusTypeSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?label ls:hasStatusType ls:Active. } "
+                + "DELETE { ?vocabulary ls:hasStatusType ls:Active. } "
                 + "WHERE { "
-                + "?label ls:hasStatusType ls:Active. "
-                + "?label dc:identifier ?identifier. "
+                + "?vocabulary ls:hasStatusType ls:Active. "
+                + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
                 + "}";
         update = update.replace("$identifier", id);
