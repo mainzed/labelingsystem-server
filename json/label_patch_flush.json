@@ -1,0 +1,5 @@
+{
+	"label": {
+		"flush": ["altLabel","note","definition","context","related","broader","narrower","closeMatch","exactMatch","relatedMatch","narrowMatch","broadMatch","seeAlso","definedBy","sameAs"]
+	}
+}
