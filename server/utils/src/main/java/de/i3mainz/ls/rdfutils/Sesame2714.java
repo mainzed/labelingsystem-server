@@ -125,7 +125,7 @@ public class Sesame2714 {
                     ValueList.add(null);
                 } else {
                     String valuestring = value.toString();
-                    if (valuestring.startsWith("http://") || valuestring.contains("mailto")) {
+                    if (valuestring.startsWith("http://") || valuestring.contains("mailto") || valuestring.startsWith("https://")) {
                         valuestring = valuestring.substring(0, valuestring.length());
                     } else if (valuestring.contains("@")) {
                         valuestring = "\"" + valuestring.substring(1, valuestring.length());
@@ -163,10 +163,13 @@ public class Sesame2714 {
                     ValueList.add(null);
                 } else {
                     String valuestring = value.toString();
-                    if (valuestring.contains("http://")) {
+                    if (valuestring.startsWith("http://") || valuestring.contains("mailto") || valuestring.startsWith("https://")) {
                         valuestring = valuestring.substring(0, valuestring.length());
                     } else if (valuestring.contains("@")) {
                         valuestring = "\"" + valuestring.substring(1, valuestring.length());
+                    } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#string>")) {
+                        valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#string>", "");
+                        valuestring = valuestring.substring(1, valuestring.length() - 1);
                     } else {
                         valuestring = valuestring.substring(1, valuestring.length() - 1);
                     }
