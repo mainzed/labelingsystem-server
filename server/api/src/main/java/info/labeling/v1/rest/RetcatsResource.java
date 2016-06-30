@@ -41,18 +41,18 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * REST API for Vocabularies
+ * REST API rectCATS items
  *
  * @author Florian Thiery M.Sc.
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 27.06.2016
+ * @version 30.06.2016
  */
-@Path("/v1/agents")
-public class AgentsResource {
+@Path("/v1/retcats")
+public class RetcatsResource {
 
     @GET
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getAgents(
+    public Response getRetcats(
             @HeaderParam("Accept") String acceptHeader,
             @QueryParam("pretty") boolean pretty,
             @QueryParam("sort") String sort)
@@ -62,11 +62,9 @@ public class AgentsResource {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
-                    + "?s a ls:Agent . "
+                    + "?s a ls:RetCAT . "
                     + "?s dc:identifier ?identifier . "
-                    + "OPTIONAL { ?s foaf:accountName ?name . } " // because of sorting
-                    + "OPTIONAL { ?s foaf:firstName ?firstName . } " // because of sorting
-                    + "OPTIONAL { ?s foaf:lastName ?lastName . } " // because of sorting
+                    + "OPTIONAL { ?s dc:title ?title . } " // because of sorting
                     + " } ";
             // SORTING
             List<String> sortList = new ArrayList<String>();
@@ -99,7 +97,7 @@ public class AgentsResource {
             JSONObject outObject = new JSONObject();
             JSONArray outArray = new JSONArray();
             for (String element : ids) {
-                String item = "ls_age";
+                String item = "ls_ret";
                 query = Utils.getAllElementsForItemID(item, element);
                 result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
                 List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -111,10 +109,10 @@ public class AgentsResource {
                     rdf.setModelTriple(item + ":" + element, predicates.get(j), objects.get(j));
                 }
                 if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
-                    outObject = Transformer.agent_GET(rdf.getModel("RDF/JSON"), element);
+                    outObject = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), element);
                     outArray.add(outObject);
                 }
-                out.put("agents", outArray);
+                out.put("retcats", outArray);
             }
             if (acceptHeader.contains("application/json")) {
                 if (pretty) {
@@ -156,23 +154,23 @@ public class AgentsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}")
+    @Path("/{retcat}")
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getAgent(@PathParam("agent") String agent, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getRetcat(@PathParam("retcat") String retcat, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -180,10 +178,10 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             if (acceptHeader.contains("application/json")) {
-                String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+                String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -195,7 +193,7 @@ public class AgentsResource {
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
-                String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+                String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -215,7 +213,7 @@ public class AgentsResource {
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else {
-                String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+                String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -227,23 +225,23 @@ public class AgentsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.json")
+    @Path("/{retcat}.json")
     @Produces("application/json;charset=UTF-8")
-    public Response getAgent_JSON(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcat_JSON(@PathParam("retcat") String retcat, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -251,9 +249,9 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+            String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
             if (pretty) {
                 JsonParser parser = new JsonParser();
                 JsonObject json = parser.parse(out).getAsJsonObject();
@@ -264,23 +262,23 @@ public class AgentsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.xml")
+    @Path("/{retcat}.xml")
     @Produces("application/xml;charset=UTF-8")
-    public Response getAgent_XML(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcat_XML(@PathParam("retcat") String retcat) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -288,29 +286,29 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.rdf")
+    @Path("/{retcat}.rdf")
     @Produces("application/rdf+xml;charset=UTF-8")
-    public Response getAgentRDF_XML(@PathParam("agent") String agent) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getRetcatRDF_XML(@PathParam("retcat") String retcat) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -318,29 +316,29 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
             return Response.ok(RDFoutput).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.ttl")
+    @Path("/{retcat}.ttl")
     @Produces("text/turtle;charset=UTF-8")
-    public Response getAgentRDF_Turtle(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcatRDF_Turtle(@PathParam("retcat") String retcat) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -348,28 +346,28 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             return Response.ok(rdf.getModel("Turtle")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.n3")
+    @Path("/{retcat}.n3")
     @Produces("text/n3;charset=UTF-8")
-    public Response getAgentRDF_N3(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcatRDF_N3(@PathParam("retcat") String retcat) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -377,28 +375,28 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             return Response.ok(rdf.getModel("N-Triples")).build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.jsonrdf")
+    @Path("/{retcat}.jsonrdf")
     @Produces("application/json;charset=UTF-8")
-    public Response getAgentRDF_JSONRDF(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcatRDF_JSONRDF(@PathParam("retcat") String retcat, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -406,7 +404,7 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             String out = rdf.getModel("RDF/JSON");
             if (pretty) {
@@ -419,23 +417,23 @@ public class AgentsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
     }
 
     @GET
-    @Path("/{agent}.jsonld")
+    @Path("/{retcat}.jsonld")
     @Produces("application/ld+json;charset=UTF-8")
-    public Response getAgentRDF_JSONLD(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getRetcatRDF_JSONLD(@PathParam("retcat") String retcat, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String item = "ls_age";
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String item = "ls_ret";
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -443,7 +441,7 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
             String out = rdf.getModel("JSON-LD");
             if (pretty) {
@@ -456,10 +454,10 @@ public class AgentsResource {
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
-                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
             }
         }
@@ -469,21 +467,21 @@ public class AgentsResource {
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response postAgent(String json) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+    public Response postRetcat(String json) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // get variables
-            String item = "ls_age";
+            String item = "ls_ret";
             String itemID = "";
             // parse name
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-            JSONObject agentObject = (JSONObject) jsonObject.get("agent");
-            JSONArray nameArray = (JSONArray) agentObject.get("name");
+            JSONObject retcatObject = (JSONObject) jsonObject.get("retcat");
+            JSONArray nameArray = (JSONArray) retcatObject.get("title");
             for (Object element : nameArray) {
                 itemID = (String) element;
             }
             // create triples
-            json = Transformer.agent_POST(json, itemID);
-            String triples = createAgentSPARQLUPDATE(item, itemID);
+            json = Transformer.retcat_POST(json, itemID);
+            String triples = createRetcatSPARQLUPDATE(item, itemID);
             // input triples
             Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
@@ -499,35 +497,35 @@ public class AgentsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), itemID).toJSONString();
+            String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), itemID).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @PUT
-    @Path("/{agent}")
+    @Path("/{retcat}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateAgent(@PathParam("agent") String agent, String json)
+    public Response updateRetcat(@PathParam("retcat") String retcat, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_age";
+            String item = "ls_ret";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, agent);
+            String queryExist = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            json = Transformer.agent_POST(json, agent);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putAgentSPARQLUPDATE(agent));
+            json = Transformer.retcat_POST(json, retcat);
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putRetcatSPARQLUPDATE(retcat));
             Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             // get result als json
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -535,39 +533,39 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+            String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @PATCH
-    @Path("/{agent}")
+    @Path("/{retcat}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateAgentPATCH(@PathParam("agent") String agent, String json)
+    public Response updateRetcatPATCH(@PathParam("retcat") String retcat, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_age";
+            String item = "ls_ret";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, agent);
+            String queryExist = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            json = Transformer.agent_POST(json, agent);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchAgentSPARQLUPDATE(agent, json));
+            json = Transformer.retcat_POST(json, retcat);
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchRetcatSPARQLUPDATE(retcat, json));
             if (!json.contains("flush")) {
                 Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
             }
             // get result als json
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-            String query = Utils.getAllElementsForItemID(item, agent);
+            String query = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -575,127 +573,118 @@ public class AgentsResource {
                 throw new ResourceNotAvailableException();
             }
             for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
+                rdf.setModelTriple(item + ":" + retcat, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent).toJSONString();
+            String out = Transformer.retcat_GET(rdf.getModel("RDF/JSON"), retcat).toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
     @DELETE
-    @Path("/{agent}")
+    @Path("/{retcat}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response deleteAgent(@PathParam("agent") String agent) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response deleteRetcat(@PathParam("retcat") String retcat) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            String item = "ls_age";
+            String item = "ls_ret";
             // check if resource exists
-            String queryExist = Utils.getAllElementsForItemID(item, agent);
+            String queryExist = Utils.getAllElementsForItemID(item, retcat);
             List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteAgentSPARQLUPDATE(agent));
+            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteRetcatSPARQLUPDATE(retcat));
             // get result als json
-            String out = Transformer.empty_JSON("agent").toJSONString();
+            String out = Transformer.empty_JSON("retcat").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AgentsResource"))
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
 
-    private static String createAgentSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String createRetcatSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " a ls:Agent . ";
-        triples += item + ":" + itemid + " a foaf:Agent . ";
-        triples += item + ":" + itemid + " ls:sameAs "
-                + "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
-                .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", itemid).replace("$item", "agent") + ">" + " . ";
+        triples += item + ":" + itemid + " a ls:RetCAT . ";
+        triples += item + ":" + itemid + " a dcat:Dataset . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
-		triples += item + ":" + itemid + " foaf:accountName \"" + itemid + "\"" + " . ";
+		triples += item + ":" + itemid + " dc:title \"" + itemid + "\"" + " . ";
+		triples += "ls_ret:catalog a dcat:Catalog . ";
+		triples += "ls_ret:catalog dcat:dataset " + item + ":" + itemid + " . ";
+		triples += "ls_ret:catalog dc:title \"Labeling System Default Reference Thesaurus Catalog\" . ";
+		triples += "ls_ret:catalog dc:description \"Labeling System Default Reference Thesaurus Catalog\" . ";
         triples += " }";
         return triples;
     }    
 
-    private static String putAgentSPARQLUPDATE(String id) throws IOException {
+    private static String putRetcatSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?agent ?p ?o. } "
+                + "DELETE { ?retcat ?p ?o. } "
                 + "WHERE { "
-                + "?agent ?p ?o. "
-                + "?agent dc:identifier ?identifier. "
+                + "?retcat ?p ?o. "
+                + "?retcat dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (foaf:mbox,foaf:firstName,foaf:lastName,foaf:homepage,foaf:img,geo:lat,geo:lon)) "
+                + "FILTER (?p IN (dc:description,dct:publisher,dcat:theme,dct:license,dcat:accessURL,ls:retcatsquery,ls:retcatsvar)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
     }
 
-    private static String patchAgentSPARQLUPDATE(String id, String json) throws IOException, ParseException {
+    private static String patchRetcatSPARQLUPDATE(String id, String json) throws IOException, ParseException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        JSONObject agentObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_age" + ":" + id));
+        JSONObject retcatObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_ret" + ":" + id));
         List<String> deleteList = new ArrayList<String>();
         // for patch
-        JSONArray flushArray = (JSONArray) agentObject.get(rdf.getPrefixItem("flush"));
+        JSONArray flushArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("flush"));
         if (flushArray != null && !flushArray.isEmpty()) {
             for (Object element : flushArray) {
                 // nur optional
-                if (element.equals("homepage")) {
-                    deleteList.add("foaf:homepage");
-                } else if (element.equals("img")) {
-                    deleteList.add("foaf:img");
-                } else if (element.equals("lat")) {
-                    deleteList.add("geo:lat");
-                } else if (element.equals("lon")) {
-                    deleteList.add("geo:lon");
-                }
             }
         }
         // for else
-        JSONArray mboxArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:mbox"));
-        if (mboxArray != null && !mboxArray.isEmpty()) {
-            deleteList.add("foaf:mbox");
+        JSONArray descriptionArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("dc:description"));
+        if (descriptionArray != null && !descriptionArray.isEmpty()) {
+            deleteList.add("dc:description");
         }
-        JSONArray firstNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:firstName"));
-        if (firstNameArray != null && !firstNameArray.isEmpty()) {
-            deleteList.add("foaf:firstName");
+        JSONArray publisherArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("dct:publisher"));
+        if (publisherArray != null && !publisherArray.isEmpty()) {
+            deleteList.add("dct:publisher");
         }
-        JSONArray lastNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:lastName"));
-        if (lastNameArray != null && !lastNameArray.isEmpty()) {
-            deleteList.add("foaf:lastName");
+		JSONArray themeArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("dcat:theme"));
+        if (themeArray != null && !themeArray.isEmpty()) {
+            deleteList.add("dcat:theme");
         }
-        JSONArray homepageArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:homepage"));
-        if (homepageArray != null && !homepageArray.isEmpty()) {
-            deleteList.add("foaf:homepage");
+        JSONArray licenseArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("dct:license"));
+        if (licenseArray != null && !licenseArray.isEmpty()) {
+            deleteList.add("dct:license");
         }
-        JSONArray imgArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:img"));
-        if (imgArray != null && !imgArray.isEmpty()) {
-            deleteList.add("foaf:img");
+        JSONArray endpointArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("dcat:accessURL"));
+        if (endpointArray != null && !endpointArray.isEmpty()) {
+            deleteList.add("dcat:accessURL");
         }
-        JSONArray latArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lat"));
-        if (latArray != null && !latArray.isEmpty()) {
-            deleteList.add("geo:lat");
+        JSONArray queryArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("ls:retcatsquery"));
+        if (queryArray != null && !queryArray.isEmpty()) {
+            deleteList.add("ls:retcatsquery");
         }
-        JSONArray lonArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lon"));
-        if (lonArray != null && !lonArray.isEmpty()) {
-            deleteList.add("geo:lon");
+        JSONArray varArray = (JSONArray) retcatObject.get(rdf.getPrefixItem("ls:retcatsvar"));
+        if (varArray != null && !varArray.isEmpty()) {
+            deleteList.add("ls:retcatsvar");
         }
         // SEND DELETE
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?agent ?p ?o. } "
+                + "DELETE { ?retcat ?p ?o. } "
                 + "WHERE { "
-                + "?agent ?p ?o. "
-                + "?agent dc:identifier ?identifier. "
+                + "?retcat ?p ?o. "
+                + "?retcat dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") ";
 
         update += "FILTER (?p IN (";
@@ -708,14 +697,15 @@ public class AgentsResource {
         return update;
     }
 
-    private static String deleteAgentSPARQLUPDATE(String id) throws IOException {
+    private static String deleteRetcatSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?agent ?p ?o. } "
+                + "DELETE { ?retcat ?p ?o. ?catalog dcat:dataset ?retcat. } "
                 + "WHERE { "
-                + "?agent ?p ?o. "
-                + "?agent dc:identifier ?identifier. "
+                + "?retcat ?p ?o. "
+                + "?retcat dc:identifier ?identifier. "
+				+ "?catalog dcat:dataset ?retcat. "
                 + "FILTER (?identifier=\"$identifier\") "
                 + "}";
         update = update.replace("$identifier", id);
