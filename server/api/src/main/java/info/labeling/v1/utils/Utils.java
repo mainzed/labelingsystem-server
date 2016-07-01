@@ -14,5 +14,18 @@ public class Utils {
         query += "ORDER BY ASC(?p)";
         return query;
     }
+	
+	public static String getSPARQLqueryElementsForRetcatsItem(String itemid) throws ConfigException, IOException {
+        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        String prefixes = rdf.getPREFIXSPARQL();
+        String query = prefixes + "SELECT ?var ?query ?url WHERE { ";
+        query += "?retcat dc:identifier ?identifier. ";
+		query += "?retcat ls:retcatsquery ?query. ";
+		query += "?retcat ls:retcatsvar ?var. ";
+		query += "?retcat dcat:accessURL ?url. ";
+        query += "FILTER (?identifier=\"$identifier\") }";
+		query = query.replace("$identifier", itemid);
+        return query;
+    }
 
 }
