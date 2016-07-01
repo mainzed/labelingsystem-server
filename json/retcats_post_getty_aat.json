@@ -1,0 +1,12 @@
+{
+	"retcat": {
+		"title": ["GettyAAT"],
+		"description": ["Getty Art and Architecture Thesuarus"],
+		"creator": ["http://label.link/item/agent/admin"],
+		"theme": ["http://label.link/item/label/123", "http://label.link/item/label/abc"],
+		"license": ["http://opendatacommons.org/licenses/by/1-0/"],
+		"endpoint": ["http://vocab.getty.edu/sparql"],
+		"query": ["SELECT ?Subject ?prefLabel ?scopeNote { ?Subject a skos:Concept. ?Subject luc:term '$searchword' . ?Subject skos:inScheme aat: . ?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:en; rdf:value ?scopeNote]} . } ORDER BY ASC(LCASE(STR(?Term)))"],
+		"var": ["$searchword"]
+	}
+}
