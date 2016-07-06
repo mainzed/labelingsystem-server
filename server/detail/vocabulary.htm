@@ -1,0 +1,55 @@
+<html>
+<head>
+<script src="http://www1.rgzm.de/kur2/js/jquery/jquery-1.12.1.js"></script>
+<script>
+// read params via javascript
+function getUrlVars() {
+	var vars = {};
+	var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+		vars[key] = value;
+	});
+	return vars;
+}
+var ID = getUrlVars()["id"];
+console.info(ID);
+
+$(document).ready(function() {
+	var servlethost = "labeling.i3mainz.hs-mainz.de";
+	//var servlethost = "localhost:8084";
+	$.ajax({
+	    url:"http://"+servlethost+"/item/vocabulary/"+ID,
+	    type: "GET",
+		headers: {
+			Accept : "application/json"
+		},
+	    async: false,
+	    error:function(jqXHR, textStatus, errorThrown) {
+	    	console.error(textStatus);
+	    },
+	    success:function(response) {
+	    	try {
+				response = JSON.parse(response);
+			} catch (e) {}
+	    	console.info(response);
+	    	$("#content").append("<h1>Detailansicht "+ID+"</h1>");
+	    	for (var key in response) {
+    			$("#content").append('<p>Resource: ' + key + '</p>');
+			}
+			$("#content").append('<p>Semantic View: ' + '<a href="../semview/vocabulary.htm?id='+ID+'">Semantic View</a>' + '</p>');
+			$("#content").append('<p>Data: ' + '<a href="http://'+servlethost+'/api/vocabs/'+ID+'.json">JSON</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.xml">XML</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.rdf">RDF</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.ttl">TTL</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.n3">N-Triples</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.jsonld">JSON-LD</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.ttl">TTL</a>' + '</p>');
+	    	for (var key in response) {
+	    		for (var item in response[key]) {
+	    			if (item==="http://www.w3.org/2000/01/rdf-schema#label") {
+	    				$("#content").append('<h2>Label: ' + response[key][item][0]["value"] + '</h2>');
+	    			}
+	    		}
+			}
+	    }
+	});
+});
+</script>
+</head>
+<body>
+<div id="content"></div>
+</body>
+</html>
