@@ -8,6 +8,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -184,6 +185,35 @@ public class Sesame2714 {
     }
 
     public static ServletOutputStream SPARQLqueryOutputFile(String repositoryID, String SesameSever, String queryString, String format, ServletOutputStream out) throws SesameSparqlException {
+        try {
+            Repository repo = new HTTPRepository(SesameSever, repositoryID);
+            repo.initialize();
+            RepositoryConnection con = repo.getConnection();
+            TupleQuery tupleQuery = con.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
+            if ("xml".equals(format) || "XML".equals(format) || "Xml".equals(format)) {
+                SPARQLResultsXMLWriter sparqlWriterXML = new SPARQLResultsXMLWriter(out);
+                tupleQuery.evaluate(sparqlWriterXML);
+            } else if ("json".equals(format) || "JSON".equals(format) || "Json".equals(format)) {
+                SPARQLResultsJSONWriter sparqlWriterJSON = new SPARQLResultsJSONWriter(out);
+                tupleQuery.evaluate(sparqlWriterJSON);
+            } else if ("csv".equals(format) || "CSV".equals(format) || "Csv".equals(format)) {
+                SPARQLResultsCSVWriter sparqlWriterCSV = new SPARQLResultsCSVWriter(out);
+                tupleQuery.evaluate(sparqlWriterCSV);
+            } else if ("tsv".equals(format) || "TSV".equals(format) || "Tsv".equals(format)) {
+                SPARQLResultsTSVWriter sparqlWriterTSV = new SPARQLResultsTSVWriter(out);
+                tupleQuery.evaluate(sparqlWriterTSV);
+            } else {
+                SPARQLResultsJSONWriter sparqlWriter = new SPARQLResultsJSONWriter(out);
+                tupleQuery.evaluate(sparqlWriter);
+            }
+            con.close();
+        } catch (Exception e) {
+            throw new SesameSparqlException(e.getMessage());
+        }
+        return out;
+    }
+    
+    public static OutputStream SPARQLqueryOutputFileOS(String repositoryID, String SesameSever, String queryString, String format, OutputStream out) throws SesameSparqlException {
         try {
             Repository repo = new HTTPRepository(SesameSever, repositoryID);
             repo.initialize();
