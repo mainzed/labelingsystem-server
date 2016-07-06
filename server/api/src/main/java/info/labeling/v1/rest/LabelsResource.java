@@ -691,25 +691,31 @@ public class LabelsResource {
     }
 
     private static String putLabelREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
+        String typeArray[] = type.split(",");
+        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        String prefixes = rdf.getPREFIXSPARQL();
+        String triples = prefixes + "INSERT DATA { ";
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + type + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:" + type + " . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        for (String entry : typeArray) {
+            if (!entry.contains("DescriptionRevision") && !entry.contains("ShareRevision") && !entry.contains("SystemRevision") && !entry.contains("LinkingRevision")) {
+                entry = "ModifyRevision";
+            }
+            String revID = UniqueIdentifier.getUUID();
+            triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
+            triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
+            triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
+            triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
+            triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
+            triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
+            triples += "ls_rev" + ":" + revID + " dc:description \"" + entry + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " dct:type ls:" + entry + " . ";
+            triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        }
         triples += " }";
         return triples;
     }
