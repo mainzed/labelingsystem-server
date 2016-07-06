@@ -1,0 +1,1421 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Labeling System Vocabulary</title>
+
+<style type="text/css">
+
+body {
+  padding: 2em 70px 2em 70px;
+  margin: 0;
+  font-family: sans-serif;
+  color: black;
+  background: white;
+}
+
+a:link    {color: blue;text-decoration:underline}
+a:visited {color: blue;text-decoration:underline}
+a:hover   {color: blue;text-decoration:underline}
+a:active  {color: blue;text-decoration:underline}
+
+h1, h2, h3, h4, h5, h6 { text-align: left }
+h1, h2, h3 { color: #036; background: white }
+h1 { font: 170% sans-serif }
+h2 { font: 140% sans-serif }
+h3 { font: 120% sans-serif }
+h4 { font: bold 100% sans-serif }
+h5 { font: italic 100% sans-serif }
+h6 { font: small-caps 100% sans-serif }
+
+p {
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+}
+
+dt, dd { margin-top: 0; margin-bottom: 0 } /* opera 3.50 */
+dt { font-weight: bold }
+
+table 
+{ 
+  width: 100%;
+  border-top: 1px solid #000; 
+  border-left: 1px solid #000; 
+  margin-bottom: 10px; 
+}
+
+table th 
+{ 
+  background: #ccc; 
+}
+
+table td, table th 
+{ 
+  border-right: 1px solid #000; 
+  border-bottom: 1px solid #000; 
+  padding: .5em; 
+  vertical-align:top;
+}
+
+</style>
+
+</head>
+
+<body>
+<h1>Labeling System Vocabulary</h1>
+<h2>21 March 2016 - <a href="https://en.wikipedia.org/wiki/Arthur_Fry" target="_blank">Fry</a> Edition</h2>
+<dt>This version:</dt>
+<dd><a href="http://labeling.i3mainz.hs-mainz.de/vocab/Fry/index.htm">http://labeling.i3mainz.hs-mainz.de/vocab/Fry/index.htm</a><br/></dd>
+<dt>Latest version:</dt>
+<dd><a href="http://labeling.i3mainz.hs-mainz.de/vocab/index.htm">http://labeling.i3mainz.hs-mainz.de/vocab/index.htm</a></dd>
+<dt>Previous version:</dt>
+<dd><a href="http://labeling.i3mainz.hs-mainz.de/vocab/Edison/index.htm">http://labeling.i3mainz.hs-mainz.de/vocab/Edison/index.htm</a><br/></dd>
+<dt>Authors:</dt>
+<dd><a href="http://www.i3mainz.hs-mainz.de/de/personal/florian.thiery">Florian Thiery</a> - Institute for Spatial Information and Surveying Technology – <a href="http://www.i3mainz.hs-mainz.de">i3mainz</a></dd>
+<br/>
+<hr/>
+
+<h2>Status of this Document</h2>
+<p>This document describes the ontology available for the Labeling System namespace.</p>
+<p>A edition history is available <a href="http://labeling.i3mainz.hs-mainz.de/vocab/history">here</a>.</p>
+</p>
+<br/>
+<hr/>
+
+<h2>Index of Contents</h2>
+<p>1. <a href="#introduction">Introduction</a></p>
+<p>2. <a href="#vocabulary">Labeling System Vocabulary Overview</a></p>
+<p>&nbsp;&nbsp;&nbsp;I. <a href="#ontology">Ontology</a></p>
+<p>&nbsp;&nbsp;&nbsp;II. <a href="#classes">Classes</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. <a href="#classes_1">Super Class</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. <a href="#classes_2">Main Classes</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. <a href="#classes_3">Certainty Classes</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d. <a href="#classes_4">Revision Type Classes</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e. <a href="#classes_5">Geometry Representation Classes</a></p>
+<p>&nbsp;&nbsp;&nbsp;III. <a href="#properties">Properties</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a. <a href="#properties_1">connecting properties</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;b. <a href="#properties_2">describing properties</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;c. <a href="#properties_3">GUI properties</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d. <a href="#properties_4">SPARQL endpoint properties</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e. <a href="#properties_5">describing and annotating properties for a rdf:Property</a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;f. <a href="#properties_6">describing properties for Geometries</a></p>
+<p>3. <a href="#references">References</a></p>
+<p>&nbsp;&nbsp;&nbsp;I. <a href="#overview">Overview</a></p>
+<p>&nbsp;&nbsp;&nbsp;II. <a href="#revision">Revision change note (label creation or modification)</a></p>
+<p>&nbsp;&nbsp;&nbsp;III. <a href="#PropertySchemeVsConceptScheme">ls:PropertyScheme vs. skos:ConceptScheme</a></p>
+<p>&nbsp;&nbsp;&nbsp;IV. <a href="#certaintyG">Property Certainty Annotation</a></p>
+<p>&nbsp;&nbsp;&nbsp;V. <a href="#certaintyBN">Property Certainty Annotation for Broader/Narrower Label</a></p>
+<p>&nbsp;&nbsp;&nbsp;VI. <a href="#geom">Geometry Properties</a></p>
+<br/>
+<hr/>
+
+<a name="introduction"></a>
+<h2>Introduction</h2>
+<p>The Labeling System ontology provides a vocabulary of classes and properties for the use inside the Labeling System.</p>
+<p>The Labeling System Ontology is available at <a href="http://labeling.i3mainz.hs-mainz.de/ontology">http://labeling.i3mainz.hs-mainz.de/ontology</a>.</p>
+<br/>
+<hr/>
+
+<a name="vocabulary"></a>
+<h2>Labeling System Vocabulary Overview</h2>
+<p>The following table gives a none-normative overview of the Labeling System vocabulary. This document can be referenced directly, by its own URI 
+<a href="http://labeling.i3mainz.hs-mainz.de/vocab/index.htm">http://labeling.i3mainz.hs-mainz.de/vocab/index.htm</a>, or indirectly, by content negotiation from the Labeling System namespace URI
+<a href="http://labeling.i3mainz.hs-mainz.de/vocab#">http://labeling.i3mainz.hs-mainz.de/vocab#</a>. Download the RDF representation here: 
+<a href="ls.rdf">RDF</a> or  
+<a href="ls.ttl">Turtle</a> .</p>
+
+<a name="ontology"></a>
+<h3>Ontology</h3>
+
+<table>
+
+	<tr>
+      <th colspan="2" id="L6">http://labeling.i3mainz.hs-mainz.de/vocab#</th>
+    </tr>
+    <tr>
+      <td width='150px'>Label: </td>
+      <td><em>Labeling System Vocabulary@en</em></td>
+    </tr>
+    <tr>
+      <td>Date: </td>
+      <td><em>21.03.2016</em></td>
+    </tr>
+	<tr>
+      <td>Description: </td>
+      <td><em>A RDF vocabulary describing classes and properties for managing the relationships in the Labeling System@en</em></td>
+    </tr>
+	<tr>
+      <td>Version: </td>
+      <td><em>Fry Edition</em></td>
+    </tr>
+	<tr>
+      <td>Creator: </td>
+      <td><em>Florian Thiery M.Sc., i3mainz - Institute for Spatial Information and Surveying Technology, Hochschule Mainz University of Applied Sciences</em></td>
+    </tr>
+    <tr>
+      <td>Licence: </td>
+      <td><em><a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">http://creativecommons.org/licenses/by-sa/4.0/</a></em></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+<a name="classes"></a>
+<h3>Classes</h3>
+
+<a name="classes_1"></a>
+<h4>I. Super Class</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#SuperClass" id="SuperConcept">ls:SuperConcept</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="C1_1"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="http://www.w3.org/2000/01/rdf-schema#Resource" target="_blank">http://www.w3.org/2000/01/rdf-schema#Resource</a></code>, <code><a href="http://www.w3.org/2000/01/rdf-schema#Class" target="_blank">http://www.w3.org/2000/01/rdf-schema#Class</a></code>, <code><a href="http://www.w3.org/2004/02/skos/core#Concept" target="_blank">http://www.w3.org/2004/02/skos/core#Concept</a></code>, <code><a href="http://www.opengis.net/ont/geosparql#Feature" target="_blank">http://www.opengis.net/ont/geosparql#SpatialObject</a></code></td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#SuperClass" target="_blank">Section: Super Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Labeling System Super Class</em></td>
+    </tr>
+	
+</table>
+
+<a name="classes_2"></a>
+<h4>II. Main Classes</h4>
+
+<table>
+	
+	<tr>
+      <th colspan="2"><a href="#Project" id="Project">ls:Project</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="C2_1"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Project</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#Vocabulary" id="Vocabulary">ls:Vocabulary</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C2_2"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Vocabulary</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#Label" id="Label">ls:Label</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C2_3"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Label</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#Revision" id="Revision">ls:Revision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C2_8"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#GUI" id="GUI">ls:GUI</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C2_10"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Labeling System GUI</em></td>
+    </tr>
+
+  <tr>
+      <th colspan="2"><a href="#Agent" id="Agent">ls:Agent</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C2_9"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses" target="_blank">Section: Main Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Agent</em></td>
+    </tr>
+    
+</table>
+
+<a name="classes_3"></a>
+<h4>III. Certainty Classes</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#Certainty" id="Certainty">ls:Certainty</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="C3_1"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#CertaintyClasses" target="_blank">Section: Certainty Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Certainty</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#CertaintyHigh" id="CertaintyHigh">ls:CertaintyHigh</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C3_2"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#Certainty">ls:Certainty</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#CertaintyClasses" target="_blank">Section: Certainty Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>High Certainty</em></td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html" target="_blank">http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html</a></code></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#CertaintyMedium" id="CertaintyMedium">ls:CertaintyMedium</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C3_3"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#Certainty">ls:Certainty</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#CertaintyClasses" target="_blank">Section: Certainty Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Medium Certainty</em></td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html" target="_blank">http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html</a></code></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#CertaintyLow" id="CertaintyLow">ls:CertaintyLow</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C3_4"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#Certainty">ls:Certainty</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#CertaintyClasses" target="_blank">Section: Certainty Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Low Certainty</em></td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html" target="_blank">http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html</a></code></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#CertaintyUnknown" id="CertaintyUnknown">ls:CertaintyUnknown</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C3_5"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#Certainty">ls:Certainty</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#CertaintyClasses" target="_blank">Section: Certainty Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Unknown Certainty</em></td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html" target="_blank">http://www.tei-c.org/release/doc/tei-p5-doc/en/html/ref-data.certainty.html</a></code></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+<a name="classes_4"></a>
+<h4>IV. Revision Type Classes</h4>
+
+<table>
+	
+	<tr>
+      <th colspan="2"><a href="#RevisionType" id="RevisionType">ls:RevisionType</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="C4_1"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#CreateRevision" id="CreateRevision">ls:CreateRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_2"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a create event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#DeleteRevision" id="DeleteRevision">ls:DeleteRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_3"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a delete event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#ConnectDisconnectRevision" id="ConnectDisconnectRevision">ls:ConnectDisconnectRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_4"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a connect or disconnect event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#PublishHideRevision" id="PublishHideRevision">ls:PublishHideRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_5"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a publish or hide event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#TexturalDescriptionRevision" id="TexturalDescriptionRevision">ls:TexturalDescriptionRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_6"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a textural description modification event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#RelationRevision" id="RelationRevision">ls:RelationRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_7"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a relation linking modification event</em></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#ContributorRevision" id="ContributorRevision">ls:ContributorRevision</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="C4_8"></code> </td>
+    </tr>
+	<tr>
+      <td>SubClassOf: </td>
+      <td><code><a href="#RevisionType">ls:RevisionType</a></code><br />
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses" target="_blank">Section: RevisionType Classes</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Revision Type to describe a contributor add or delete event</em></td>
+    </tr>
+    
+  </tbody>
+</table>
+
+<a name="properties"></a>
+<h3>Properties</h3>
+
+<a name="properties_1"></a>
+<h4>I. connecting properties</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#contains" id="contains">ls:contains</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P1_1"></code> </td>
+    </tr>
+    <tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#ConnectingProperties" target="_blank">Section: Connecting Properties</a></code></td>
+    </tr>
+	<tr>
+      <td>Label: </td>
+      <td><em>contains</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Project">ls:Project</a></code>, <code><a href="#Vocabulary">ls:Vocabulary</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#Label">ls:Label</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Inverse of:</td>
+      <td><code><a href="#belongsTo">ls:belongsTo</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#belongsTo" id="belongsTo">ls:belongsTo</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P1_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#ConnectingProperties" target="_blank">Section: Connecting Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>belongs to</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#Label">ls:Label</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="#Vocabulary">ls:Project</a></code>, <code><a href="#Label">ls:Vocabulary</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Inverse of:</td>
+      <td><code><a href="#contains">ls:contains</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#inPropertyScheme" id="inPropertyScheme">ls:inPropertyScheme</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P1_3"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#ConnectingProperties" target="_blank">Section: Connecting Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>is in Property Scheme</em></td>
+    </tr>
+  <tr>
+      <td>Domain:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="#PropertyScheme">ls:PropertyScheme</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#hasGUI" id="hasGUI">ls:hasGUI</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P1_4"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#ConnectingProperties" target="_blank">Section: Connecting Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has GUI</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="http://xmlns.com/foaf/0.1/Agent" target="_blank">http://xmlns.com/foaf/0.1/Agent</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="#GUI">ls:GUI</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Inverse of:</td>
+      <td><code><a href="#isGUIof">ls:isGUIof</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#isGUIof" id="isGUIof">ls:isGUIof</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P1_5"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#ConnectingProperties" target="_blank">Section: Connecting Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>is GUI of</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#GUI">ls:GUI</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="http://xmlns.com/foaf/0.1/Agent" target="_blank">http://xmlns.com/foaf/0.1/Agent</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Inverse of:</td>
+      <td><code><a href="#hasGUI">ls:hasGUI</a></code><br />
+      </td>
+    </tr>
+
+</table>
+
+<a name="properties_2"></a>
+<h4>II. describing properties</h4>
+
+<table>
+	
+	<tr>
+      <th colspan="2"><a href="#identifier" id="identifier">ls:identifier</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P2_1"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has identifier</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+	  <td><code><a href="#Project">ls:Project</a></code>, <code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#Label">ls:Label</a></code>, <code><a href="#Annotation">ls:Annotation</a></code>, <code><a href="#PropertyScheme">ls:PropertyScheme</a></code>, <code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code>, <code><a href="#Revision">ls:Revision</a></code>, <code><a href="http://xmlns.com/foaf/0.1/Agent">http://xmlns.com/foaf/0.1/Agent</a></code>, <code><a href="#GUI">ls:GUI</a></code>, <code><a href="#SPARQLendpoint">ls:SPARQLendpoint</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br /></td>
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#sameas" id="sameas">ls:sameAs</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P2_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>same as</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Project">ls:Project</a></code>, <code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#Label">ls:Label</a></code>, <code><a href="#Annotation">ls:Annotation</a></code>, <code><a href="#PropertyScheme">ls:PropertyScheme</a></code>, <code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code>, <code><a href="#Revision">ls:Revision</a></code>, <code><a href="http://xmlns.com/foaf/0.1/Agent">http://xmlns.com/foaf/0.1/Agent</a></code>, <code><a href="#GUI">ls:GUI</a></code>, <code><a href="#SPARQLendpoint">ls:SPARQLendpoint</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2000/01/rdf-schema#Resource" target="_blank">http://www.w3.org/2000/01/rdf-schema#Resource</a></code></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#state" id="contains">ls:state</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P2_3"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has state</em></td>
+    </tr>
+	   <tr>
+      <td>Domain:</td>
+      <td><code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#PropertyScheme">ls:PropertyScheme</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+     <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br /></td>
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#prefLang" id="prefLang">ls:prefLang</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P2_4"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has preference language</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Label">ls:Label</a></code>, <code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br /></td>
+      </td>
+    </tr>
+
+    <tr>
+      <th colspan="2"><a href="#hasContext" id="hasContext">ls:hasContext</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P2_5"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has context</em></td>
+    </tr>
+  <tr>
+      <td>Domain:</td>
+      <td><code><a href="#Label">ls:Label</a></code>, <code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br /></td>
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#changeNoteItem" id="changeNoteItem">ls:changeNoteItem</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P2_6"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties" target="_blank">Section: Describing Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has changenote item</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#Revision">ls:Revision</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="#Project">ls:Project</a></code>, <code><a href="#Vocabulary">ls:Vocabulary</a></code>, <code><a href="#Label">ls:Label</a></code>, <code><a href="#PropertyScheme">ls:PropertyScheme</a></code>, <code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Inverse of:</td>
+      <td><code><a href="http://www.w3.org/2004/02/skos/core#Concept">http://www.w3.org/2004/02/skos/core#Concept</a></code><br />
+      </td>
+    </tr>
+
+</table>
+
+<a name="properties_3"></a>
+<h4>III. GUI properties</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#GUIcreator" id="GUIcreator">ls:GUIcreator</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P3_1"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GUIProperties" target="_blank">Section: GUI Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>GUI creator</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#GUI">ls:GUI</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#GUIprefLang" id="GUIprefLang">ls:GUIprefLang</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P3_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GUIProperties" target="_blank">Section: GUI Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>GUI preference language</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#GUI">ls:GUI</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#GUImenuLang" id="GUImenuLang">ls:GUImenuLang</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P3_3"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GUIProperties" target="_blank">Section: GUI Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>GUI menu language</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#GUI">ls:GUI</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br />
+      </td>
+    </tr>
+
+</table>
+
+<a name="properties_4"></a>
+<h4>IV. SPARQL endpoint properties</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#sparqlname" id="sparqlname">ls:sparqlname</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P4_1"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#SPARQLendpointProperties" target="_blank">Section: SPARQL endpoint Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>SPARQL endpoint name</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#SPARQLendpoint">ls:SPARQLendpoint</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#sparqlxmluri" id="sparqlxmluri">ls:sparqlxmluri</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P4_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#SPARQLendpointProperties" target="_blank">Section: SPARQL endpoint Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>SPARQL endpoint URI for get a XML response</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#SPARQLendpoint">ls:SPARQLendpoint</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2000/01/rdf-schema#Resource" target="_blank">http://www.w3.org/2000/01/rdf-schema#Resource</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#sparqlquery" id="sparqlquery">ls:sparqlquery</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P4_3"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#SPARQLendpointProperties" target="_blank">Section: SPARQL endpoint Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>SPARQL query</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#SPARQLendpoint">ls:SPARQLendpoint</a></code><br />
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br />
+      </td>
+    </tr>
+
+</table>
+
+<a name="properties_5"></a>
+<h4>V. describing and annotating properties for a rdf:Property</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#relatedProperty" id="relatedProperty">ls:relatedProperty</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P5_1"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has related property</em></td>
+    </tr>
+  <tr>
+      <td>Domain:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+     <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code>
+    </tr>
+
+    <tr>
+      <th colspan="2"><a href="#broadProperty" id="broadProperty">ls:broadProperty</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P5_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has broad property</em></td>
+    </tr>
+  <tr>
+      <td>Domain:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code>
+      </td>
+    </tr>
+
+    <tr>
+      <th colspan="2"><a href="#narrowProperty" id="narrowProperty">ls:narrowProperty</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P5_3"></code></td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has narrow property</em></td>
+    </tr>
+  <tr>
+      <td>Domain:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code>
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#hasPropertyAnnotation" id="hasPropertyAnnotation">ls:hasPropertyAnnotation</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P5_4"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has property annotation</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#Label">ls:Label</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="#Annotation">ls:Annotation</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#hasCertainty" id="hasCertainty">ls:hasCertainty</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P5_5"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has certainty</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#Annotation">ls:Annotation</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="#Certainty">ls:Certainty</a></code><br />
+      </td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#hasExternalProperty" id="hasExternalProperty">ls:hasExternalProperty</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P5_6"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#PropertyAnnotationProperties" target="_blank">Section: Property Annotation Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has external property</em></td>
+    </tr>
+    <tr>
+      <td>Domain:</td>
+      <td><code><a href="#PropertyScheme">ls:PropertyScheme</a></code><br />
+      </td>
+    </tr>
+	<tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/1999/02/22-rdf-syntax-ns#Property" target="_blank">http://www.w3.org/1999/02/22-rdf-syntax-ns#Property</a></code></td>
+      </td>
+    </tr>
+
+</table>
+
+<a name="properties_6"></a>
+<h4>VI. describing properties for Geometries</h4>
+
+<table>
+
+	<tr>
+      <th colspan="2"><a href="#hasSRID" id="hasSRID">ls:hasSRID</a> </th>
+    </tr>
+    <tr>
+      <td width='150px'>URI: </td>
+      <td><code id="P6_1"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GeometryProperties" target="_blank">Section: Geometry Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has Spatial Reference Identifier (SRID)</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Geometry">ls:Geometry</a></code>, <code><a href="http://www.opengis.net/ont/geosparql#SpatialObject" target="_blank">http://www.opengis.net/ont/geosparql#SpatialObject</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+     <td><code><a href="http://www.w3.org/2000/01/rdf-schema#Resource" target="_blank">http://www.w3.org/2000/01/rdf-schema#Resource</a></code>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.opengis.net/def/crs/EPSG/0/" target="_blank">http://www.opengis.net/def/crs/EPSG/0/</a></code></td>
+    </tr>
+
+    <tr>
+      <th colspan="2"><a href="#asGeoJSON" id="asGeoJSON">ls:asGeoJSON</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P6_2"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GeometryProperties" target="_blank">Section: Geometry Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>has broad property</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Geometry">ls:Geometry</a></code>, <code><a href="http://www.opengis.net/ont/geosparql#SpatialObject" target="_blank">http://www.opengis.net/ont/geosparql#SpatialObject</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.w3.org/2001/XMLSchema#string" target="_blank">http://www.w3.org/2001/XMLSchema#string</a></code><br /></td>
+      </td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://geojson.org/geojson-spec.html" target="_blank">http://geojson.org/geojson-spec.html</a></code></td>
+    </tr>
+	
+	<tr>
+      <th colspan="2"><a href="#simpleFeatureType" id="simpleFeatureType">ls:simpleFeatureType</a> </th>
+    </tr>
+    <tr>
+      <td>URI: </td>
+      <td><code id="P6_3"></code> </td>
+    </tr>
+	<tr>
+      <td>Definition: </td>
+      <td><code><a href="http://labeling.i3mainz.hs-mainz.de/ls-reference#GeometryProperties" target="_blank">Section: Geometry Properties</a></code></td>
+    </tr>
+    <tr>
+      <td>Label: </td>
+      <td><em>Simple Feature Type of the Geometry</em></td>
+    </tr>
+	<tr>
+      <td>Domain:</td>
+      <td><code><a href="#Geometry">ls:Geometry</a></code>, <code><a href="http://www.opengis.net/ont/geosparql#SpatialObject" target="_blank">http://www.opengis.net/ont/geosparql#SpatialObject</a></code><br /></td>
+      </td>
+    </tr>
+    <tr>
+      <td>Range:</td>
+      <td><code><a href="http://www.opengis.net/ont/sf#Geometry" target="_blank">http://www.opengis.net/ont/sf#Geometry</a></code><br /></td>
+      </td>
+    </tr>
+	<tr>
+      <td>seeAlso: </td>
+      <td><code><a href="http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=40114" target="_blank">http://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=40114</a></code></td>
+    </tr>
+
+</table>
+
+<a name="references"></a>
+<h2>References</h2>
+<a name="overview"></a>
+<h3>Overview</h3>
+<p><a href="vocab.png" target="_blank"><img src="vocab.png" width="65%"></a></p>
+<a name="revision"></a>
+<h3>Revision change note (create, modify, remove)</h3>
+<p><a href="revision.png" target="_blank"><img src="revision.png" width="65%"></a></p>
+<br/>
+<hr/>
+<p><a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a>&nbsp;&nbsp;This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+
+<script>
+	function setLinkText(id, extension) {
+		var host = document.location.origin;
+		return document.getElementById(id).innerHTML = host+extension;
+	}
+	function setLinkCode(id, extension) {
+		var host = document.location.origin;
+		return document.getElementById(id).innerHTML = host+extension;
+	}
+
+	setLinkText("C1_1","/vocab#SuperConcept");
+	
+	setLinkText("C2_1","/vocab#Project");
+	setLinkText("C2_2","/vocab#Vocabulary");
+	setLinkText("C2_3","/vocab#Label");
+	setLinkText("C2_4","/vocab#Geometry");
+	setLinkText("C2_5","/vocab#Annotation");
+	setLinkText("C2_6","/vocab#PropertyScheme");
+	setLinkText("C2_7","/vocab#Property");
+	setLinkText("C2_8","/vocab#Revision");
+	setLinkText("C2_9","/vocab#Agent");
+	setLinkText("C2_10","/vocab#GUI");
+	setLinkText("C2_11","/vocab#SPARQLendpoint");
+	
+	setLinkText("C3_1","/vocab#Certainty");
+	setLinkText("C3_2","/vocab#CertaintyHigh");
+	setLinkText("C3_3","/vocab#CertaintyMedium");
+	setLinkText("C3_4","/vocab#CertaintyLow");
+	setLinkText("C3_5","/vocab#CertaintyUnknown");
+	
+	setLinkText("C4_1","/vocab#RevisionType");
+	setLinkText("C4_2","/vocab#CreateRevision");
+	setLinkText("C4_3","/vocab#DeleteRevision");
+	setLinkText("C4_4","/vocab#ConnectDisconnectRevision");
+	setLinkText("C4_5","/vocab#PublishHideRevision");
+	setLinkText("C4_6","/vocab#TexturalDescriptionRevision");
+	setLinkText("C4_7","/vocab#RelationRevision");
+	setLinkText("C4_8","/vocab#ContributorRevision");
+
+	setLinkText("P1_1","/vocab#contains");
+	setLinkText("P1_2","/vocab#belongsTo");
+	setLinkText("P1_3","/vocab#inPropertyScheme");
+	setLinkText("P1_4","/vocab#hasGUI");
+	setLinkText("P1_5","/vocab#isGUIof");
+	
+	setLinkText("P2_1","/vocab#identifier");
+	setLinkText("P2_2","/vocab#sameAs");
+	setLinkText("P2_3","/vocab#state");
+	setLinkText("P2_4","/vocab#prefLang");
+	setLinkText("P2_5","/vocab#hasContext");
+	setLinkText("P2_6","/vocab#changeNoteItem");
+	
+	setLinkText("P3_1","/vocab#GUIcreator");
+	setLinkText("P3_2","/vocab#GUIprefLang");
+	setLinkText("P3_3","/vocab#GUImenuLang");
+	
+	setLinkText("P4_1","/vocab#sparqlname");
+	setLinkText("P4_2","/vocab#sparqlxmluri");
+	setLinkText("P4_3","/vocab#sparqlquery");
+
+	setLinkText("P5_1","/vocab#relatedProperty");
+	setLinkText("P5_2","/vocab#broadProperty");
+	setLinkText("P5_3","/vocab#narrowProperty");
+	setLinkText("P5_4","/vocab#hasPropertyAnnotation");
+	setLinkText("P5_5","/vocab#hasCertainty");
+	setLinkText("P5_6","/vocab#hasExternalProperty");
+	
+	setLinkText("P6_1","/vocab#hasSRID");
+	setLinkText("P6_2","/vocab#asGeoJSON");
+	setLinkText("P6_3","/vocab#simpleFeatureType");
+	
+</script>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+@prefix ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix geo: <http://www.opengis.net/ont/geosparql#>.
+@prefix sf: <http://www.opengis.net/ont/sf#>.
+@prefix dcat: <http://www.w3.org/ns/dcat#>.
+
+# Ontology
+
+ls: a owl:Ontology;
+	rdfs:label "Labeling System Vocabulary"@en;
+	dcterms:created "2016-07-26"^^xsd:date;
+	dcterms:description "A RDF vocabulary describing the Labeling System ontology"@en;
+	owl:versionInfo "Aldgate Edition";
+	dcterms:creator "Florian Thiery M.Sc., i3mainz - Institute for Spatial Information and Surveying Technology, Hochschule Mainz University of Applied Sciences";
+	dcterms:licence <http://creativecommons.org/licenses/by/4.0/>;
+	rdfs:seeAlso <http://labeling.i3mainz.hs-mainz.de/vocab/index.htm>.
+
+# Classes
+
+# Super Class
+
+ls:SuperClass a owl:Class;
+	rdfs:SubClassOf rdfs:Resource, rdfs:Class, skos:Concept, geo:SpatialObject;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#SuperClass>;
+	rdfs:label "Labeling System Super Class"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+# Main Classes
+
+ls:Vocabulary a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses>;
+	rdfs:label "Labeling System Vocabulary"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Label a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses>;
+	rdfs:label "Labeling System Label"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Revision a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses>;
+	rdfs:label "Labeling System Revision"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Agent a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses>;
+	rdfs:label "Labeling System Agent"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:RetCAT a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#MainClasses>;
+	rdfs:label "Labeling System RetCAT item"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+# Release Type Classes
+
+ls:ReleaseType a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#ReleaseTypeClasses>;
+	rdfs:label "release type"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Public a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ReleaseType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#ReleaseTypeClasses>;
+	rdfs:label "public item"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Hidden a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ReleaseType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#ReleaseTypeClasses>;
+	rdfs:label "hidden item"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+# Status Type Classes
+
+ls:StatusType a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#StatusTypeClasses>;
+	rdfs:label "status type"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Active a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:StatusType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#StatusTypeClasses>;
+	rdfs:label "active item"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:Deleted a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:StatusType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#StatusTypeClasses>;
+	rdfs:label "deleted item"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+# Revision Type Classes
+	
+ls:RevisionType a owl:Class, ls:SuperClass;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+	
+ls:CreateRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:RevisionType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a create event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:ModifyRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:RevisionType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a modification event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+	
+ls:DeleteRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:RevisionType;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a delete event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+	
+ls:DescriptionRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ModifyRevision;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a textural description modification event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:LinkingRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ModifyRevision;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a linking modification event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:ShareRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ModifyRevision;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a share modification event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:SystemRevision a owl:Class, ls:SuperClass;
+	rdfs:SubClassOf ls:ModifyRevision;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#RevisionTypeClasses>;
+	rdfs:label "Revision Type to describe a internal modification event"@en;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+# Properties
+
+# describing properties
+
+ls:hasReleaseType a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "has release type"@en;
+	rdfs:domain ls:Vocabulary;
+	rdfs:range ls:ReleaseType;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:hasStatusType a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "has status type"@en;
+	rdfs:domain ls:Vocabulary, ls:Label;
+	rdfs:range ls:StatusType;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:isRetcatsItem a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "is a item in the retCATS application"@en;
+	rdfs:domain ls:Vocabulary;
+	rdfs:range xsd:boolean;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:sameAs a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "same as HTML view"@en;
+	rdfs:domain ls:Vocabulary, ls:Label, ls:Agent;
+	rdfs:range rdfs:Resource;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:preferredLabel a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "has preffered label"@en;
+	rdfs:domain ls:Label;
+	rdfs:range xsd:string;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:preferredLang a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "has preffered language"@en;
+	rdfs:domain ls:Label;
+	rdfs:range xsd:string;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:hasContext a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "has context ID"@en;
+	rdfs:domain ls:Label;
+	rdfs:range xsd:string;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:retcatsquery a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "query to get results for the retCAT application"@en;
+	rdfs:domain ls:RetCAT;
+	rdfs:range xsd:string;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
+
+ls:retcatsvar a owl:ObjectProperty, rdf:Property;
+	skos:definition <http://labeling.i3mainz.hs-mainz.de/ls-reference#DescribingProperties>;
+	rdfs:label "variable to get results for the retCAT application"@en;
+	rdfs:domain ls:RetCAT;
+	rdfs:range xsd:string;
+	rdfs:isDefinedBy <http://labeling.i3mainz.hs-mainz.de/vocab>.
