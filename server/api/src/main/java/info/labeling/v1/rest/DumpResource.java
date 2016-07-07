@@ -42,7 +42,7 @@ public class DumpResource {
 	public static String tmpDirPath2 = "";
 	public static String downloadLink = "";
 	public static String size_url = "";
-	public static long sleepTimeInMills = 5000; //3600000 = 1 hour | 43200000 = 12 hours
+	public static long sleepTimeInMills = 43200000; //3600000 = 1 hour | 43200000 = 12 hours
 	public static String lastDump = "";
 	public static String lastDumpTime = "";
 	private static final List<String> fileList = new ArrayList<String>();
@@ -62,17 +62,19 @@ public class DumpResource {
 			html_footer += "</html>";
 			listFilesForFolder();
 			out = "<h1>Index of Labeling System Dumps</h1>";
-			out += "<table style=\"width:75%\" border='1'>";
-			out += "<tr><th>Name</th><th>Last modified</th><th>Size</th><th>Triples</th></tr>";
-			for (String file : fileList) {
-				numberOfTriples = "";
-				try {
-					numberOfTriples = (file.split("#")[0]).split("-")[2].replace(".tar.gz", "") + " triples";
-				} catch (Exception e) {
+			if (fileList.size() > 0) {
+				out += "<table style=\"width:75%\" border='1'>";
+				out += "<tr><th>Name</th><th>Last modified</th><th>Size</th><th>Triples</th></tr>";
+				for (String file : fileList) {
+					numberOfTriples = "";
+					try {
+						numberOfTriples = (file.split("#")[0]).split("-")[2].replace(".tar.gz", "") + " triples";
+					} catch (Exception e) {
+					}
+					out += "<tr><td width='25%'><a href='" + filePath + file.split("#")[0] + "'>" + file.split("#")[0] + "</a></td><td width='25%'>" + file.split("#")[2] + "</td><td width='25%'>" + file.split("#")[1] + " KB</td><td width='25%'> " + numberOfTriples + "</td></tr>";
 				}
-				out += "<tr><td width='25%'><a href='" + filePath + file.split("#")[0] + "'>" + file.split("#")[0] + "</a></td><td width='25%'>" + file.split("#")[2] + "</td><td width='25%'>" + file.split("#")[1] + " KB</td><td width='25%'> " + numberOfTriples + "</td></tr>";
+				out += "</table>";
 			}
-			out += "</table>";
 			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.DumpResource"))
@@ -100,7 +102,7 @@ public class DumpResource {
 
 	@POST
 	@Path("/start")
-	public Response startDumping(@FormParam("mode") String mode) {
+	public Response startDumping() {
 		try {
 			fileDir = PropertiesLocal.getPropertyParam("dump_server");
 			filePath = PropertiesLocal.getPropertyParam("dump_web");
@@ -109,9 +111,14 @@ public class DumpResource {
 			tmpDirPath = fileDir + "tmpDir_1" + "/";
 			tmpDirPath2 = fileDir + "tmpDir_2" + "/";
 			dumping = true;
+			String html_header = "<html>";
+			html_header += "<head>";
+			html_header += "</head>";
+			html_header += "<body>";
+			String html_footer = "</body>";
+			html_footer += "</html>";
 			start();
-			URI targetURIForRedirection = new URI("http://" + PropertiesLocal.getPropertyParam("host") + "/api/v1/DumpResource");
-			return Response.temporaryRedirect(targetURIForRedirection).build();
+			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
 		} catch (Exception e) {
 			stop();
 			dumping = false;
@@ -122,7 +129,7 @@ public class DumpResource {
 
 	@POST
 	@Path("/stop")
-	public Response stopDumping(@FormParam("mode") String mode) {
+	public Response stopDumping() {
 		try {
 			String html_header = "<html>";
 			html_header += "<head>";
