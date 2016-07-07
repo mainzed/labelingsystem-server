@@ -16,8 +16,8 @@ console.info(ID);
 $(document).ready(function() {
 	var servlethost = "labeling.i3mainz.hs-mainz.de";
 	//var servlethost = "localhost:8084";
-	var url = "http://"+servlethost+"/api/v1/vocabs/"+ID;
-	var uri = "http://"+servlethost+"/item/vocabulary/"+ID;
+	var url = "http://"+servlethost+"/api/v1/agents/"+ID;
+	var uri = "http://"+servlethost+"/item/agent/"+ID;
 	$.ajax({
 	    url:url,
 	    type: "GET",
@@ -34,11 +34,11 @@ $(document).ready(function() {
 			} catch (e) {}
 	    	console.info(response);
 	    	$("#content").append("<h1>Detailansicht "+ID+"</h1>");
-			$("#content").append('<p>Resource: ' + response.vocab.id[0] + '</p>');
+			$("#content").append('<p>Resource: ' + response.agent.id[0] + '</p>');
 			$("#content").append('<p>Resource: ' + uri + '</p>');
-			$("#content").append('<p>Semantic View: ' + '<a href="../semview/vocabulary.htm?id='+ID+'">Semantic View</a>' + '</p>');
-			$("#content").append('<p>Data: ' + '<a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.json">JSON</a> <a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.xml">XML</a> <a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.rdf">RDF</a> <a href="http://'+servlethost+'/api/vocabs/'+ID+'.ttl">TTL</a> <a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.n3">N-Triples</a> <a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.jsonld">JSON-LD</a> <a href="http://'+servlethost+'/api/v1/vocabs/'+ID+'.ttl">TTL</a>' + '</p>');
-			var details = response.vocab;
+			$("#content").append('<p>Semantic View: ' + '<a href="../semview/agent.htm?id='+ID+'">Semantic View</a>' + '</p>');
+			$("#content").append('<p>Data: ' + '<a href="http://'+servlethost+'/api/v1/agents/'+ID+'.json">JSON</a> <a href="http://'+servlethost+'/api/v1/agents/'+ID+'.xml">XML</a> <a href="http://'+servlethost+'/api/v1/agents/'+ID+'.rdf">RDF</a> <a href="http://'+servlethost+'/api/agents/'+ID+'.ttl">TTL</a> <a href="http://'+servlethost+'/api/v1/agents/'+ID+'.n3">N-Triples</a> <a href="http://'+servlethost+'/api/v1/agents/'+ID+'.jsonld">JSON-LD</a> <a href="http://'+servlethost+'/api/v1/agents/'+ID+'.ttl">TTL</a>' + '</p>');
+			var details = response.agent;
 			for (var item in details) {
 				$("#content").append('<h3>'+item+': ' + details[item] + '</h3>');
 			}
