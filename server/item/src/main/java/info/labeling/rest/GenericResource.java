@@ -26,7 +26,6 @@ public class GenericResource {
 
     @GET
     @Path("/vocabulary/{vocabulary}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             String HOST_API = PropertiesLocal.getPropertyParam("api");
@@ -38,7 +37,7 @@ public class GenericResource {
                 URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".json");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("text/html")) {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/xml")) {
                 URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".xml");
@@ -52,14 +51,11 @@ public class GenericResource {
             } else if (acceptHeader.startsWith("text/n3")) {
                 URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".n3");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
-            } else if (acceptHeader.startsWith("application/rdf+json")) {
-                URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".jsonrdf");
-                return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/ld+json")) {
                 URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".jsonld");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             }
         } catch (Exception e) {
@@ -70,7 +66,6 @@ public class GenericResource {
     
     @GET
     @Path("/label/{label}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             String HOST_API = PropertiesLocal.getPropertyParam("api");
@@ -82,7 +77,7 @@ public class GenericResource {
                 URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".json");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("text/html")) {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/xml")) {
                 URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".xml");
@@ -96,14 +91,11 @@ public class GenericResource {
             } else if (acceptHeader.startsWith("text/n3")) {
                 URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".n3");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
-            } else if (acceptHeader.startsWith("application/rdf+json")) {
-                URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".jsonrdf");
-                return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/ld+json")) {
                 URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".jsonld");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             }
         } catch (Exception e) {
@@ -114,7 +106,6 @@ public class GenericResource {
     
     @GET
     @Path("/agent/{agent}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getAgent(@HeaderParam("Accept") String acceptHeader, @PathParam("agent") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             String HOST_API = PropertiesLocal.getPropertyParam("api");
@@ -126,7 +117,7 @@ public class GenericResource {
                 URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".json");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("text/html")) {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/xml")) {
                 URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".xml");
@@ -140,14 +131,11 @@ public class GenericResource {
             } else if (acceptHeader.startsWith("text/n3")) {
                 URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".n3");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
-            } else if (acceptHeader.startsWith("application/rdf+json")) {
-                URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".jsonrdf");
-                return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/ld+json")) {
                 URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".jsonld");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else {
-                URI targetURIForRedirection = new URI(HOST_HTMLPAGE + itemID);
+                URI targetURIForRedirection = new URI(HOST_HTMLPAGE);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             }
         } catch (Exception e) {
@@ -158,7 +146,6 @@ public class GenericResource {
     
     @GET
     @Path("/revision/{revision}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getRevision(@HeaderParam("Accept") String acceptHeader, @PathParam("revision") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             String HOST_API = PropertiesLocal.getPropertyParam("api");
@@ -177,9 +164,6 @@ public class GenericResource {
             } else if (acceptHeader.startsWith("text/n3")) {
                 URI targetURIForRedirection = new URI(HOST_API + "revisions/" + itemID + ".n3");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
-            } else if (acceptHeader.startsWith("application/rdf+json")) {
-                URI targetURIForRedirection = new URI(HOST_API + "revisions/" + itemID + ".jsonrdf");
-                return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/ld+json")) {
                 URI targetURIForRedirection = new URI(HOST_API + "revisions/" + itemID + ".jsonld");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
@@ -195,7 +179,6 @@ public class GenericResource {
     
     @GET
     @Path("/retcats/{retcat}")
-    @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getRetcat(@HeaderParam("Accept") String acceptHeader, @PathParam("retcat") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             String HOST_API = PropertiesLocal.getPropertyParam("api");
@@ -213,9 +196,6 @@ public class GenericResource {
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("text/n3")) {
                 URI targetURIForRedirection = new URI(HOST_API + "retcats/" + itemID + ".n3");
-                return Response.temporaryRedirect(targetURIForRedirection).build();
-            } else if (acceptHeader.startsWith("application/rdf+json")) {
-                URI targetURIForRedirection = new URI(HOST_API + "retcats/" + itemID + ".jsonrdf");
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             } else if (acceptHeader.startsWith("application/ld+json")) {
                 URI targetURIForRedirection = new URI(HOST_API + "retcats/" + itemID + ".jsonld");
