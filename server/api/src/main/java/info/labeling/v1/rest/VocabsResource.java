@@ -495,6 +495,56 @@ public class VocabsResource {
             }
         }
     }
+	
+	@GET
+    @Path("/{vocabulary}.skos")
+    @Produces("application/rdf+xml;charset=UTF-8")
+    public Response getVocabularyRDF_SKOS(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+        try {
+            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            String item = "ls_voc";
+            String query = Utils.getAllElementsForItemID(item, vocabulary);
+            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            if (result.size() < 1) {
+                throw new ResourceNotAvailableException();
+            }
+            for (int i = 0; i < predicates.size(); i++) {
+                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
+            }
+			item = "ls_voc";
+            query = Utils.getAllLabelsForVocabulary(vocabulary);
+            result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<String> labels = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "id");
+            if (result.size() < 1) {
+                throw new ResourceNotAvailableException();
+            }
+            for (int i = 0; i < labels.size(); i++) {
+                item = "ls_lab";
+				query = Utils.getAllElementsForItemID(item, labels.get(i));
+				result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+				predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+				objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+				if (labels.size() < 1) {
+					throw new ResourceNotAvailableException();
+				}
+				for (int j = 0; j < predicates.size(); j++) {
+					rdf.setModelTriple(item + ":" + labels.get(i), predicates.get(j), objects.get(j));
+				}
+            }
+            String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
+            return Response.ok(RDFoutput).build();
+        } catch (Exception e) {
+            if (e.toString().contains("ResourceNotAvailableException")) {
+                return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
+                        .header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        }
+    }
 
     @POST
     @Path("/user/{user}")

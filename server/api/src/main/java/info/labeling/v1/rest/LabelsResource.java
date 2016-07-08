@@ -501,7 +501,7 @@ public class LabelsResource {
             }
         }
     }
-
+	
     @POST
     @Path("/user/{user}")
     @Consumes(MediaType.APPLICATION_JSON)
