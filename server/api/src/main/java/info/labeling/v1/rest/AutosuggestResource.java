@@ -11,7 +11,6 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -133,9 +132,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -306,9 +307,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -479,9 +482,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -657,9 +662,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -830,9 +837,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -1002,9 +1011,11 @@ public class AutosuggestResource {
 				if (broaderURIObject != null) {
 					broaderURI = (String) broaderURIObject.get("value");
 				}
-				HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-				hstmpBroader.put(broaderURI, broaderVL);
-				tmpAutosuggest.setBroader(hstmpBroader);
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
 				// get narrower 
 				String narrowerVL = "";
 				String narrowerURI = "";
@@ -1130,7 +1141,68 @@ public class AutosuggestResource {
 				response.append(inputLine);
 			}
 			in.close();
-			return Response.ok(response.toString()).header("Content-Type", "application/json;charset=UTF-8").build();
+			// init output
+			JSONObject jsonOut = new JSONObject();
+			JSONArray outArray = new JSONArray();
+			// parse SPARQL results json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
+			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
+			// create unique list of ids
+			HashSet<String> uris = new HashSet<String>();
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				uris.add(subjectValue);
+			}
+			// create list of autosuggest objects
+			Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+			for (String element : uris) {
+				autosuggests.put(element, new Autosuggest(element));
+			}
+			// fill objects
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				// get Subject
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				// for every subject value get object from list and write values in it 
+				Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+				// get Label
+				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+				String labelValue = (String) labelObject.get("value");
+				String labelLang = (String) labelObject.get("xml:lang");
+				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get scopeNote
+				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
+				if (scopeNoteObject != null) {
+					String scopeNoteValue = (String) scopeNoteObject.get("value");
+					String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
+					tmpAutosuggest.setDefinition(scopeNoteValue + "@" + scopeNoteLang);
+				}
+			}
+			// fill output json
+			for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
+				Autosuggest tmpAS = entry.getValue();
+				JSONObject suggestionObject = new JSONObject();
+				JSONObject suggestionObjectCollection = new JSONObject();
+				// label
+				JSONArray labelArrayNew = new JSONArray();
+				labelArrayNew.add(tmpAS.getLabel());
+				suggestionObjectCollection.put("label", labelArrayNew);
+				// definition
+				JSONArray scopeNoteArrayNew = new JSONArray();
+				if (!tmpAS.getDefinition().equals("")) {
+					scopeNoteArrayNew.add(tmpAS.getDefinition());
+				}
+				suggestionObjectCollection.put("definition", scopeNoteArrayNew);
+				// add information to output
+				suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
+				outArray.add(suggestionObject);
+			}
+			jsonOut.put("autosuggest", outArray);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutosuggestResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -1251,20 +1323,358 @@ public class AutosuggestResource {
 	@GET
 	@Path("/labelingsystem")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getSPARQLresultsLABELINGSYSTEM(@QueryParam("query") String searchword) {
+	public Response getSPARQLresultsLabelingSystem(@QueryParam("query") String searchword) {
 		try {
-			String url_string = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryString=" + searchword + "&MaxHits=" + LIMIT;
-			URL url = new URL(url_string);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestProperty("Accept", "application/json");
-			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			String url = "http://localhost:8084/api/v1/sparql";
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+					+ "?Subject skos:inScheme ?scheme . "
+					+ "?Subject skos:prefLabel ?prefLabels . "
+					+ "?Subject ls:preferredLabel ?prefLabel . "
+					+ "?Subject ls:preferredLang ?prefLang . "
+					+ "OPTIONAL { ?Subject skos:note ?scopeNote . } "
+					+ "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
+					+ "OPTIONAL { ?Subject skos:definition ?def . } "
+					+ "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
+					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
+					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
+					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i') || regex(?def, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) "
+					+ "FILTER(LANGMATCHES(LANG(?scopeNote), ?prefLang))"
+					+ "} LIMIT " + LIMIT;
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Accept", "application/sparql-results+json");
+			String urlParameters = "query=" + sparql;
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.writeBytes(urlParameters);
+			wr.flush();
+			wr.close();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 			String inputLine;
 			StringBuilder response = new StringBuilder();
-			while ((inputLine = br.readLine()) != null) {
+			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
 			}
-			br.close();
-			return Response.ok(response.toString()).header("Content-Type", "application/json;charset=UTF-8").build();
+			in.close();
+			// init output
+			JSONObject jsonOut = new JSONObject();
+			JSONArray outArray = new JSONArray();
+			// parse SPARQL results json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
+			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
+			// create unique list of ids
+			HashSet<String> uris = new HashSet<String>();
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				uris.add(subjectValue);
+			}
+			// create list of autosuggest objects
+			Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+			for (String element : uris) {
+				autosuggests.put(element, new Autosuggest(element));
+			}
+			// fill objects
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				// get Subject
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				// for every subject value get object from list and write values in it 
+				Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+				// get Label
+				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+				String labelValue = (String) labelObject.get("value");
+				String labelLang = (String) labelObject.get("xml:lang");
+				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get scopeNote
+				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
+				if (scopeNoteObject != null) {
+					String scopeNoteValue = (String) scopeNoteObject.get("value");
+					String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
+					tmpAutosuggest.setDefinition(scopeNoteValue + "@" + scopeNoteLang);
+				}
+				// get broader 
+				String broaderVL = "";
+				String broaderURI = "";
+				JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
+				if (broaderObject != null) {
+					String broaderValue = (String) broaderObject.get("value");
+					String broaderLang = (String) broaderObject.get("xml:lang");
+					broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+				}
+				JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
+				if (broaderURIObject != null) {
+					broaderURI = (String) broaderURIObject.get("value");
+				}
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
+				// get narrower 
+				String narrowerVL = "";
+				String narrowerURI = "";
+				JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
+				if (narrowerObject != null) {
+					String narrowerValue = (String) narrowerObject.get("value");
+					String narrowerLang = (String) narrowerObject.get("xml:lang");
+					narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+				}
+				JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
+				if (narrowerURIObject != null) {
+					narrowerURI = (String) narrowerURIObject.get("value");
+				}
+				if (!narrowerURI.equals("")) {
+					HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
+					hstmpNarrower.put(narrowerURI, narrowerVL);
+					tmpAutosuggest.setNarrower(hstmpNarrower);
+				}
+			}
+			// fill output json
+			for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
+				Autosuggest tmpAS = entry.getValue();
+				JSONObject suggestionObject = new JSONObject();
+				JSONObject suggestionObjectCollection = new JSONObject();
+				// label
+				JSONArray labelArrayNew = new JSONArray();
+				labelArrayNew.add(tmpAS.getLabel());
+				suggestionObjectCollection.put("label", labelArrayNew);
+				// definition
+				JSONArray scopeNoteArrayNew = new JSONArray();
+				if (!tmpAS.getDefinition().equals("")) {
+					scopeNoteArrayNew.add(tmpAS.getDefinition());
+				}
+				suggestionObjectCollection.put("definition", scopeNoteArrayNew);
+				// broader
+				Set broaderTerms = tmpAS.getBroader();
+				JSONArray broaderArrayNew = new JSONArray();
+				if (broaderTerms.size() > 0) {
+					for (Object element : broaderTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Entry thisEntry = (Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject broaderObjectTmp = new JSONObject();
+							broaderObjectTmp.put("uri", key);
+							broaderObjectTmp.put("label", value);
+							broaderArrayNew.add(broaderObjectTmp);
+						}
+					}
+				}
+				suggestionObjectCollection.put("broader", broaderArrayNew);
+				// narrrower
+				Set narrrowerTerms = tmpAS.getNarrower();
+				JSONArray narrrowerArrayNew = new JSONArray();
+				if (narrrowerTerms.size() > 0) {
+					for (Object element : narrrowerTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Entry thisEntry = (Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject narrrowerObjectTmp = new JSONObject();
+							narrrowerObjectTmp.put("uri", key);
+							narrrowerObjectTmp.put("label", value);
+							narrrowerArrayNew.add(narrrowerObjectTmp);
+						}
+					}
+				}
+				suggestionObjectCollection.put("narrrower", narrrowerArrayNew);
+				// add information to output
+				suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
+				outArray.add(suggestionObject);
+			}
+			jsonOut.put("autosuggest", outArray);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutosuggestResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/labelingsystem/{vocabulary}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getSPARQLresultsLabelingSystem(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
+		try {
+			String url = "http://localhost:8084/api/v1/sparql";
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+					+ "?Subject skos:inScheme ?scheme . "
+					+ "?Subject skos:prefLabel ?prefLabels . "
+					+ "?Subject ls:preferredLabel ?prefLabel . "
+					+ "?Subject ls:preferredLang ?prefLang . "
+					+ "OPTIONAL { ?Subject skos:note ?scopeNote . } "
+					+ "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
+					+ "OPTIONAL { ?Subject skos:definition ?def . } "
+					+ "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
+					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
+					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
+					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i') || regex(?def, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) "
+					+ "FILTER(LANGMATCHES(LANG(?scopeNote), ?prefLang))"
+					+ "FILTER(?scheme=<http://"+PropertiesLocal.getPropertyParam("host")+"/item/vocabulary/"+vocabulary+">) "
+					+ "} LIMIT " + LIMIT;
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			con.setRequestProperty("Accept", "application/sparql-results+json");
+			String urlParameters = "query=" + sparql;
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.writeBytes(urlParameters);
+			wr.flush();
+			wr.close();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			// init output
+			JSONObject jsonOut = new JSONObject();
+			JSONArray outArray = new JSONArray();
+			// parse SPARQL results json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
+			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
+			// create unique list of ids
+			HashSet<String> uris = new HashSet<String>();
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				uris.add(subjectValue);
+			}
+			// create list of autosuggest objects
+			Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+			for (String element : uris) {
+				autosuggests.put(element, new Autosuggest(element));
+			}
+			// fill objects
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				// get Subject
+				JSONObject subject = (JSONObject) tmpElement.get("Subject");
+				String subjectValue = (String) subject.get("value");
+				// for every subject value get object from list and write values in it 
+				Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+				// get Label
+				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+				String labelValue = (String) labelObject.get("value");
+				String labelLang = (String) labelObject.get("xml:lang");
+				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get scopeNote
+				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
+				if (scopeNoteObject != null) {
+					String scopeNoteValue = (String) scopeNoteObject.get("value");
+					String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
+					tmpAutosuggest.setDefinition(scopeNoteValue + "@" + scopeNoteLang);
+				}
+				// get broader 
+				String broaderVL = "";
+				String broaderURI = "";
+				JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
+				if (broaderObject != null) {
+					String broaderValue = (String) broaderObject.get("value");
+					String broaderLang = (String) broaderObject.get("xml:lang");
+					broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+				}
+				JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
+				if (broaderURIObject != null) {
+					broaderURI = (String) broaderURIObject.get("value");
+				}
+				if (!broaderURI.equals("")) {
+					HashMap<String, String> hstmpBroader = new HashMap<String, String>();
+					hstmpBroader.put(broaderURI, broaderVL);
+					tmpAutosuggest.setBroader(hstmpBroader);
+				}
+				// get narrower 
+				String narrowerVL = "";
+				String narrowerURI = "";
+				JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
+				if (narrowerObject != null) {
+					String narrowerValue = (String) narrowerObject.get("value");
+					String narrowerLang = (String) narrowerObject.get("xml:lang");
+					narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+				}
+				JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
+				if (narrowerURIObject != null) {
+					narrowerURI = (String) narrowerURIObject.get("value");
+				}
+				if (!narrowerURI.equals("")) {
+					HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
+					hstmpNarrower.put(narrowerURI, narrowerVL);
+					tmpAutosuggest.setNarrower(hstmpNarrower);
+				}
+			}
+			// fill output json
+			for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
+				Autosuggest tmpAS = entry.getValue();
+				JSONObject suggestionObject = new JSONObject();
+				JSONObject suggestionObjectCollection = new JSONObject();
+				// label
+				JSONArray labelArrayNew = new JSONArray();
+				labelArrayNew.add(tmpAS.getLabel());
+				suggestionObjectCollection.put("label", labelArrayNew);
+				// definition
+				JSONArray scopeNoteArrayNew = new JSONArray();
+				if (!tmpAS.getDefinition().equals("")) {
+					scopeNoteArrayNew.add(tmpAS.getDefinition());
+				}
+				suggestionObjectCollection.put("definition", scopeNoteArrayNew);
+				// broader
+				Set broaderTerms = tmpAS.getBroader();
+				JSONArray broaderArrayNew = new JSONArray();
+				if (broaderTerms.size() > 0) {
+					for (Object element : broaderTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Entry thisEntry = (Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject broaderObjectTmp = new JSONObject();
+							broaderObjectTmp.put("uri", key);
+							broaderObjectTmp.put("label", value);
+							broaderArrayNew.add(broaderObjectTmp);
+						}
+					}
+				}
+				suggestionObjectCollection.put("broader", broaderArrayNew);
+				// narrrower
+				Set narrrowerTerms = tmpAS.getNarrower();
+				JSONArray narrrowerArrayNew = new JSONArray();
+				if (narrrowerTerms.size() > 0) {
+					for (Object element : narrrowerTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Entry thisEntry = (Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject narrrowerObjectTmp = new JSONObject();
+							narrrowerObjectTmp.put("uri", key);
+							narrrowerObjectTmp.put("label", value);
+							narrrowerArrayNew.add(narrrowerObjectTmp);
+						}
+					}
+				}
+				suggestionObjectCollection.put("narrrower", narrrowerArrayNew);
+				// add information to output
+				suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
+				outArray.add(suggestionObject);
+			}
+			jsonOut.put("autosuggest", outArray);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutosuggestResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
