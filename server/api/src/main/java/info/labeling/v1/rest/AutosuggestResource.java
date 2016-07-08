@@ -36,17 +36,6 @@ public class AutosuggestResource {
 	private final String LIMIT = "20";
 
 	@GET
-	public Response getAPIpage() {
-		return Response.noContent().build();
-	}
-
-	@GET
-	@Path("/heritagedata")
-	public Response getAPIpageHD() {
-		return Response.noContent().build();
-	}
-
-	@GET
 	@Path("/heritagedata/historicengland")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getSPARQLresultsHE(@QueryParam("query") String searchword) {
@@ -569,12 +558,6 @@ public class AutosuggestResource {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutosuggestResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
-	}
-
-	@GET
-	@Path("/getty")
-	public Response getAPIpageGE() {
-		return Response.noContent().build();
 	}
 
 	@GET
