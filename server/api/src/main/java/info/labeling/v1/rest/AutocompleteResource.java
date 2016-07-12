@@ -8,7 +8,6 @@ import de.i3mainz.ls.rdfutils.exceptions.AutocompleteLengthException;
 import de.i3mainz.ls.rdfutils.exceptions.Logging;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.net.URLDecoder;
-import java.util.HashSet;
 import java.util.List;
 import javax.ws.rs.Produces;
 import javax.ws.rs.GET;
@@ -23,70 +22,177 @@ import org.openrdf.query.BindingSet;
 @Path("/v1/autocomplete")
 public class AutocompleteResource {
 
-    // @Path("/label/{filter}/{value}")
     @GET
-    @Path("/label/{filter}/{value}")
+    @Path("/label")
     @Produces("application/json;charset=UTF-8")
-    public Response getSuggestionsForLabelsSystem(@QueryParam("query") String requestquery, @PathParam("filter") String filter, @PathParam("value") String value) {
+    public Response getSuggestionsForLabels(@QueryParam("query") String requestquery) {
         try {
             String substing = requestquery.toLowerCase();
             substing = URLDecoder.decode(substing, "UTF-8");
             int suggestions = 20;
             int minLength = 1;
-            // substring in prefLabels
             if (substing.length() <= minLength) {
                 throw new AutocompleteLengthException();
             } else {
-                // QUERY FOR TRIPLESTORE
                 RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
                 String query = rdf.getPREFIXSPARQL();
                 query += "SELECT * WHERE { "
-                        + "?label a ls:Label . "
-                        + "?label skos:prefLabel ?prefLabel . "
-                        + "?label skos:prefLabel ?prefLabels . "
-                        + "?label dc:identifier ?labelIdentifier . "
-                        + "OPTIONAL { ?label skos:altLabel ?altLabel . }"
-                        + "OPTIONAL { ?label skos:altLabel ?altLabels . }"
-                        + "FILTER(regex(?prefLabel, '" + substing + "', 'i') || regex(?altLabel, '" + substing + "', 'i'))";
-                if (filter.equals("creator")) {
-                    query += "FILTER(?creator=\"" + value + "\")";
-                } else if (filter.equals("vocabulary")) {
-                    query += "FILTER(?vocabulary=<"+rdf.getPrefixItem("ls_lab:"+value)+">)";
-                }
-                query += "} "
-                        + "ORDER BY ASC(?prefLabel)"
+                        + "?s a ls:Label . "
+                        + "?s skos:prefLabel ?acquery . "
+                        + "FILTER(regex(?acquery, '" + substing + "', 'i'))"
+                        + "} "
+                        + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
-
-                // EXECUTE QUERY
-                List<BindingSet> query_result = Sesame2714.SPARQLquery(PropertiesLocal.getREPOSITORY(), PropertiesLocal.getSESAMESERVER(), query);
-                // results
-                List<String> ids = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(query_result, "labelIdentifier");
-                List<String> query_prefLabel = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(query_result, "prefLabel");
-                List<String> query_altLabel = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(query_result, "altLabel");
-                // create labeloutput object for each unique id
-                HashSet<String> hs = new HashSet<String>();
-                for (String element : ids) {
-                    hs.add(element);
-                }
-                // START BUILD JSON
-                JSONObject jsonobj_query = new JSONObject(); // {}
-                JSONArray jsonarray_suggestions = new JSONArray(); // []
-                for (String element : hs) {
-                    for (String elementID : ids) {
-                        if (element.equals(elementID)) {
-                        }
-                    }
-                    String match = "";
-                    JSONObject jsonobj_suggestion = new JSONObject(); // {}
-                    // autocomplete required
-                    jsonobj_suggestion.put("value", match);
-                    jsonobj_suggestion.put("data", ids);
-                    // autocomplete more information
+                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                JSONObject jsonobj_query = new JSONObject(); 
+                JSONArray jsonarray_suggestions = new JSONArray(); 
+                for (int i=0; i<suggestion_uri.size(); i++) {
+                    JSONObject jsonobj_suggestion = new JSONObject();
+                    jsonobj_suggestion.put("value", suggestion_string.get(i));
+                    jsonobj_suggestion.put("data", suggestion_uri.get(i));
                     jsonarray_suggestions.add(jsonobj_suggestion);
                 }
                 jsonobj_query.put("suggestions", jsonarray_suggestions);
                 jsonobj_query.put("query", substing);
-                // pretty print JSON output (Gson)
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(jsonobj_query)).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutocompleteResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+    
+    @GET
+    @Path("/label/{filter}/{value}")
+    @Produces("application/json;charset=UTF-8")
+    public Response getSuggestionsForLabelsFilter(@QueryParam("query") String requestquery, @PathParam("filter") String filter, @PathParam("value") String value) {
+        try {
+            String substing = requestquery.toLowerCase();
+            substing = URLDecoder.decode(substing, "UTF-8");
+            int suggestions = 20;
+            int minLength = 1;
+            if (substing.length() <= minLength) {
+                throw new AutocompleteLengthException();
+            } else {
+                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                String query = rdf.getPREFIXSPARQL();
+                query += "SELECT * WHERE { "
+                        + "?s a ls:Label . "
+                        + "?s skos:prefLabel ?acquery . "
+                        + "?s dc:creator ?creator . "
+                        + "?s skos:inScheme ?vocabulary . "
+                        + "FILTER(regex(?acquery, '" + substing + "', 'i'))";
+                if (filter.equals("creator")) {
+                    query += "FILTER(?creator=\"" + value + "\")";
+                } else if (filter.equals("vocabulary")) {
+                    query += "FILTER(?vocabulary=<" + rdf.getPrefixItem("ls_voc:" + value) + ">)";
+                }
+                query += "} "
+                        + "ORDER BY ASC(?acquery)"
+                        + "LIMIT " + suggestions;
+
+                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                JSONObject jsonobj_query = new JSONObject(); 
+                JSONArray jsonarray_suggestions = new JSONArray(); 
+                for (int i=0; i<suggestion_uri.size(); i++) {
+                    JSONObject jsonobj_suggestion = new JSONObject();
+                    jsonobj_suggestion.put("value", suggestion_string.get(i));
+                    jsonobj_suggestion.put("data", suggestion_uri.get(i));
+                    jsonarray_suggestions.add(jsonobj_suggestion);
+                }
+                jsonobj_query.put("suggestions", jsonarray_suggestions);
+                jsonobj_query.put("query", substing);
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(jsonobj_query)).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutocompleteResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    @GET
+    @Path("/agent")
+    @Produces("application/json;charset=UTF-8")
+    public Response getSuggestionsForAgents(@QueryParam("query") String requestquery) {
+        try {
+            String substing = requestquery.toLowerCase();
+            substing = URLDecoder.decode(substing, "UTF-8");
+            int suggestions = 10;
+            int minLength = 1;
+            if (substing.length() <= minLength) {
+                throw new AutocompleteLengthException();
+            } else {
+                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                String query = rdf.getPREFIXSPARQL();
+                query += "SELECT * WHERE { "
+                        + "?s a ls:Agent . "
+                        + "?s foaf:accountName ?acquery . "
+                        + "FILTER(regex(?acquery, '" + substing + "', 'i'))";
+                query += "} "
+                        + "ORDER BY ASC(?acquery) "
+                        + "LIMIT " + suggestions;
+                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                JSONObject jsonobj_query = new JSONObject();
+                JSONArray jsonarray_suggestions = new JSONArray();
+                for (int i = 0; i < suggestion_uri.size(); i++) {
+                    JSONObject jsonobj_suggestion = new JSONObject();
+                    jsonobj_suggestion.put("value", suggestion_string.get(i));
+                    jsonobj_suggestion.put("data", suggestion_uri.get(i));
+                    jsonarray_suggestions.add(jsonobj_suggestion);
+                }
+                jsonobj_query.put("suggestions", jsonarray_suggestions);
+                jsonobj_query.put("query", substing);
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                return Response.ok(gson.toJson(jsonobj_query)).header("Content-Type", "application/json;charset=UTF-8").build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutocompleteResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    @GET
+    @Path("/vocabulary")
+    @Produces("application/json;charset=UTF-8")
+    public Response getSuggestionsForVocabs(@QueryParam("query") String requestquery) {
+        try {
+            String substing = requestquery.toLowerCase();
+            substing = URLDecoder.decode(substing, "UTF-8");
+            int suggestions = 10;
+            int minLength = 1;
+            if (substing.length() <= minLength) {
+                throw new AutocompleteLengthException();
+            } else {
+                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                String query = rdf.getPREFIXSPARQL();
+                query += "SELECT * WHERE { "
+                        + "?s a ls:Vocabulary . "
+                        + "?s dc:title ?acquery . "
+                        + "FILTER(regex(?acquery, '" + substing + "', 'i'))";
+                query += "} "
+                        + "ORDER BY ASC(?acquery) "
+                        + "LIMIT " + suggestions;
+                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                JSONObject jsonobj_query = new JSONObject();
+                JSONArray jsonarray_suggestions = new JSONArray();
+                for (int i = 0; i < suggestion_uri.size(); i++) {
+                    JSONObject jsonobj_suggestion = new JSONObject();
+                    jsonobj_suggestion.put("value", suggestion_string.get(i));
+                    jsonobj_suggestion.put("data", suggestion_uri.get(i));
+                    jsonarray_suggestions.add(jsonobj_suggestion);
+                }
+                jsonobj_query.put("suggestions", jsonarray_suggestions);
+                jsonobj_query.put("query", substing);
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 return Response.ok(gson.toJson(jsonobj_query)).header("Content-Type", "application/json;charset=UTF-8").build();
             }
