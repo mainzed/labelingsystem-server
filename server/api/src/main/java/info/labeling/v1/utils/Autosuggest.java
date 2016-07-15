@@ -8,6 +8,7 @@ public class Autosuggest {
 	private String id = "";
 	private String label = "";
 	private String definition = "";
+	private String schemeTitle = "";
 	private HashSet<HashMap<String,String>> broader = new HashSet<HashMap<String,String>>();
 	private HashSet<HashMap<String,String>> narrower = new HashSet<HashMap<String,String>>();
 
@@ -55,6 +56,12 @@ public class Autosuggest {
 		this.narrower.add(narrower);
 	}
 
-	
+	public String getSchemeTitle() {
+		return schemeTitle;
+	}
+
+	public void setSchemeTitle(String schemeTitle) {
+		this.schemeTitle = schemeTitle;
+	}
 	
 }

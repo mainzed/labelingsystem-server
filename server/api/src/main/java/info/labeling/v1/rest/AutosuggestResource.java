@@ -1,11 +1,8 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.Sesame2714;
 import de.i3mainz.ls.rdfutils.exceptions.Logging;
-import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
 import info.labeling.v1.utils.Autosuggest;
 import info.labeling.v1.utils.PropertiesLocal;
-import info.labeling.v1.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -14,7 +11,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -28,7 +24,6 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.openrdf.query.BindingSet;
 
 @Path("/v1/autosuggests")
 public class AutosuggestResource {
@@ -41,10 +36,11 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsHE(@QueryParam("query") String searchword) {
 		try {
 			String url = "http://heritagedata.org/live/sparql";
-			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
 					+ "?Subject skos:inScheme ?scheme . "
 					+ "?Subject skos:prefLabel ?prefLabel . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
@@ -101,6 +97,11 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				String schemeLang = (String) schemeObject.get("xml:lang");
+				tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -154,6 +155,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -216,10 +221,11 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsRCAHMS(@QueryParam("query") String searchword) {
 		try {
 			String url = "http://heritagedata.org/live/sparql";
-			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
 					+ "?Subject skos:inScheme ?scheme . "
 					+ "?Subject skos:prefLabel ?prefLabel . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
@@ -276,6 +282,11 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				String schemeLang = (String) schemeObject.get("xml:lang");
+				tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -329,6 +340,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -391,10 +406,11 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsRCAHMW(@QueryParam("query") String searchword) {
 		try {
 			String url = "http://heritagedata.org/live/sparql";
-			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> "
-					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
 					+ "?Subject skos:inScheme ?scheme . "
 					+ "?Subject skos:prefLabel ?prefLabel . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
@@ -451,6 +467,11 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				String schemeLang = (String) schemeObject.get("xml:lang");
+				tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -504,6 +525,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -566,10 +591,12 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsAAT(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
 		try {
 			String url = "http://vocab.getty.edu/sparql";
-			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred { "
+			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle { "
 					+ "?Subject a skos:Concept. "
 					+ "?Subject luc:term '" + searchword + "' . "
 					+ "?Subject skos:inScheme aat: . "
+					+ "?Subject skos:inScheme ?scheme . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
 					+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
 					+ "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
@@ -625,6 +652,10 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				tmpAutosuggest.setSchemeTitle(schemeValue);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -678,6 +709,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -740,10 +775,12 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsTGN(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
 		try {
 			String url = "http://vocab.getty.edu/sparql";
-			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred { "
+			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
 					+ "?Subject a skos:Concept. "
 					+ "?Subject luc:term '" + searchword + "' . "
 					+ "?Subject skos:inScheme tgn: . "
+					+ "?Subject skos:inScheme ?scheme . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
 					//+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
 					+ "OPTIONAL {?Subject gvp:parentString ?scopeNote . } "
@@ -800,6 +837,10 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				//String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				tmpAutosuggest.setSchemeTitle(schemeValue);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -853,6 +894,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -915,10 +960,12 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsULAN(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
 		try {
 			String url = "http://vocab.getty.edu/sparql";
-			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred { "
+			String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
 					+ "?Subject a skos:Concept. "
 					+ "?Subject luc:term '" + searchword + "' . "
 					+ "?Subject skos:inScheme ulan: . "
+					+ "?Subject skos:inScheme ?scheme . "
+					+ "?scheme rdfs:label ?schemeTitle . "
 					+ "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
 					+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
 					+ "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
@@ -974,6 +1021,10 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				//String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				tmpAutosuggest.setSchemeTitle(schemeValue);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -1027,6 +1078,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -1071,115 +1126,6 @@ public class AutosuggestResource {
 					}
 				}
 				suggestionObjectCollection.put("narrrower", narrrowerArrayNew);
-				// add information to output
-				suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
-				outArray.add(suggestionObject);
-			}
-			jsonOut.put("autosuggest", outArray);
-			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.AutosuggestResource"))
-					.header("Content-Type", "application/json;charset=UTF-8").build();
-		}
-	}
-
-	@GET
-	@Path("/retcats/{retcat}")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getSPARQLresultsRETCATS(@PathParam("retcat") String retcat, @QueryParam("query") String searchword) {
-		try {
-
-			String query = Utils.getSPARQLqueryElementsForRetcatsItem(retcat);
-			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
-			List<String> vars = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "var");
-			List<String> queries = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "query");
-			List<String> urls = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "url");
-			if (result.size() < 1) {
-				throw new ResourceNotAvailableException();
-			}
-			String url = "";
-			String sparql = "";
-			String var = "";
-			for (int i = 0; i < queries.size(); i++) {
-				sparql = queries.get(i) + " LIMIT " + LIMIT;
-				var = vars.get(i);
-				sparql = sparql.replace(var, searchword);
-				url = urls.get(i);
-			}
-			// get answers
-			URL obj = new URL(url);
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("POST");
-			con.setRequestProperty("Accept", "application/sparql-results+json");
-			String urlParameters = "query=" + sparql;
-			con.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(urlParameters);
-			wr.flush();
-			wr.close();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-			String inputLine;
-			StringBuilder response = new StringBuilder();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			// init output
-			JSONObject jsonOut = new JSONObject();
-			JSONArray outArray = new JSONArray();
-			// parse SPARQL results json
-			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-			// create unique list of ids
-			HashSet<String> uris = new HashSet<String>();
-			for (Object element : bindingsArray) {
-				JSONObject tmpElement = (JSONObject) element;
-				JSONObject subject = (JSONObject) tmpElement.get("Subject");
-				String subjectValue = (String) subject.get("value");
-				uris.add(subjectValue);
-			}
-			// create list of autosuggest objects
-			Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
-			for (String element : uris) {
-				autosuggests.put(element, new Autosuggest(element));
-			}
-			// fill objects
-			for (Object element : bindingsArray) {
-				JSONObject tmpElement = (JSONObject) element;
-				// get Subject
-				JSONObject subject = (JSONObject) tmpElement.get("Subject");
-				String subjectValue = (String) subject.get("value");
-				// for every subject value get object from list and write values in it 
-				Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
-				// get Label
-				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-				String labelValue = (String) labelObject.get("value");
-				String labelLang = (String) labelObject.get("xml:lang");
-				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
-				// get scopeNote
-				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-				if (scopeNoteObject != null) {
-					String scopeNoteValue = (String) scopeNoteObject.get("value");
-					String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-					tmpAutosuggest.setDefinition(scopeNoteValue + "@" + scopeNoteLang);
-				}
-			}
-			// fill output json
-			for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-				Autosuggest tmpAS = entry.getValue();
-				JSONObject suggestionObject = new JSONObject();
-				JSONObject suggestionObjectCollection = new JSONObject();
-				// label
-				JSONArray labelArrayNew = new JSONArray();
-				labelArrayNew.add(tmpAS.getLabel());
-				suggestionObjectCollection.put("label", labelArrayNew);
-				// definition
-				JSONArray scopeNoteArrayNew = new JSONArray();
-				if (!tmpAS.getDefinition().equals("")) {
-					scopeNoteArrayNew.add(tmpAS.getDefinition());
-				}
-				suggestionObjectCollection.put("definition", scopeNoteArrayNew);
 				// add information to output
 				suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
 				outArray.add(suggestionObject);
@@ -1247,6 +1193,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getLabel());
+				suggestionObjectCollection.put("scheme", "DBpedia");
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -1309,20 +1259,17 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsLabelingSystem(@QueryParam("query") String searchword) {
 		try {
 			String url = "http://localhost:8084/api/v1/sparql";
-			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
-					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
 					+ "?Subject skos:inScheme ?scheme . "
+					+ "?scheme dc:title ?schemeTitle . "
 					+ "?Subject skos:prefLabel ?prefLabels . "
 					+ "?Subject ls:preferredLabel ?prefLabel . "
-					+ "?Subject ls:preferredLang ?prefLang . "
 					+ "OPTIONAL { ?Subject skos:note ?scopeNote . } "
 					+ "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
-					+ "OPTIONAL { ?Subject skos:definition ?def . } "
-					+ "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i') || regex(?def, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) "
-					+ "FILTER(LANGMATCHES(LANG(?scopeNote), ?prefLang))"
+					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i')) "
 					+ "} LIMIT " + LIMIT;
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -1374,6 +1321,11 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				String schemeLang = (String) schemeObject.get("xml:lang");
+				tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -1427,6 +1379,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
@@ -1489,20 +1445,17 @@ public class AutosuggestResource {
 	public Response getSPARQLresultsLabelingSystem(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
 		try {
 			String url = "http://localhost:8084/api/v1/sparql";
-			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
-					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred WHERE { "
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
+					+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
 					+ "?Subject skos:inScheme ?scheme . "
+					+ "?scheme dc:title ?schemeTitle . "
 					+ "?Subject skos:prefLabel ?prefLabels . "
-					+ "?Subject ls:preferredLabel ?prefLabel . "
-					+ "?Subject ls:preferredLang ?prefLang . "
+					//+ "?Subject ls:preferredLabel ?prefLabel . "
 					+ "OPTIONAL { ?Subject skos:note ?scopeNote . } "
 					+ "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
-					+ "OPTIONAL { ?Subject skos:definition ?def . } "
-					+ "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i') || regex(?def, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) "
-					+ "FILTER(LANGMATCHES(LANG(?scopeNote), ?prefLang))"
+					+ "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i')) "
 					+ "FILTER(?scheme=<http://"+PropertiesLocal.getPropertyParam("host")+"/item/vocabulary/"+vocabulary+">) "
 					+ "} LIMIT " + LIMIT;
 			URL obj = new URL(url);
@@ -1555,6 +1508,11 @@ public class AutosuggestResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+				// get Scheme
+				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
+				String schemeValue = (String) schemeObject.get("value");
+				String schemeLang = (String) schemeObject.get("xml:lang");
+				tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
 				// get scopeNote
 				JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
 				if (scopeNoteObject != null) {
@@ -1608,6 +1566,10 @@ public class AutosuggestResource {
 				JSONArray labelArrayNew = new JSONArray();
 				labelArrayNew.add(tmpAS.getLabel());
 				suggestionObjectCollection.put("label", labelArrayNew);
+				// scheme
+				JSONArray schemeArrayNew = new JSONArray();
+				schemeArrayNew.add(tmpAS.getSchemeTitle());
+				suggestionObjectCollection.put("scheme", schemeArrayNew);
 				// definition
 				JSONArray scopeNoteArrayNew = new JSONArray();
 				if (!tmpAS.getDefinition().equals("")) {
