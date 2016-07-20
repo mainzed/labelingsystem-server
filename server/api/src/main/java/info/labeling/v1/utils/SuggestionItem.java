@@ -3,16 +3,16 @@ package info.labeling.v1.utils;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class Autosuggest {
+public class SuggestionItem {
 	
 	private String id = "";
-	private String label = "";
-	private String definition = "";
 	private String schemeTitle = "";
+	private HashSet<String> label = new HashSet();
+	private HashSet<String> definition = new HashSet();
 	private HashSet<HashMap<String,String>> broader = new HashSet<HashMap<String,String>>();
 	private HashSet<HashMap<String,String>> narrower = new HashSet<HashMap<String,String>>();
 
-	public Autosuggest(String ID) {
+	public SuggestionItem(String ID) {
 		id = ID;
 	}
 	
@@ -22,22 +22,6 @@ public class Autosuggest {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
-	}
-
-	public String getDefinition() {
-		return definition;
-	}
-
-	public void setDefinition(String definition) {
-		this.definition = definition;
 	}
 
 	public HashSet<HashMap<String, String>> getBroader() {
@@ -63,5 +47,23 @@ public class Autosuggest {
 	public void setSchemeTitle(String schemeTitle) {
 		this.schemeTitle = schemeTitle;
 	}
+
+	public HashSet<String> getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label.add(label);
+	}
+
+	public HashSet<String> getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(String definition) {
+		this.definition.add(definition);
+	}
+	
+	
 	
 }

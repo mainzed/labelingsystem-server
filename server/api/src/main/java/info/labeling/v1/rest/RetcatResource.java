@@ -1,18 +1,17 @@
 package info.labeling.v1.rest;
 
 import de.i3mainz.ls.rdfutils.exceptions.Logging;
-import info.labeling.v1.utils.Autosuggest;
+import info.labeling.v1.utils.SuggestionItem;
 import info.labeling.v1.utils.PropertiesLocal;
 import info.labeling.v1.utils.RetcatItems;
 import info.labeling.v1.utils.SQlite;
+import info.labeling.v1.utils.SuggestionItem;
 import info.labeling.v1.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -204,9 +203,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -215,7 +214,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -271,8 +270,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -331,7 +330,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -389,9 +388,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -400,7 +399,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -456,8 +455,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -516,7 +515,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -574,9 +573,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -585,7 +584,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -641,8 +640,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -701,7 +700,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -712,9 +711,10 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/aat")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsAAT(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
+    public Response getResultsAAT(@QueryParam("query") String searchword) {
         try {
-            String url = "http://vocab.getty.edu/sparql";
+            String lang = "en"; // language for scopeNote
+			String url = "http://vocab.getty.edu/sparql";
             String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle { "
                     + "?Subject a skos:Concept. "
                     + "?Subject luc:term '" + searchword + "' . "
@@ -759,9 +759,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -770,7 +770,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -825,8 +825,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -885,7 +885,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -896,9 +896,9 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/tgn")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsTGN(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
+    public Response getResultsTGN(@QueryParam("query") String searchword) {
         try {
-            String url = "http://vocab.getty.edu/sparql";
+			String url = "http://vocab.getty.edu/sparql";
             String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
                     + "?Subject a skos:Concept. "
                     + "?Subject luc:term '" + searchword + "' . "
@@ -906,7 +906,6 @@ public class RetcatResource {
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme rdfs:label ?schemeTitle . "
                     + "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    //+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
                     + "OPTIONAL {?Subject gvp:parentString ?scopeNote . } "
                     + "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
                     + "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
@@ -944,9 +943,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -955,7 +954,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -1010,8 +1009,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1070,7 +1069,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1081,9 +1080,10 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/ulan")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsULAN(@QueryParam("query") String searchword, @QueryParam("lang") String lang) {
+    public Response getResultsULAN(@QueryParam("query") String searchword) {
         try {
-            String url = "http://vocab.getty.edu/sparql";
+            String lang = "en"; // language for scopeNote
+			String url = "http://vocab.getty.edu/sparql";
             String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
                     + "?Subject a skos:Concept. "
                     + "?Subject luc:term '" + searchword + "' . "
@@ -1128,9 +1128,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -1139,7 +1139,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -1194,8 +1194,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1254,7 +1254,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1285,12 +1285,12 @@ public class RetcatResource {
             // fill objects
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
             JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (Object element : resultsArray) {
                 JSONObject tmpElement = (JSONObject) element;
                 String uriValue = (String) tmpElement.get("uri");
-                autosuggests.put(uriValue, new Autosuggest(uriValue));
-                Autosuggest tmpAutosuggest = autosuggests.get(uriValue);
+                autosuggests.put(uriValue, new SuggestionItem(uriValue));
+                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
                 String labelValue = (String) tmpElement.get("label");
                 tmpAutosuggest.setLabel(labelValue);
                 String descriptionValue = (String) tmpElement.get("description");
@@ -1299,8 +1299,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1327,7 +1327,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1358,13 +1358,13 @@ public class RetcatResource {
             // fill objects
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
             JSONArray resultsArray = (JSONArray) jsonObject.get("geonames");
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (Object element : resultsArray) {
                 JSONObject tmpElement = (JSONObject) element;
                 Long uriValue = (Long) tmpElement.get("geonameId");
                 String uri = "http://sws.geonames.org/" + uriValue;
-                autosuggests.put(uri, new Autosuggest(uri));
-                Autosuggest tmpAutosuggest = autosuggests.get(uri);
+                autosuggests.put(uri, new SuggestionItem(uri));
+                SuggestionItem tmpAutosuggest = autosuggests.get(uri);
                 String labelValue = (String) tmpElement.get("name");
                 tmpAutosuggest.setLabel(labelValue);
                 String adminName1 = (String) tmpElement.get("adminName1");
@@ -1374,8 +1374,8 @@ public class RetcatResource {
                 tmpAutosuggest.setDefinition(adminName1 + ", " + countryName + " [" + lat + " " + lon + "]");
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1402,7 +1402,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1433,13 +1433,13 @@ public class RetcatResource {
             // fill objects
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
             JSONArray resultsArray = (JSONArray) jsonObject.get("items");
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (Object element : resultsArray) {
                 JSONObject tmpElement = (JSONObject) element;
                 String uriValue = (String) tmpElement.get("identifier");
                 if (uriValue.contains("pleiades.stoa.org")) {
-                    autosuggests.put(uriValue, new Autosuggest(uriValue));
-                    Autosuggest tmpAutosuggest = autosuggests.get(uriValue);
+                    autosuggests.put(uriValue, new SuggestionItem(uriValue));
+                    SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
                     String labelValue = (String) tmpElement.get("title");
                     tmpAutosuggest.setLabel(labelValue);
                     String descriptionValue = (String) tmpElement.get("description");
@@ -1449,8 +1449,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1477,7 +1477,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1507,14 +1507,14 @@ public class RetcatResource {
             // fill objects
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
             JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (Object element : resultsArray) {
                 JSONObject tmpElement = (JSONObject) element;
                 JSONObject resourceObject = (JSONObject) tmpElement.get("resource");
                 String uriValue = (String) resourceObject.get("@id");
                 uriValue = "http://chronontology.dainst.org" + uriValue;
-                autosuggests.put(uriValue, new Autosuggest(uriValue));
-                Autosuggest tmpAutosuggest = autosuggests.get(uriValue);
+                autosuggests.put(uriValue, new SuggestionItem(uriValue));
+                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
                 String labelValue = resourceObject.get("prefLabel").toString().replace("}", "").split(":")[1].replace("\"", "");
                 tmpAutosuggest.setLabel(labelValue);
                 String descriptionValue = (String) resourceObject.get("description");
@@ -1581,8 +1581,8 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
                 // label
@@ -1641,7 +1641,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1659,13 +1659,11 @@ public class RetcatResource {
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme dc:title ?schemeTitle . "
-                    + "?Subject skos:prefLabel ?prefLabels . "
-                    + "?Subject ls:preferredLabel ?prefLabel . "
+                    + "?Subject skos:prefLabel ?prefLabel . "
                     + "OPTIONAL { ?Subject skos:note ?scopeNote . } "
-                    + "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i')) "
+                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "} LIMIT " + LIMIT;
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -1700,9 +1698,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -1711,7 +1709,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -1767,18 +1765,18 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
+				// scheme
+                JSONArray schemeArrayNew = new JSONArray();
+                schemeArrayNew.add(tmpAS.getSchemeTitle());
+                suggestionObjectCollection.put("scheme", schemeArrayNew);
                 // label
                 JSONArray labelArrayNew = new JSONArray();
                 labelArrayNew.add(tmpAS.getLabel());
                 suggestionObjectCollection.put("label", labelArrayNew);
-                // scheme
-                JSONArray schemeArrayNew = new JSONArray();
-                schemeArrayNew.add(tmpAS.getSchemeTitle());
-                suggestionObjectCollection.put("scheme", schemeArrayNew);
                 // definition
                 JSONArray scopeNoteArrayNew = new JSONArray();
                 if (!tmpAS.getDefinition().equals("")) {
@@ -1827,7 +1825,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1845,13 +1843,11 @@ public class RetcatResource {
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme dc:title ?schemeTitle . "
-                    + "?Subject skos:prefLabel ?prefLabels . "
-                    //+ "?Subject ls:preferredLabel ?prefLabel . "
+                    + "?Subject skos:prefLabel ?prefLabel . "
                     + "OPTIONAL { ?Subject skos:note ?scopeNote . } "
-                    + "OPTIONAL { ?Subject skos:note ?scopeNotes . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?prefLabels, '" + searchword + "', 'i') || regex(?scopeNotes, '" + searchword + "', 'i')) "
+                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "FILTER(?scheme=<http://" + PropertiesLocal.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                     + "} LIMIT " + LIMIT;
             URL obj = new URL(url);
@@ -1887,9 +1883,9 @@ public class RetcatResource {
                 uris.add(subjectValue);
             }
             // create list of autosuggest objects
-            Map<String, Autosuggest> autosuggests = new HashMap<String, Autosuggest>();
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
             for (String element : uris) {
-                autosuggests.put(element, new Autosuggest(element));
+                autosuggests.put(element, new SuggestionItem(element));
             }
             // fill objects
             for (Object element : bindingsArray) {
@@ -1898,7 +1894,7 @@ public class RetcatResource {
                 JSONObject subject = (JSONObject) tmpElement.get("Subject");
                 String subjectValue = (String) subject.get("value");
                 // for every subject value get object from list and write values in it 
-                Autosuggest tmpAutosuggest = autosuggests.get(subjectValue);
+                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
                 // get Label
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
@@ -1954,18 +1950,18 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, Autosuggest> entry : autosuggests.entrySet()) {
-                Autosuggest tmpAS = entry.getValue();
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
                 JSONObject suggestionObject = new JSONObject();
                 JSONObject suggestionObjectCollection = new JSONObject();
+				// scheme
+                JSONArray schemeArrayNew = new JSONArray();
+                schemeArrayNew.add(tmpAS.getSchemeTitle());
+                suggestionObjectCollection.put("scheme", schemeArrayNew);
                 // label
                 JSONArray labelArrayNew = new JSONArray();
                 labelArrayNew.add(tmpAS.getLabel());
                 suggestionObjectCollection.put("label", labelArrayNew);
-                // scheme
-                JSONArray schemeArrayNew = new JSONArray();
-                schemeArrayNew.add(tmpAS.getSchemeTitle());
-                suggestionObjectCollection.put("scheme", schemeArrayNew);
                 // definition
                 JSONArray scopeNoteArrayNew = new JSONArray();
                 if (!tmpAS.getDefinition().equals("")) {
@@ -2014,7 +2010,7 @@ public class RetcatResource {
                 suggestionObject.put(tmpAS.getId(), suggestionObjectCollection);
                 outArray.add(suggestionObject);
             }
-            jsonOut.put("autosuggest", outArray);
+            jsonOut.put("suggestions", outArray);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
