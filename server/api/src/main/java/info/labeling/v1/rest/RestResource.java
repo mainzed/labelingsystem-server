@@ -13,7 +13,7 @@ public class RestResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getAPIpage() throws URISyntaxException {
-		return Response.ok("{\"info\": \"Welcome to the Labeling System API Version 1.0\",\"link\": \"http://labeling.link\"}").build();
+		return Response.ok("{\"info\": \"Welcome to the Labeling System API Version 1.0\",\"link\": \"http://labeling.i3mainz.hs-mainz.de/share/apidoc_20160720.htm\"}").build();
 		
 	}
 
