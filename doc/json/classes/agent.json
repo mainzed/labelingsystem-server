@@ -1,0 +1,13 @@
+{
+	"agent": {
+		"id": [],
+		"name": ["kai"],
+		"email": ["mailto:kai@example.com"],
+		"firstName": ["K"],
+		"lastName": ["ai"],
+		"homepage": [],
+		"img": [],
+		"lat": [],
+		"lon": []
+	}
+}

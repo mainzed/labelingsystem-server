@@ -1,16 +1,14 @@
 {
-    "vocab":
-    {
-        "title":["Elephant@en"],
-		"description":["This is an animal.@de"],
-        "retcats":["true"],
-        "releaseType":["public"],
-        "theme":["http://example.com/tier"],
-        "creator":["test"],
-        "statusType":["active"],
-        "created":["2016-06-21T15:10:28.110+0200"],  
-        "license":["http://creativecommons.org/licenses/by/4.0/"],
-        "contributor":["test","flo","ich"],
-        "id":["7c1bd125-72e0-483f-97dc-1b1fd90c7496"]
+    "vocab": {
+        "title": ["Elephant@en"],
+        "description": ["This is an animal.@de"],
+        "releaseType": ["public"],
+        "theme": ["http://example.com/tier"],
+        "creator": ["test"],
+        "statusType": ["active"],
+        "created": ["2016-06-21T15:10:28.110+0200"],
+        "license": ["http://creativecommons.org/licenses/by/4.0/"],
+        "contributor": ["test", "flo", "ich"],
+        "id": ["7c1bd125-72e0-483f-97dc-1b1fd90c7496"]
     }
 }

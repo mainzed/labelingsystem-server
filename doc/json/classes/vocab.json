@@ -1,0 +1,16 @@
+{
+	"vocab": {
+		"title": ["furniture@en"],
+		"description": ["Something in the room@en"],
+		"releaseType": ["draft"],
+		"statusType": [],
+		"theme": [],
+		"created": [],
+		"modified": [],
+		"topConcept": [],
+		"creator": [],
+		"contributor": [],
+		"id": [],
+		"license": []
+	}
+}

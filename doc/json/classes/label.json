@@ -1,0 +1,29 @@
+{
+	"label": {
+		"vocab": ["http://labeling.i3mainz.hs-mainz.de/item/vocabulary/9c51004c-7746-4bfd-b4be-93e1d3551ebb"],
+		"creator": [],
+		"contributor": [],
+		"id": [],
+		"license": [],
+		"prefLabel": ["chair@en", "Stuhl@de", "chaise@fr"],
+		"altLabel": [],
+		"note": [],
+		"definition": [],
+		"preferredLabel": ["chair@en"],
+		"statusType": [],
+		"context": [],
+		"related": [],
+		"broader": [],
+		"narrower": [],
+		"relatedMatch": [],
+		"broadMatch": [],
+		"narrowMatch": [],
+		"closeMatch": [],
+		"exactMatch": [],
+		"seeAlso": [],
+		"definedBy": [],
+		"sameAs": [],
+		"created": [],
+		"modified": []
+	}
+}
