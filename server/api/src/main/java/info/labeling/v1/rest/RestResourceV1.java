@@ -11,8 +11,9 @@ public class RestResourceV1 {
 
 	@GET
 	public Response getAPIpage() throws URISyntaxException {
-		URI uri = new URI("https://gist.github.com/florianthiery/539427960fb629ec861d6e9e8cb0a0db");
-		return Response.seeOther(uri).build();
+		return Response.noContent().build();
+		//URI uri = new URI("https://gist.github.com/florianthiery/539427960fb629ec861d6e9e8cb0a0db");
+		//return Response.seeOther(uri).build();
 	}
 
 }

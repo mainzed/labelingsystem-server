@@ -501,7 +501,125 @@ public class LabelsResource {
             }
         }
     }
-	
+
+    @GET
+    @Path("/{label}/hierarchy")
+    @Produces("application/json;charset=UTF-8")
+    public Response getLabel_BNR(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+        try {
+            String query = Utils.getHierarchyForLabelsOneStep(label);
+            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            HashSet<String> nT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "narrowerTerm");
+            HashSet<String> bT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "broaderTerm");
+            HashSet<String> rT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "relatedTerm");
+            JSONObject jsonOut = new JSONObject();
+            JSONArray ntArray = new JSONArray();
+            for (String item : nT) {
+                if (item != null) {
+                    ntArray.add(item);
+                }
+            }
+            jsonOut.put("narrower", ntArray);
+            JSONArray btArray = new JSONArray();
+            for (String item : bT) {
+                if (item != null) {
+                    btArray.add(item);
+                }
+            }
+            jsonOut.put("broader", btArray);
+            JSONArray rtArray = new JSONArray();
+            for (String item : rT) {
+                if (item != null) {
+                    rtArray.add(item);
+                }
+            }
+            jsonOut.put("related", rtArray);
+            return Response.ok(jsonOut.toJSONString()).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+    
+    @GET
+    @Path("/{label}/relations")
+    @Produces("application/json;charset=UTF-8")
+    public Response getLabel_Relations(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+        try {
+            String query = Utils.getRelationsForLabelsByCreator(label);
+            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            HashSet<String> nT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "nt");
+            HashSet<String> bT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "bt");
+            HashSet<String> rT= Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "rt");
+            HashSet<String> nmT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "nmt");
+            HashSet<String> bmT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "bmt");
+            HashSet<String> rmT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "rmt");
+            HashSet<String> cmT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "cmt");
+            HashSet<String> emT = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "emt");
+            JSONObject jsonOut = new JSONObject();
+            JSONArray ntArray = new JSONArray();
+            for (String item : nT) {
+                if (item != null) {
+                    ntArray.add(item);
+                }
+            }
+            jsonOut.put("narrower", ntArray);
+            JSONArray btArray = new JSONArray();
+            for (String item : bT) {
+                if (item != null) {
+                    btArray.add(item);
+                }
+            }
+            jsonOut.put("broader", btArray);
+            JSONArray rtArray = new JSONArray();
+            for (String item : rT) {
+                if (item != null) {
+                    rtArray.add(item);
+                }
+            }
+            jsonOut.put("related", rtArray);
+            JSONArray nmtArray = new JSONArray();
+            for (String item : nmT) {
+                if (item != null) {
+                    nmtArray.add(item);
+                }
+            }
+            jsonOut.put("narrowMatch", nmtArray);
+            JSONArray bmtArray = new JSONArray();
+            for (String item : bmT) {
+                if (item != null) {
+                    bmtArray.add(item);
+                }
+            }
+            jsonOut.put("broadMatch", bmtArray);
+            JSONArray rmtArray = new JSONArray();
+            for (String item : rmT) {
+                if (item != null) {
+                    rmtArray.add(item);
+                }
+            }
+            jsonOut.put("relatedMatch", rmtArray);
+            JSONArray cmtArray = new JSONArray();
+            for (String item : cmT) {
+                if (item != null) {
+                    cmtArray.add(item);
+                }
+            }
+            jsonOut.put("closeMatch", cmtArray);
+            JSONArray emtArray = new JSONArray();
+            for (String item : emT) {
+                if (item != null) {
+                    emtArray.add(item);
+                }
+            }
+            jsonOut.put("exactMatch", emtArray);
+            return Response.ok(jsonOut.toJSONString()).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
     @POST
     @Path("/user/{user}")
     @Consumes(MediaType.APPLICATION_JSON)
