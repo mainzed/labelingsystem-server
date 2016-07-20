@@ -59,21 +59,6 @@ public class Transformer {
                 descriptionArrayNew.add(descriptionObject);
                 vocabularyObject.put(rdf.getPrefixItem("dc:description"), descriptionArrayNew);
             }
-            // change retcats
-            String retcatsString = null;
-            JSONArray retcatsArray = (JSONArray) vocabularyObject.get("retcats");
-            if (retcatsArray != null && !retcatsArray.isEmpty()) {
-                for (Object element : retcatsArray) {
-                    retcatsString = (String) element;
-                }
-                vocabularyObject.remove("retcats");
-                JSONArray retcatsArrayNew = new JSONArray();
-                JSONObject retcatsObject = new JSONObject();
-                retcatsObject.put("type", "literal");
-                retcatsObject.put("value", retcatsString);
-                retcatsArrayNew.add(retcatsObject);
-                vocabularyObject.put(rdf.getPrefixItem("ls:isRetcatsItem"), retcatsArrayNew);
-            }
             // change releasetype
             String releaseString = null;
             JSONArray releaseArray = (JSONArray) vocabularyObject.get("releaseType");
@@ -85,7 +70,7 @@ public class Transformer {
                 JSONArray releaseArrayNew = new JSONArray();
                 JSONObject releaseObject = new JSONObject();
                 releaseObject.put("type", "uri");
-                if (releaseString.equals("hidden")) {
+                if (releaseString.equals("draft")) {
                     releaseObject.put("value", rdf.getPrefixItem("ls:Hidden"));
                 } else {
                     releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
@@ -200,20 +185,6 @@ public class Transformer {
                 }
             }
         }
-        // change ls:isRetcatsItem
-        JSONArray retcatsArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:isRetcatsItem"));
-        if (retcatsArray != null && !retcatsArray.isEmpty()) {
-            for (Object element : retcatsArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("ls:isRetcatsItem"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONArray arrayNew = new JSONArray();
-                arrayNew.add(value);
-                if (fields == null || fields.contains("retcats")) {
-                    vocabularyObject.put(rdf.getPrefixItem("retcats"), arrayNew);
-                }
-            }
-        }
         // change ls:hasReleaseType
         JSONArray releaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
         if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
@@ -221,8 +192,8 @@ public class Transformer {
                 vocabularyObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
                 JSONObject obj = (JSONObject) element;
                 String value = (String) obj.get("value");
-                if (value.contains("Hidden")) {
-                    value = "hidden";
+                if (value.contains("Draft")) {
+                    value = "draft";
                 } else {
                     value = "public";
                 }

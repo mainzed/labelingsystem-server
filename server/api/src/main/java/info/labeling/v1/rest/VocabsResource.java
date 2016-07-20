@@ -797,7 +797,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:hasTopConcept,dct:contributor,dc:contributor,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:isRetcatsItem)) "
+                + "FILTER (?p IN (skos:hasTopConcept,dct:contributor,dc:contributor,dc:title,dc:description,ls:hasReleaseType,dcat:theme)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
@@ -844,10 +844,6 @@ public class VocabsResource {
         if (themenArray != null && !themenArray.isEmpty()) {
             deleteList.add("dcat:theme");
         }
-        JSONArray isRetcatsItemArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:isRetcatsItem"));
-        if (isRetcatsItemArray != null && !isRetcatsItemArray.isEmpty()) {
-            deleteList.add("ls:isRetcatsItem");
-        }
         // SEND DELETE
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
@@ -876,7 +872,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:isRetcatsItem,ls:sameAs,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
+                + "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:sameAs,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
