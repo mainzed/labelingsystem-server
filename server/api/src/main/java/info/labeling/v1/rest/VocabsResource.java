@@ -709,10 +709,6 @@ public class VocabsResource {
         triples += item + ":" + itemid + " a ls:Vocabulary . ";
         triples += item + ":" + itemid + " a skos:ConceptScheme . ";
         triples += item + ":" + itemid + " ls:hasStatusType ls:Active . ";
-        triples += item + ":" + itemid + " ls:sameAs "
-                + "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
-                .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", itemid).replace("$item", "vocabulary") + ">" + " . ";
         triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
         triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
@@ -872,7 +868,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,ls:sameAs,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
+                + "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;

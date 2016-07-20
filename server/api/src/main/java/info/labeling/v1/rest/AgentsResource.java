@@ -614,10 +614,6 @@ public class AgentsResource {
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Agent . ";
         triples += item + ":" + itemid + " a foaf:Agent . ";
-        triples += item + ":" + itemid + " ls:sameAs "
-                + "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
-                .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", itemid).replace("$item", "agent") + ">" + " . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
 		triples += item + ":" + itemid + " foaf:accountName \"" + itemid + "\"" + " . ";
         triples += " }";

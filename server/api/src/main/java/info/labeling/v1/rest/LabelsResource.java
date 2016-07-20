@@ -783,10 +783,6 @@ public class LabelsResource {
         triples += item + ":" + itemid + " a ls:Label . ";
         triples += item + ":" + itemid + " a skos:ConceptScheme . ";
         triples += item + ":" + itemid + " ls:hasStatusType ls:Active . ";
-        triples += item + ":" + itemid + " ls:sameAs "
-                + "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
-                .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", itemid).replace("$item", "label") + ">" + " . ";
         triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
         triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
@@ -874,7 +870,7 @@ public class LabelsResource {
                 + "OPTIONAL { ?resource skos:broader ?label . } "
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:preferredLang,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,skos:inScheme)) "
+                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,skos:inScheme)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
@@ -948,10 +944,6 @@ public class LabelsResource {
         JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
         if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
             deleteList.add("ls:preferredLabel");
-        }
-        JSONArray preferredLangArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLang"));
-        if (preferredLangArray != null && !preferredLangArray.isEmpty()) {
-            deleteList.add("ls:preferredLang");
         }
         JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:context"));
         if (contextArray != null && !contextArray.isEmpty()) {
@@ -1033,7 +1025,7 @@ public class LabelsResource {
                 + "?label ?p ?o. "
                 + "?label dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:preferredLang,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,dc:created,dc:modified,ls:sameAs)) "
+                + "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
