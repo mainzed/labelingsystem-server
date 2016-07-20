@@ -16,7 +16,7 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-@Path("/v1/wayback")
+@Path("/wayback")
 public class WaybackResource {
 
 	@GET

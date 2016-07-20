@@ -33,7 +33,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
-@Path("/v1/retcat")
+@Path("/retcat")
 public class RetcatResource {
 
     private final String LIMIT = "20";

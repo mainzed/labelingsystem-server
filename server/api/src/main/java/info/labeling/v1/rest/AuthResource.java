@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
-@Path("/v1/auth")
+@Path("/auth")
 public class AuthResource {
 
     @POST

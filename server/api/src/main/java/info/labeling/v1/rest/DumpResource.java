@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.FileFileFilter;
 
-@Path("/v1/dump")
+@Path("/dump")
 public class DumpResource {
 
 	public static String mode = "start";

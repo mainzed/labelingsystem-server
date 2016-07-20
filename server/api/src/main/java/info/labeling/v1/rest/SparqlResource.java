@@ -17,7 +17,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-@Path("/v1/sparql")
+@Path("/sparql")
 public class SparqlResource {
 
     private static String QUERY = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";

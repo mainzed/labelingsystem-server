@@ -52,7 +52,7 @@ import org.json.simple.parser.ParseException;
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
  * @version 23.06.2016
  */
-@Path("/v1/vocabs")
+@Path("/vocabs")
 public class VocabsResource {
 
     @GET

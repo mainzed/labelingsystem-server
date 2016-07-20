@@ -38,7 +38,7 @@ import org.openrdf.query.BindingSet;
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
  * @version 27.06.2016
  */
-@Path("/v1/revisions")
+@Path("/revisions")
 public class RevisionsResource {
 
     @GET

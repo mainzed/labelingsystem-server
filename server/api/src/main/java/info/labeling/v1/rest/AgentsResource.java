@@ -47,7 +47,7 @@ import org.json.simple.parser.ParseException;
  * @author i3mainz - Institute for Spatial Information and Surveying Technology
  * @version 27.06.2016
  */
-@Path("/v1/agents")
+@Path("/agents")
 public class AgentsResource {
 
     @GET

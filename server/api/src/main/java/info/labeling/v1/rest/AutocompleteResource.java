@@ -19,7 +19,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.openrdf.query.BindingSet;
 
-@Path("/v1/autocomplete")
+@Path("/autocomplete")
 public class AutocompleteResource {
 
     @GET
