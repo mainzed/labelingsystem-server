@@ -38,6 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import org.jboss.resteasy.annotations.GZIP;
 import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -45,17 +46,10 @@ import org.openrdf.query.BindingSet;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- * REST API for Vocabularies
- *
- * @author Florian Thiery M.Sc.
- * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 23.06.2016
- */
 @Path("/labels")
 public class LabelsResource {
 
-    @GET
+	@GET
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getLabels(
             @HeaderParam("Accept") String acceptHeader,
@@ -132,8 +126,6 @@ public class LabelsResource {
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
-            JSONObject out = new JSONObject();
-            JSONObject outObject = new JSONObject();
             JSONArray outArray = new JSONArray();
             for (String element : ids) {
                 String item = "ls_lab";
@@ -148,30 +140,29 @@ public class LabelsResource {
                     rdf.setModelTriple(item + ":" + element, predicates.get(j), objects.get(j));
                 }
                 if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
-                    outObject = Transformer.label_GET(rdf.getModel("RDF/JSON"), element, fields);
-                    outArray.add(outObject);
+                    JSONObject tmp = Transformer.label_GET(rdf.getModel("RDF/JSON"), element, fields);
+                    outArray.add(tmp);
                 }
-                out.put("labels", outArray);
             }
             if (acceptHeader.contains("application/json")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).build();
                 } else {
-                    return Response.ok(out).build();
+                    return Response.ok(outArray).build();
                 }
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
                 } else {
-                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                    return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
                 }
             } else if (acceptHeader.contains("application/xml")) {
                 return Response.ok(rdf.getModel("RDF/XML")).build();
@@ -185,11 +176,11 @@ public class LabelsResource {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else if (pretty) {
                 JsonParser parser = new JsonParser();
-                JsonObject json = parser.parse(out.toString()).getAsJsonObject();
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
@@ -274,6 +265,7 @@ public class LabelsResource {
     }
 
     @GET
+	@GZIP
     @Path("/{label}.json")
     @Produces("application/json;charset=UTF-8")
     public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
@@ -870,7 +862,7 @@ public class LabelsResource {
                 + "OPTIONAL { ?resource skos:broader ?label . } "
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,skos:inScheme)) "
+                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,skos:inScheme)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
@@ -888,11 +880,7 @@ public class LabelsResource {
                 // nur optional
                 if (element.equals("altLabel")) {
                     deleteList.add("skos:altLabel");
-                } else if (element.equals("note")) {
-                    deleteList.add("skos:note");
-                } else if (element.equals("definition")) {
-                    deleteList.add("skos:definition");
-                } else if (element.equals("context")) {
+                }  else if (element.equals("context")) {
                     deleteList.add("ls:context");
                 } else if (element.equals("related")) {
                     deleteList.add("skos:related");
@@ -912,10 +900,6 @@ public class LabelsResource {
                     deleteList.add("skos:broadMatch");
                 } else if (element.equals("seeAlso")) {
                     deleteList.add("rdfs:seeAlso");
-                } else if (element.equals("definedBy")) {
-                    deleteList.add("rdfs:isDefinedBy");
-                } else if (element.equals("sameAs")) {
-                    deleteList.add("owl:sameAs");
                 }
             }
         }
@@ -932,14 +916,6 @@ public class LabelsResource {
         JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
         if (altLabelArray != null && !altLabelArray.isEmpty()) {
             deleteList.add("skos:altLabel");
-        }
-        JSONArray noteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:note"));
-        if (noteArray != null && !noteArray.isEmpty()) {
-            deleteList.add("skos:note");
-        }
-        JSONArray definitionArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:definition"));
-        if (definitionArray != null && !definitionArray.isEmpty()) {
-            deleteList.add("skos:definition");
         }
         JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
         if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
@@ -985,14 +961,6 @@ public class LabelsResource {
         if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
             deleteList.add("rdfs:seeAlso");
         }
-        JSONArray isDefinedByArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:isDefinedBy"));
-        if (isDefinedByArray != null && !isDefinedByArray.isEmpty()) {
-            deleteList.add("rdfs:isDefinedBy");
-        }
-        JSONArray sameAsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("owl:sameAs"));
-        if (sameAsArray != null && !sameAsArray.isEmpty()) {
-            deleteList.add("owl:sameAs");
-        }
         // SEND DELETE
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
@@ -1025,7 +993,7 @@ public class LabelsResource {
                 + "?label ?p ?o. "
                 + "?label dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:note,skos:definition,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,rdfs:isDefinedBy,owl:sameAs,dc:created,dc:modified)) "
+                + "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;

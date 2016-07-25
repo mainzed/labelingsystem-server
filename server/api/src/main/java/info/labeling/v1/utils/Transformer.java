@@ -1,6 +1,8 @@
 package info.labeling.v1.utils;
 
 import de.i3mainz.ls.rdfutils.RDF;
+import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
+import de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException;
 import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,6 +11,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.repository.RepositoryException;
 
 public class Transformer {
 
@@ -300,7 +305,7 @@ public class Transformer {
 			arrayNew.add(value);
 			vocabularyObject.put(rdf.getPrefixItem("id"), arrayNew);
 		}
-        // OPTIONAL VALUES
+		// OPTIONAL VALUES
 		// change skos:hasTopConcept
 		JSONArray topConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
 		if (topConceptArray != null && !topConceptArray.isEmpty()) {
@@ -678,50 +683,41 @@ public class Transformer {
 		//init
 		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 		// parse json
-		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+		//JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		// change id
-		jsonObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), jsonObject.remove("label"));
-		JSONObject labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_lab" + ":" + id));
+		//jsonObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), jsonObject.remove("label"));
+		//JSONObject labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_lab" + ":" + id));
+		JSONObject rdfObject = new JSONObject();
+		JSONObject labelObject = (JSONObject) new JSONParser().parse(json);
 		// for patch
 		JSONArray flushArray = (JSONArray) labelObject.get("flush");
 		if (flushArray != null && !flushArray.isEmpty()) {
-			return jsonObject.toJSONString();
+			return labelObject.toJSONString();
 		} else {
 			// change prefLabel
-			JSONArray prefLabelArray = (JSONArray) labelObject.get("prefLabel");
-			List<String> prefLabelStringList = new ArrayList<String>();
+			JSONArray prefLabelArray = (JSONArray) labelObject.get("prefLabels");
 			if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
-				for (Object element : prefLabelArray) {
-					prefLabelStringList.add((String) element);
-				}
-				labelObject.remove("prefLabel");
+				labelObject.remove("prefLabels");
 				JSONArray arrayNew = new JSONArray();
-				for (String element : prefLabelStringList) {
-					String[] tmpStringArray = element.split("@");
+				for (Object element : prefLabelArray) {
+					JSONObject thisObject = (JSONObject) element;
 					JSONObject tmpObject = new JSONObject();
 					tmpObject.put("type", "literal");
-					tmpObject.put("value", tmpStringArray[0]);
-					tmpObject.put("lang", tmpStringArray[1]);
+					tmpObject.put("value", thisObject.get("value"));
+					tmpObject.put("lang", thisObject.get("lang"));
 					arrayNew.add(tmpObject);
+					Boolean thumbnail = (Boolean) thisObject.get("isThumbnail");
+					if (thumbnail) {
+						JSONArray tmpArray = new JSONArray();
+						JSONObject tmpObject2 = new JSONObject();
+						tmpObject2.put("type", "literal");
+						tmpObject2.put("value", thisObject.get("value"));
+						tmpObject2.put("lang", thisObject.get("lang"));
+						tmpArray.add(tmpObject2);
+						labelObject.put(rdf.getPrefixItem("ls:preferredLabel"), tmpArray);
+					}
 				}
 				labelObject.put(rdf.getPrefixItem("skos:prefLabel"), arrayNew);
-			}
-			// change preferredLabel
-			JSONArray preferredLabelArray = (JSONArray) labelObject.get("preferredLabel");
-			if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-				String[] preferredLabelStringArray = null;
-				for (Object element : preferredLabelArray) {
-					String tmpString = (String) element;
-					preferredLabelStringArray = tmpString.split("@");
-				}
-				labelObject.remove("preferredLabel");
-				JSONArray arrayNew = new JSONArray();
-				JSONObject tmpObject = new JSONObject();
-				tmpObject.put("type", "literal");
-				tmpObject.put("value", preferredLabelStringArray[0]);
-				tmpObject.put("lang", preferredLabelStringArray[1]);
-				arrayNew.add(tmpObject);
-				labelObject.put(rdf.getPrefixItem("ls:preferredLabel"), arrayNew);
 			}
 			// change vocabID
 			String vocabArray = (String) labelObject.get("vocabID");
@@ -735,99 +731,51 @@ public class Transformer {
 				labelObject.put(rdf.getPrefixItem("skos:inScheme"), arrayNew);
 			}
 			// change altLabel
-			JSONArray altLabelArray = (JSONArray) labelObject.get("altLabel");
-			List<String> altLabelStringList = new ArrayList<String>();
+			JSONArray altLabelArray = (JSONArray) labelObject.get("altLabels");
 			if (altLabelArray != null && !altLabelArray.isEmpty()) {
-				for (Object element : altLabelArray) {
-					altLabelStringList.add((String) element);
-				}
-				labelObject.remove("altLabel");
+				labelObject.remove("altLabels");
 				JSONArray arrayNew = new JSONArray();
-				for (String element : altLabelStringList) {
-					String[] tmpStringArray = element.split("@");
+				for (Object element : altLabelArray) {
+					JSONObject thisObject = (JSONObject) element;
 					JSONObject tmpObject = new JSONObject();
 					tmpObject.put("type", "literal");
-					tmpObject.put("value", tmpStringArray[0]);
-					tmpObject.put("lang", tmpStringArray[1]);
+					tmpObject.put("value", thisObject.get("value"));
+					tmpObject.put("lang", thisObject.get("lang"));
 					arrayNew.add(tmpObject);
 				}
 				labelObject.put(rdf.getPrefixItem("skos:altLabel"), arrayNew);
 			}
-			// change note
-			JSONArray noteArray = (JSONArray) labelObject.get("note");
-			List<String> noteStringList = new ArrayList<String>();
-			if (noteArray != null && !noteArray.isEmpty()) {
-				for (Object element : noteArray) {
-					noteStringList.add((String) element);
-				}
-				labelObject.remove("note");
-				JSONArray arrayNew = new JSONArray();
-				for (String element : noteStringList) {
-					String[] tmpStringArray = element.split("@");
-					JSONObject tmpObject = new JSONObject();
-					tmpObject.put("type", "literal");
-					tmpObject.put("value", tmpStringArray[0]);
-					tmpObject.put("lang", tmpStringArray[1]);
-					arrayNew.add(tmpObject);
-				}
-				labelObject.put(rdf.getPrefixItem("skos:note"), arrayNew);
-			}
 			// change scopeNote
-			String scopeNoteArray = (String) labelObject.get("scopeNote");
+			JSONObject scopeNoteArray = (JSONObject) labelObject.get("scopeNote");
 			if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
 				labelObject.remove("scopeNote");
-				String[] tmpStringArray = scopeNoteArray.split("@");
 				JSONObject tmpObject = new JSONObject();
 				tmpObject.put("type", "literal");
-				tmpObject.put("value", tmpStringArray[0]);
-				tmpObject.put("lang", tmpStringArray[1]);
+				tmpObject.put("value", scopeNoteArray.get("value"));
+				tmpObject.put("lang", scopeNoteArray.get("lang"));
 				JSONArray arrayNew = new JSONArray();
 				arrayNew.add(tmpObject);
 				labelObject.put(rdf.getPrefixItem("skos:scopeNote"), arrayNew);
 			}
-			// change definition
-			JSONArray definitionArray = (JSONArray) labelObject.get("definition");
-			List<String> definitionStringList = new ArrayList<String>();
-			if (definitionArray != null && !definitionArray.isEmpty()) {
-				for (Object element : definitionArray) {
-					definitionStringList.add((String) element);
-				}
-				labelObject.remove("definition");
-				JSONArray arrayNew = new JSONArray();
-				for (String element : definitionStringList) {
-					String[] tmpStringArray = element.split("@");
-					JSONObject tmpObject = new JSONObject();
-					tmpObject.put("type", "literal");
-					tmpObject.put("value", tmpStringArray[0]);
-					tmpObject.put("lang", tmpStringArray[1]);
-					arrayNew.add(tmpObject);
-				}
-				labelObject.put(rdf.getPrefixItem("skos:definition"), arrayNew);
-			}
 			// change context
-			JSONArray contextArray = (JSONArray) labelObject.get("context");
+			String contextArray = (String) labelObject.get("context");
 			if (contextArray != null && !contextArray.isEmpty()) {
-				String contextString = null;
-				for (Object element : contextArray) {
-					String tmpString = (String) element;
-					contextString = tmpString;
-				}
 				labelObject.remove("context");
 				JSONArray arrayNew = new JSONArray();
 				JSONObject tmpObject = new JSONObject();
 				tmpObject.put("type", "literal");
-				tmpObject.put("value", contextString);
+				tmpObject.put("value", contextArray);
 				arrayNew.add(tmpObject);
 				labelObject.put(rdf.getPrefixItem("ls:hasContext"), arrayNew);
 			}
 			// change contributor
 			List<String> contributorStringList = new ArrayList<String>();
-			JSONArray contributorArray = (JSONArray) labelObject.get("contributor");
+			JSONArray contributorArray = (JSONArray) labelObject.get("contributors");
 			if (contributorArray != null && !contributorArray.isEmpty()) {
 				for (Object element : contributorArray) {
 					contributorStringList.add((String) element);
 				}
-				labelObject.remove("contributor");
+				labelObject.remove("contributors");
 				JSONArray arrayNew = new JSONArray();
 				JSONArray arrayNew2 = new JSONArray();
 				for (String element : contributorStringList) {
@@ -855,7 +803,7 @@ public class Transformer {
 				for (String element : relatedStringList) {
 					JSONObject tmpObject = new JSONObject();
 					tmpObject.put("type", "uri");
-					tmpObject.put("value", element);
+					tmpObject.put("value", rdf.getPrefixItem("ls_lab:"+element));
 					arrayNew.add(tmpObject);
 				}
 				labelObject.put(rdf.getPrefixItem("skos:related"), arrayNew);
@@ -876,7 +824,7 @@ public class Transformer {
 				for (String element : broaderStringList) {
 					JSONObject tmpObject = new JSONObject();
 					tmpObject.put("type", "uri");
-					tmpObject.put("value", element);
+					tmpObject.put("value", rdf.getPrefixItem("ls_lab:"+element));
 					arrayNew.add(tmpObject);
 					// narrower
 					JSONObject tmpLabelObject = new JSONObject();
@@ -886,7 +834,7 @@ public class Transformer {
 					tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
 					arrayNew2.add(tmpObject2);
 					tmpLabelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew2);
-					jsonObject.put(element, tmpLabelObject);
+					rdfObject.put(rdf.getPrefixItem("ls_lab:"+element), tmpLabelObject);
 				}
 				labelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew);
 			}
@@ -895,14 +843,18 @@ public class Transformer {
 			List<String> narrowerStringList = new ArrayList<String>();
 			if (narrowerArray != null && !narrowerArray.isEmpty()) {
 				for (Object element : narrowerArray) {
-					narrowerStringList.add((String) element);
+					if (element.equals("null")) {
+						narrowerStringList.add("http://dummy.net");
+					} else {
+						narrowerStringList.add((String) element);
+					}
 				}
 				labelObject.remove("narrower");
 				JSONArray arrayNew = new JSONArray();
 				for (String element : narrowerStringList) {
 					JSONObject tmpObject = new JSONObject();
 					tmpObject.put("type", "uri");
-					tmpObject.put("value", element);
+					tmpObject.put("value", rdf.getPrefixItem("ls_lab:"+element));
 					arrayNew.add(tmpObject);
 					// broader
 					JSONObject tmpLabelObject = new JSONObject();
@@ -912,7 +864,7 @@ public class Transformer {
 					tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
 					arrayNew2.add(tmpObject2);
 					tmpLabelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew2);
-					jsonObject.put(element, tmpLabelObject);
+					rdfObject.put(rdf.getPrefixItem("ls_lab:"+element), tmpLabelObject);
 				}
 				labelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew);
 			}
@@ -921,7 +873,8 @@ public class Transformer {
 			List<String> closeMatchStringList = new ArrayList<String>();
 			if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
 				for (Object element : closeMatchArray) {
-					closeMatchStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					closeMatchStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("closeMatch");
 				JSONArray arrayNew = new JSONArray();
@@ -938,7 +891,8 @@ public class Transformer {
 			List<String> exactMatchStringList = new ArrayList<String>();
 			if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
 				for (Object element : exactMatchArray) {
-					exactMatchStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					exactMatchStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("exactMatch");
 				JSONArray arrayNew = new JSONArray();
@@ -955,7 +909,8 @@ public class Transformer {
 			List<String> relatedMatchStringList = new ArrayList<String>();
 			if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
 				for (Object element : relatedMatchArray) {
-					relatedMatchStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					relatedMatchStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("relatedMatch");
 				JSONArray arrayNew = new JSONArray();
@@ -972,7 +927,8 @@ public class Transformer {
 			List<String> narrowMatchStringList = new ArrayList<String>();
 			if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
 				for (Object element : narrowMatchArray) {
-					narrowMatchStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					narrowMatchStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("narrowMatch");
 				JSONArray arrayNew = new JSONArray();
@@ -989,7 +945,8 @@ public class Transformer {
 			List<String> broadMatchStringList = new ArrayList<String>();
 			if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
 				for (Object element : broadMatchArray) {
-					broadMatchStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					broadMatchStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("broadMatch");
 				JSONArray arrayNew = new JSONArray();
@@ -1006,7 +963,8 @@ public class Transformer {
 			List<String> seeAlsoStringList = new ArrayList<String>();
 			if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
 				for (Object element : seeAlsoArray) {
-					seeAlsoStringList.add((String) element);
+					JSONObject tmpjson = (JSONObject) element;
+					seeAlsoStringList.add((String) tmpjson.get("url"));
 				}
 				labelObject.remove("seeAlso");
 				JSONArray arrayNew = new JSONArray();
@@ -1018,51 +976,14 @@ public class Transformer {
 				}
 				labelObject.put(rdf.getPrefixItem("rdfs:seeAlso"), arrayNew);
 			}
-			// change definedBy
-			JSONArray definedByArray = (JSONArray) labelObject.get("definedBy");
-			List<String> definedByStringList = new ArrayList<String>();
-			if (definedByArray != null && !definedByArray.isEmpty()) {
-				for (Object element : definedByArray) {
-					definedByStringList.add((String) element);
-				}
-				labelObject.remove("definedBy");
-				JSONArray arrayNew = new JSONArray();
-				for (String element : definedByStringList) {
-					JSONObject tmpObject = new JSONObject();
-					tmpObject.put("type", "uri");
-					tmpObject.put("value", element);
-					arrayNew.add(tmpObject);
-				}
-				labelObject.put(rdf.getPrefixItem("rdfs:isDefinedBy"), arrayNew);
-			}
-			// change definedBy
-			JSONArray sameAsArray = (JSONArray) labelObject.get("sameAs");
-			List<String> sameAsStringList = new ArrayList<String>();
-			if (sameAsArray != null && !sameAsArray.isEmpty()) {
-				for (Object element : sameAsArray) {
-					sameAsStringList.add((String) element);
-				}
-				labelObject.remove("sameAs");
-				JSONArray arrayNew = new JSONArray();
-				for (String element : sameAsStringList) {
-					JSONObject tmpObject = new JSONObject();
-					tmpObject.put("type", "uri");
-					tmpObject.put("value", element);
-					arrayNew.add(tmpObject);
-				}
-				labelObject.put(rdf.getPrefixItem("owl:sameAs"), arrayNew);
-			}
 			// delete items
-			labelObject.remove(rdf.getPrefixItem("vocab"));
+			labelObject.remove(rdf.getPrefixItem("vocabID"));
 			labelObject.remove(rdf.getPrefixItem("creator"));
-			labelObject.remove(rdf.getPrefixItem("contributor"));
+			labelObject.remove(rdf.getPrefixItem("contributors"));
 			labelObject.remove(rdf.getPrefixItem("id"));
 			labelObject.remove(rdf.getPrefixItem("license"));
-			labelObject.remove(rdf.getPrefixItem("prefLabel"));
-			labelObject.remove(rdf.getPrefixItem("altLabel"));
-			labelObject.remove(rdf.getPrefixItem("note"));
-			labelObject.remove(rdf.getPrefixItem("definition"));
-			labelObject.remove(rdf.getPrefixItem("preferredLabel"));
+			labelObject.remove(rdf.getPrefixItem("prefLabels"));
+			labelObject.remove(rdf.getPrefixItem("altLabels"));
 			labelObject.remove(rdf.getPrefixItem("statusType"));
 			labelObject.remove(rdf.getPrefixItem("context"));
 			labelObject.remove(rdf.getPrefixItem("related"));
@@ -1074,15 +995,15 @@ public class Transformer {
 			labelObject.remove(rdf.getPrefixItem("narrowMatch"));
 			labelObject.remove(rdf.getPrefixItem("broadMatch"));
 			labelObject.remove(rdf.getPrefixItem("seeAlso"));
-			labelObject.remove(rdf.getPrefixItem("definedBy"));
-			labelObject.remove(rdf.getPrefixItem("sameAs"));
 			labelObject.remove(rdf.getPrefixItem("created"));
-			labelObject.remove(rdf.getPrefixItem("modified"));
-			return jsonObject.toJSONString();
+			labelObject.remove(rdf.getPrefixItem("modifications"));
+			// add object
+			rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
+			return rdfObject.toJSONString();
 		}
 	}
 
-	public static JSONObject label_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException {
+	public static JSONObject label_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
 		//init
 		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 		// parse json
@@ -1097,7 +1018,12 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				String arrayNew = value.split("vocabulary/")[1];
+				String arrayNew;
+				if (value.contains("vocabulary/")) {
+					arrayNew = value.split("vocabulary/")[1];
+				} else {
+					arrayNew = value;
+				}
 				if (fields == null || fields.contains("vocabID")) {
 					labelObject.put(rdf.getPrefixItem("vocabID"), arrayNew);
 				}
@@ -1110,9 +1036,7 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("dc:creator"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
-				labelObject.put(rdf.getPrefixItem("creator"), arrayNew);
+				labelObject.put(rdf.getPrefixItem("creator"), value);
 			}
 		}
 		// change dc:contrubutor
@@ -1125,7 +1049,7 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				arrayNew.add(value);
 			}
-			labelObject.put(rdf.getPrefixItem("contributor"), arrayNew);
+			labelObject.put(rdf.getPrefixItem("contributors"), arrayNew);
 		}
 		// change dc:identifier
 		JSONArray identifierArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:identifier"));
@@ -1134,9 +1058,7 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("dc:identifier"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
-				labelObject.put(rdf.getPrefixItem("id"), arrayNew);
+				labelObject.put(rdf.getPrefixItem("id"), value);
 			}
 		}
 		// change dct:license
@@ -1146,11 +1068,21 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("dct:license"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("license")) {
-					labelObject.put(rdf.getPrefixItem("license"), arrayNew);
+					labelObject.put(rdf.getPrefixItem("license"), value);
 				}
+			}
+		}
+		// get thumbnail
+		JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
+		String thumbnail = "";
+		if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
+			for (Object element : preferredLabelArray) {
+				labelObject.remove(rdf.getPrefixItem("ls:preferredLabel"));
+				JSONObject obj = (JSONObject) element;
+				String value = (String) obj.get("value");
+				String lang = (String) obj.get("lang");
+				thumbnail = value + "@" + lang;
 			}
 		}
 		// change skos:prefLabel
@@ -1162,83 +1094,48 @@ public class Transformer {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");
-				arrayNew.add(value + "@" + lang);
+				JSONObject objTmp = new JSONObject();
+				objTmp.put("value", value);
+				objTmp.put("lang", lang);
+				if (thumbnail.equals(value + "@" + lang)) {
+					objTmp.put("isThumbnail", true);
+				} else {
+					objTmp.put("isThumbnail", false);
+				}
+				arrayNew.add(objTmp);
 			}
-			labelObject.put(rdf.getPrefixItem("prefLabel"), arrayNew);
+			labelObject.put(rdf.getPrefixItem("prefLabels"), arrayNew);
 		}
 		// change skos:altLabel
 		JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
 		if (altLabelArray != null && !altLabelArray.isEmpty()) {
 			JSONArray arrayNew = new JSONArray();
 			labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
-			for (Object element : altLabelArray) {
+			for (Object element : prefLabelArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");
-				arrayNew.add(value + "@" + lang);
+				JSONObject objTmp = new JSONObject();
+				objTmp.put("value", value);
+				objTmp.put("lang", lang);
+				arrayNew.add(objTmp);
 			}
-			if (fields == null || fields.contains("altLabel")) {
-				labelObject.put(rdf.getPrefixItem("altLabel"), arrayNew);
-			}
-		}
-		// change skos:note
-		JSONArray noteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:note"));
-		if (noteArray != null && !noteArray.isEmpty()) {
-			JSONArray arrayNew = new JSONArray();
-			labelObject.remove(rdf.getPrefixItem("skos:note"));
-			for (Object element : noteArray) {
-				JSONObject obj = (JSONObject) element;
-				String value = (String) obj.get("value");
-				String lang = (String) obj.get("lang");
-				arrayNew.add(value + "@" + lang);
-			}
-			if (fields == null || fields.contains("note")) {
-				labelObject.put(rdf.getPrefixItem("note"), arrayNew);
-			}
+			labelObject.put(rdf.getPrefixItem("altLabels"), arrayNew);
 		}
 		// change skos:scopeNote
 		JSONArray scopeNoteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:scopeNote"));
 		if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
-			String arrayNew = "";
 			labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
+			JSONObject objTmp = new JSONObject();
 			for (Object element : scopeNoteArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");
-				arrayNew = value + "@" + lang;
+				objTmp.put("value", value);
+				objTmp.put("lang", lang);
 			}
 			if (fields == null || fields.contains("scopeNote")) {
-				labelObject.put(rdf.getPrefixItem("scopeNote"), arrayNew);
-			}
-		}
-		// change skos:definition
-		JSONArray definitionArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:definition"));
-		if (definitionArray != null && !definitionArray.isEmpty()) {
-			JSONArray arrayNew = new JSONArray();
-			labelObject.remove(rdf.getPrefixItem("skos:definition"));
-			for (Object element : definitionArray) {
-				JSONObject obj = (JSONObject) element;
-				String value = (String) obj.get("value");
-				String lang = (String) obj.get("lang");
-				arrayNew.add(value + "@" + lang);
-			}
-			if (fields == null || fields.contains("definition")) {
-				labelObject.put(rdf.getPrefixItem("definition"), arrayNew);
-			}
-		}
-		// change ls:preferredLabel
-		JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
-		if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-			for (Object element : preferredLabelArray) {
-				labelObject.remove(rdf.getPrefixItem("ls:preferredLabel"));
-				JSONObject obj = (JSONObject) element;
-				String value = (String) obj.get("value");
-				String lang = (String) obj.get("lang");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value + "@" + lang);
-				if (fields == null || fields.contains("preferredLabel")) {
-					labelObject.put(rdf.getPrefixItem("preferredLabel"), arrayNew);
-				}
+				labelObject.put(rdf.getPrefixItem("scopeNote"), objTmp);
 			}
 		}
 		// change ls:hasStatusType
@@ -1253,10 +1150,8 @@ public class Transformer {
 				} else {
 					value = "deleted";
 				}
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("statusType")) {
-					labelObject.put(rdf.getPrefixItem("statusType"), arrayNew);
+					labelObject.put(rdf.getPrefixItem("statusType"), value);
 				}
 			}
 		}
@@ -1267,10 +1162,8 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("context")) {
-					labelObject.put(rdf.getPrefixItem("context"), arrayNew);
+					labelObject.put(rdf.getPrefixItem("context"), value);
 				}
 			}
 		}
@@ -1282,6 +1175,7 @@ public class Transformer {
 			for (Object element : relatedArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
+				value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
 				arrayNew.add(value);
 			}
 			if (fields == null || fields.contains("related")) {
@@ -1296,6 +1190,7 @@ public class Transformer {
 			for (Object element : broaderArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
+				value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
 				arrayNew.add(value);
 			}
 			if (fields == null || fields.contains("broader")) {
@@ -1310,6 +1205,7 @@ public class Transformer {
 			for (Object element : narrowerArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
+				value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
 				arrayNew.add(value);
 			}
 			if (fields == null || fields.contains("narrower")) {
@@ -1324,7 +1220,21 @@ public class Transformer {
 			for (Object element : closeMatchArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				// get retcat info
+				boolean match = false;
+				List<String[]> retcatlist = RetcatItems.getAllItems();
+				for (String[] arrayItem : retcatlist) {
+					if (value.contains(arrayItem[3])) {
+						match = true;
+						tmpObject.put("type", arrayItem[4]);
+					}
+				}
+				if (!match) {
+					tmpObject.put("type", "wayback");
+				}
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("closeMatch")) {
 				labelObject.put(rdf.getPrefixItem("closeMatch"), arrayNew);
@@ -1338,7 +1248,21 @@ public class Transformer {
 			for (Object element : exactMatchArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				// get retcat info
+				boolean match = false;
+				List<String[]> retcatlist = RetcatItems.getAllItems();
+				for (String[] arrayItem : retcatlist) {
+					if (value.contains(arrayItem[3])) {
+						match = true;
+						tmpObject.put("type", arrayItem[4]);
+					}
+				}
+				if (!match) {
+					tmpObject.put("type", "wayback");
+				}
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("exactMatch")) {
 				labelObject.put(rdf.getPrefixItem("exactMatch"), arrayNew);
@@ -1352,7 +1276,21 @@ public class Transformer {
 			for (Object element : relatedMatchArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				// get retcat info
+				boolean match = false;
+				List<String[]> retcatlist = RetcatItems.getAllItems();
+				for (String[] arrayItem : retcatlist) {
+					if (value.contains(arrayItem[3])) {
+						match = true;
+						tmpObject.put("type", arrayItem[4]);
+					}
+				}
+				if (!match) {
+					tmpObject.put("type", "wayback");
+				}
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("relatedMatch")) {
 				labelObject.put(rdf.getPrefixItem("relatedMatch"), arrayNew);
@@ -1366,7 +1304,21 @@ public class Transformer {
 			for (Object element : narrowMatchArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				// get retcat info
+				boolean match = false;
+				List<String[]> retcatlist = RetcatItems.getAllItems();
+				for (String[] arrayItem : retcatlist) {
+					if (value.contains(arrayItem[3])) {
+						match = true;
+						tmpObject.put("type", arrayItem[4]);
+					}
+				}
+				if (!match) {
+					tmpObject.put("type", "wayback");
+				}
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("altLabel")) {
 				labelObject.put(rdf.getPrefixItem("narrowMatch"), arrayNew);
@@ -1380,7 +1332,21 @@ public class Transformer {
 			for (Object element : broadMatchArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				// get retcat info
+				boolean match = false;
+				List<String[]> retcatlist = RetcatItems.getAllItems();
+				for (String[] arrayItem : retcatlist) {
+					if (value.contains(arrayItem[3])) {
+						match = true;
+						tmpObject.put("type", arrayItem[4]);
+					}
+				}
+				if (!match) {
+					tmpObject.put("type", "wayback");
+				}
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("broadMatch")) {
 				labelObject.put(rdf.getPrefixItem("broadMatch"), arrayNew);
@@ -1394,38 +1360,13 @@ public class Transformer {
 			for (Object element : seeAlsoArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				arrayNew.add(value);
+				JSONObject tmpObject = new JSONObject();
+				tmpObject.put("url", value);
+				tmpObject.put("type", "wayback");
+				arrayNew.add(tmpObject);
 			}
 			if (fields == null || fields.contains("seeAlso")) {
 				labelObject.put(rdf.getPrefixItem("seeAlso"), arrayNew);
-			}
-		}
-		// change rdfs:isDefinedBy
-		JSONArray definedByArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:isDefinedBy"));
-		if (definedByArray != null && !definedByArray.isEmpty()) {
-			JSONArray arrayNew = new JSONArray();
-			labelObject.remove(rdf.getPrefixItem("rdfs:isDefinedBy"));
-			for (Object element : definedByArray) {
-				JSONObject obj = (JSONObject) element;
-				String value = (String) obj.get("value");
-				arrayNew.add(value);
-			}
-			if (fields == null || fields.contains("definedBy")) {
-				labelObject.put(rdf.getPrefixItem("definedBy"), arrayNew);
-			}
-		}
-		// change owl:sameAs
-		JSONArray sameAsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("owl:sameAs"));
-		if (sameAsArray != null && !sameAsArray.isEmpty()) {
-			JSONArray arrayNew = new JSONArray();
-			labelObject.remove(rdf.getPrefixItem("owl:sameAs"));
-			for (Object element : sameAsArray) {
-				JSONObject obj = (JSONObject) element;
-				String value = (String) obj.get("value");
-				arrayNew.add(value);
-			}
-			if (fields == null || fields.contains("sameAs")) {
-				labelObject.put(rdf.getPrefixItem("sameAs"), arrayNew);
 			}
 		}
 		// change dc:created
@@ -1435,10 +1376,8 @@ public class Transformer {
 				labelObject.remove(rdf.getPrefixItem("dc:created"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("created")) {
-					labelObject.put(rdf.getPrefixItem("created"), arrayNew);
+					labelObject.put(rdf.getPrefixItem("created"), value);
 				}
 			}
 		}
@@ -1452,8 +1391,8 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				arrayModify.add(value);
 			}
-			if (fields == null || fields.contains("modified")) {
-				labelObject.put(rdf.getPrefixItem("modified"), arrayModify);
+			if (fields == null || fields.contains("modifications")) {
+				labelObject.put(rdf.getPrefixItem("modifications"), arrayModify);
 			}
 		}
 		// delete items
@@ -1463,7 +1402,7 @@ public class Transformer {
 		labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
 		labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
 		// return
-		return jsonObject;
+		return labelObject;
 	}
 
 }
