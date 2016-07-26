@@ -21,62 +21,46 @@ public class Transformer {
 		//init
 		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 		// parse json
-		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-		// change id
-		jsonObject.put(rdf.getPrefixItem("ls_voc" + ":" + id), jsonObject.remove("vocab"));
-		JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_voc" + ":" + id));
+		JSONObject rdfObject = new JSONObject();
+		JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
 		// for patch
 		JSONArray flushArray = (JSONArray) vocabularyObject.get("flush");
 		if (flushArray != null && !flushArray.isEmpty()) {
-			return jsonObject.toJSONString();
+			return vocabularyObject.toJSONString();
 		} else {
 			// change title
-			String[] titleStringArray = null;
-			JSONArray titleArray = (JSONArray) vocabularyObject.get("title");
+			JSONObject titleArray = (JSONObject) vocabularyObject.get("title");
 			if (titleArray != null && !titleArray.isEmpty()) {
-				for (Object element : titleArray) {
-					String titleString = (String) element;
-					titleStringArray = titleString.split("@");
-				}
 				vocabularyObject.remove("title");
 				JSONArray titleArrayNew = new JSONArray();
 				JSONObject titleObject = new JSONObject();
 				titleObject.put("type", "literal");
-				titleObject.put("value", titleStringArray[0]);
-				titleObject.put("lang", titleStringArray[1]);
+				titleObject.put("value", titleArray.get("value"));
+				titleObject.put("lang", titleArray.get("lang"));
 				titleArrayNew.add(titleObject);
 				vocabularyObject.put(rdf.getPrefixItem("dc:title"), titleArrayNew);
 			}
 			// change description
-			String[] descriptionStringArray = null;
-			JSONArray descriptionArray = (JSONArray) vocabularyObject.get("description");
+			JSONObject descriptionArray = (JSONObject) vocabularyObject.get("description");
 			if (descriptionArray != null && !descriptionArray.isEmpty()) {
-				for (Object element : descriptionArray) {
-					String descriptionString = (String) element;
-					descriptionStringArray = descriptionString.split("@");
-				}
 				vocabularyObject.remove("description");
 				JSONArray descriptionArrayNew = new JSONArray();
 				JSONObject descriptionObject = new JSONObject();
 				descriptionObject.put("type", "literal");
-				descriptionObject.put("value", descriptionStringArray[0]);
-				descriptionObject.put("lang", descriptionStringArray[1]);
+				descriptionObject.put("value", descriptionArray.get("value"));
+				descriptionObject.put("lang", descriptionArray.get("lang"));
 				descriptionArrayNew.add(descriptionObject);
 				vocabularyObject.put(rdf.getPrefixItem("dc:description"), descriptionArrayNew);
 			}
 			// change releasetype
-			String releaseString = null;
-			JSONArray releaseArray = (JSONArray) vocabularyObject.get("releaseType");
-			if (releaseArray != null && !releaseArray.isEmpty()) {
-				for (Object element : releaseArray) {
-					releaseString = (String) element;
-				}
+			String releaseString = (String) vocabularyObject.get("releaseType");
+			if (releaseString != null && !releaseString.isEmpty()) {
 				vocabularyObject.remove("releaseType");
 				JSONArray releaseArrayNew = new JSONArray();
 				JSONObject releaseObject = new JSONObject();
 				releaseObject.put("type", "uri");
 				if (releaseString.equals("draft")) {
-					releaseObject.put("value", rdf.getPrefixItem("ls:Hidden"));
+					releaseObject.put("value", rdf.getPrefixItem("ls:Draft"));
 				} else {
 					releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
 				}
@@ -123,23 +107,6 @@ public class Transformer {
 				vocabularyObject.put(rdf.getPrefixItem("dc:contributor"), contributorArrayNew);
 				vocabularyObject.put(rdf.getPrefixItem("dct:contributor"), contributorArrayNew2);
 			}
-			// change topConcept
-			List<String> topConceptStringList = new ArrayList<String>();
-			JSONArray topConceptArray = (JSONArray) vocabularyObject.get("topConcept");
-			if (topConceptArray != null && !topConceptArray.isEmpty()) {
-				for (Object element : topConceptArray) {
-					topConceptStringList.add((String) element);
-				}
-				vocabularyObject.remove("topConcept");
-				JSONArray topConceptArrayNew = new JSONArray();
-				for (String element : topConceptStringList) {
-					JSONObject topConceptObject = new JSONObject();
-					topConceptObject.put("type", "uri");
-					topConceptObject.put("value", element);
-					topConceptArrayNew.add(topConceptObject);
-				}
-				vocabularyObject.put(rdf.getPrefixItem("skos:hasTopConcept"), topConceptArrayNew);
-			}
 			// delete optional items
 			vocabularyObject.remove(rdf.getPrefixItem("contributor"));
 			vocabularyObject.remove(rdf.getPrefixItem("topConcept"));
@@ -151,7 +118,9 @@ public class Transformer {
 			vocabularyObject.remove(rdf.getPrefixItem("license"));
 			vocabularyObject.remove(rdf.getPrefixItem("id"));
 			vocabularyObject.remove(rdf.getPrefixItem("statusType"));
-			return jsonObject.toJSONString();
+			// add object
+			rdfObject.put(rdf.getPrefixItem("ls_voc" + ":" + id), vocabularyObject);
+			return rdfObject.toJSONString();
 		}
 	}
 
@@ -171,9 +140,10 @@ public class Transformer {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value + "@" + lang);
-				vocabularyObject.put(rdf.getPrefixItem("title"), arrayNew);
+				JSONObject objTmp = new JSONObject();
+				objTmp.put("value", value);
+				objTmp.put("lang", lang);
+				vocabularyObject.put(rdf.getPrefixItem("title"), objTmp);
 			}
 		}
 		// change dct:description
@@ -184,10 +154,11 @@ public class Transformer {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value + "@" + lang);
+				JSONObject objTmp = new JSONObject();
+				objTmp.put("value", value);
+				objTmp.put("lang", lang);
 				if (fields == null || fields.contains("description")) {
-					vocabularyObject.put(rdf.getPrefixItem("description"), arrayNew);
+					vocabularyObject.put(rdf.getPrefixItem("description"), objTmp);
 				}
 			}
 		}
@@ -203,10 +174,8 @@ public class Transformer {
 				} else {
 					value = "public";
 				}
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("releaseType")) {
-					vocabularyObject.put(rdf.getPrefixItem("releaseType"), arrayNew);
+					vocabularyObject.put(rdf.getPrefixItem("releaseType"), value);
 				}
 			}
 		}
@@ -222,10 +191,8 @@ public class Transformer {
 				} else {
 					value = "deleted";
 				}
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("statusType")) {
-					vocabularyObject.put(rdf.getPrefixItem("statusType"), arrayNew);
+					vocabularyObject.put(rdf.getPrefixItem("statusType"), value);
 				}
 			}
 		}
@@ -250,9 +217,7 @@ public class Transformer {
 				vocabularyObject.remove(rdf.getPrefixItem("dc:creator"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
-				vocabularyObject.put(rdf.getPrefixItem("creator"), arrayNew);
+				vocabularyObject.put(rdf.getPrefixItem("creator"), value);
 			}
 		}
 		// change dc:contributor
@@ -265,7 +230,7 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				arrayContributor.add(value);
 			}
-			vocabularyObject.put(rdf.getPrefixItem("contributor"), arrayContributor);
+			vocabularyObject.put(rdf.getPrefixItem("contributors"), arrayContributor);
 		}
 		// change dc:created
 		JSONArray createdArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:created"));
@@ -274,10 +239,8 @@ public class Transformer {
 				vocabularyObject.remove(rdf.getPrefixItem("dc:created"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("created")) {
-					vocabularyObject.put(rdf.getPrefixItem("created"), arrayNew);
+					vocabularyObject.put(rdf.getPrefixItem("created"), value);
 				}
 			}
 		}
@@ -288,10 +251,8 @@ public class Transformer {
 				vocabularyObject.remove(rdf.getPrefixItem("dct:license"));
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
-				JSONArray arrayNew = new JSONArray();
-				arrayNew.add(value);
 				if (fields == null || fields.contains("license")) {
-					vocabularyObject.put(rdf.getPrefixItem("license"), arrayNew);
+					vocabularyObject.put(rdf.getPrefixItem("license"), value);
 				}
 			}
 		}
@@ -301,9 +262,7 @@ public class Transformer {
 			vocabularyObject.remove(rdf.getPrefixItem("dc:identifier"));
 			JSONObject obj = (JSONObject) element;
 			String value = (String) obj.get("value");
-			JSONArray arrayNew = new JSONArray();
-			arrayNew.add(value);
-			vocabularyObject.put(rdf.getPrefixItem("id"), arrayNew);
+			vocabularyObject.put(rdf.getPrefixItem("id"), value);
 		}
 		// OPTIONAL VALUES
 		// change skos:hasTopConcept
@@ -316,8 +275,8 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				arrayTopConcept.add(value);
 			}
-			if (fields == null || fields.contains("topConcept")) {
-				vocabularyObject.put(rdf.getPrefixItem("topConcept"), arrayTopConcept);
+			if (fields == null || fields.contains("topConcepts")) {
+				vocabularyObject.put(rdf.getPrefixItem("topConcepts"), arrayTopConcept);
 			}
 		}
 		// change dc:modified
@@ -342,7 +301,7 @@ public class Transformer {
 		vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
 		vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
 		// return
-		return jsonObject;
+		return vocabularyObject;
 	}
 
 	public static JSONObject revision_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
@@ -1003,7 +962,7 @@ public class Transformer {
 		}
 	}
 
-	public static JSONObject label_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+	public static JSONObject label_GET(String json, String id, String fields, List<String[]> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
 		//init
 		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
 		// parse json
@@ -1224,7 +1183,7 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				List<String[]> retcatlist = RetcatItems.getAllItems();
+				
 				for (String[] arrayItem : retcatlist) {
 					if (value.contains(arrayItem[3])) {
 						match = true;
@@ -1252,7 +1211,6 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				List<String[]> retcatlist = RetcatItems.getAllItems();
 				for (String[] arrayItem : retcatlist) {
 					if (value.contains(arrayItem[3])) {
 						match = true;
@@ -1280,7 +1238,6 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				List<String[]> retcatlist = RetcatItems.getAllItems();
 				for (String[] arrayItem : retcatlist) {
 					if (value.contains(arrayItem[3])) {
 						match = true;
@@ -1308,7 +1265,6 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				List<String[]> retcatlist = RetcatItems.getAllItems();
 				for (String[] arrayItem : retcatlist) {
 					if (value.contains(arrayItem[3])) {
 						match = true;
@@ -1336,7 +1292,6 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				List<String[]> retcatlist = RetcatItems.getAllItems();
 				for (String[] arrayItem : retcatlist) {
 					if (value.contains(arrayItem[3])) {
 						match = true;

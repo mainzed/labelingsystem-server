@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -74,7 +76,8 @@ public class VocabsResource {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
-                    + "?s a ls:Vocabulary . "
+                    + "?s ?p ?o . "
+					+ "?s a ls:Vocabulary . "
                     + "?s dc:identifier ?identifier . "
                     + "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:contributor ?contributor . } " // because of sorting, filtering
@@ -121,51 +124,58 @@ public class VocabsResource {
                 query += "LIMIT " + limit + " OFFSET " + offset;
             }
             // QUERY TRIPLESTORE
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
-            HashSet<String> ids = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "identifier");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
-            }
-            JSONObject out = new JSONObject();
-            JSONObject outObject = new JSONObject();
-            JSONArray outArray = new JSONArray();
-            for (String element : ids) {
-                String item = "ls_voc";
-                query = Utils.getAllElementsForItemID(item, element);
-                result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
-                List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-                List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-                if (result.size() < 1) {
-                    throw new ResourceNotAvailableException();
-                }
-                for (int j = 0; j < predicates.size(); j++) {
-                    rdf.setModelTriple(item + ":" + element, predicates.get(j), objects.get(j));
-                }
-                if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
-                    outObject = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), element, fields);
-                    outArray.add(outObject);
-                }
-                out.put("vocabs", outArray);
-            }
+			long ctm_start = System.currentTimeMillis();
+			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+			List<String> s = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+			List<String> p = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> o = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			System.out.print("querytime: ");
+			System.out.println(System.currentTimeMillis() - ctm_start);
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < s.size(); i++) {
+				rdf.setModelTriple(s.get(i), p.get(i), o.get(i));
+			}
+			JSONArray outArray = new JSONArray();
+			if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
+				JSONObject jsonObject = (JSONObject) new JSONParser().parse(rdf.getModel("RDF/JSON"));
+				Set keys = jsonObject.keySet();
+				Iterator a = keys.iterator();
+				while (a.hasNext()) {
+					String key = (String) a.next();
+					JSONObject tmpObject = (JSONObject) jsonObject.get(key);
+					JSONArray idArray = (JSONArray) tmpObject.get(rdf.getPrefixItem("dc:identifier"));
+					JSONObject idObject = (JSONObject) idArray.get(0);
+					String h = (String) idObject.get("value");
+					JSONObject tmpObject2 = new JSONObject();
+					tmpObject2.put(key, tmpObject);
+					String hh = tmpObject2.toString();
+					JSONObject tmp = Transformer.vocabulary_GET(hh, h, fields);
+					outArray.add(tmp);
+				}
+			}
+			System.out.print("finaltime: ");
+			System.out.println(System.currentTimeMillis() - ctm_start);
             if (acceptHeader.contains("application/json")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).build();
                 } else {
-                    return Response.ok(out).build();
+                    return Response.ok(outArray).build();
                 }
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
                 } else {
-                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                    return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
                 }
             } else if (acceptHeader.contains("application/xml")) {
                 return Response.ok(rdf.getModel("RDF/XML")).build();
@@ -179,11 +189,11 @@ public class VocabsResource {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else if (pretty) {
                 JsonParser parser = new JsonParser();
-                JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {

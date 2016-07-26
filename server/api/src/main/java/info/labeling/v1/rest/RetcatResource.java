@@ -2170,6 +2170,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelExtern(@QueryParam("url") String url) {
         try {
+			url = Utils.encodeURIUmlaut(url);
             Document doc = Jsoup.connect(url).get();
             Elements titleTag = doc.select("title");
             JSONObject jsonOut = new JSONObject();
