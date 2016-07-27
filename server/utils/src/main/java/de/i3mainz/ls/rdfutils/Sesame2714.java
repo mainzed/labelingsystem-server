@@ -89,7 +89,7 @@ public class Sesame2714 {
      * @throws de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException
      */
     public static List<BindingSet> SPARQLquery(String repositoryID, String SesameSever, String queryString) throws RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException {
-        List<BindingSet> BindingList = new ArrayList<BindingSet>();
+		List<BindingSet> BindingList = new ArrayList<BindingSet>();
         try {
             Repository repo = new HTTPRepository(SesameSever, repositoryID);
             repo.initialize();
