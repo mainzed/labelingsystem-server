@@ -1,29 +1,40 @@
 {
-	"label": {
-		"vocab": ["http://labeling.i3mainz.hs-mainz.de/item/vocabulary/9c51004c-7746-4bfd-b4be-93e1d3551ebb"],
-		"creator": [],
-		"contributor": [],
-		"id": [],
-		"license": [],
-		"prefLabel": ["chair@en", "Stuhl@de", "chaise@fr"],
-		"altLabel": [],
-		"note": [],
-		"definition": [],
-		"preferredLabel": ["chair@en"],
-		"statusType": [],
-		"context": [],
-		"related": [],
-		"broader": [],
-		"narrower": [],
-		"relatedMatch": [],
-		"broadMatch": [],
-		"narrowMatch": [],
-		"closeMatch": [],
-		"exactMatch": [],
-		"seeAlso": [],
-		"definedBy": [],
-		"sameAs": [],
-		"created": [],
-		"modified": []
-	}
+	"vocabID": "vocabID",
+	"creator": "creator",
+	"contributors": ["contributor"],
+	"id": "id",
+	"license": "license",
+	"prefLabels": [{
+		"isThumbnail": false,
+		"value": "Stuhl",
+		"lang": "de"
+	}, {
+		"isThumbnail": true,
+		"value": "chair",
+		"lang": "en"
+	}],
+	"altLabels": [{
+		"value": "Stuuhl",
+		"lang": "de"
+	}, {
+		"value": "Stuuhl",
+		"lang": "en"
+	}],
+	"scopeNote": {
+		"value": "scopeNote",
+		"lang": "en"
+	},
+	"statusType": "statusType",
+	"context": "someUUID",
+	"related": ["http://labeling.i3mainz.hs-mainz.de/item/label/1", "http://labeling.i3mainz.hs-mainz.de/item/label/2"],
+	"broader": ["http://labeling.i3mainz.hs-mainz.de/item/label/3"],
+	"narrower": ["http://labeling.i3mainz.hs-mainz.de/item/label/4"],
+	"relatedMatch": ["http://vocab.getty.edu/111111"],
+	"broadMatch": ["http://purl.org/heritagedata/schemes/222222"],
+	"narrowMatch": ["http://chronontology.dainst.org/period/ax6745h"],
+	"closeMatch": ["http://vocab.getty.edu/000000"],
+	"exactMatch": ["http://example.com/4"],
+	"seeAlso": ["http://example.com/5"],
+	"created": "date",
+	"modifications": ["date", "date"]
 }
