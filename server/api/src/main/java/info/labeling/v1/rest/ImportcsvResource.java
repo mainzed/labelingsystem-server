@@ -2,7 +2,7 @@ package info.labeling.v1.rest;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.CSV;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.BufferedReader;

@@ -1,9 +1,9 @@
 package info.labeling.v1.utils;
 
-import de.i3mainz.ls.rdfutils.RDF;
-import de.i3mainz.ls.rdfutils.exceptions.ResourceNotAvailableException;
-import de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException;
-import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
+import info.labeling.rdf.RDF;
+import info.labeling.exceptions.ResourceNotAvailableException;
+import info.labeling.exceptions.SesameSparqlException;
+import info.labeling.exceptions.UniqueIdentifierException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -1070,7 +1070,7 @@ public class Transformer {
 		if (altLabelArray != null && !altLabelArray.isEmpty()) {
 			JSONArray arrayNew = new JSONArray();
 			labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
-			for (Object element : prefLabelArray) {
+			for (Object element : altLabelArray) {
 				JSONObject obj = (JSONObject) element;
 				String value = (String) obj.get("value");
 				String lang = (String) obj.get("lang");

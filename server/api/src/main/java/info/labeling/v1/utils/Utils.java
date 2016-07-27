@@ -1,7 +1,7 @@
 package info.labeling.v1.utils;
 
-import de.i3mainz.ls.rdfutils.RDF;
-import de.i3mainz.ls.rdfutils.exceptions.ConfigException;
+import info.labeling.rdf.RDF;
+import info.labeling.exceptions.ConfigException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

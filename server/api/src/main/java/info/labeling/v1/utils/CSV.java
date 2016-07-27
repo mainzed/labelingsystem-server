@@ -2,16 +2,15 @@ package info.labeling.v1.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.i3mainz.ls.Config.Config;
-import de.i3mainz.ls.identifier.UniqueIdentifier;
-import de.i3mainz.ls.rdfutils.RDF;
-import de.i3mainz.ls.rdfutils.Sesame2714;
-import de.i3mainz.ls.rdfutils.exceptions.ConfigException;
-import de.i3mainz.ls.rdfutils.exceptions.CsvExistanceException;
-import de.i3mainz.ls.rdfutils.exceptions.CsvLabelImportException;
-import de.i3mainz.ls.rdfutils.exceptions.CsvLanguageException;
-import de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException;
-import de.i3mainz.ls.rdfutils.exceptions.UniqueIdentifierException;
+//import de.i3mainz.ls.Config.Config;
+import info.labeling.rdf.RDF;
+import info.labeling.rdf.Sesame2714;
+import info.labeling.exceptions.ConfigException;
+import info.labeling.exceptions.CsvExistanceException;
+import info.labeling.exceptions.CsvLabelImportException;
+import info.labeling.exceptions.CsvLanguageException;
+import info.labeling.exceptions.SesameSparqlException;
+import info.labeling.exceptions.UniqueIdentifierException;
 import info.labeling.v1.rest.ImportcsvResource;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -67,16 +66,16 @@ public class CSV implements Runnable {
         }
     }
 
-    private static String createLabelTriples(String[] tokens, String creator, String context) throws IOException, UniqueIdentifierException, CsvLabelImportException, de.i3mainz.ls.rdfutils.exceptions.ConfigException, de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException {
+    private static String createLabelTriples(String[] tokens, String creator, String context) throws IOException, UniqueIdentifierException, CsvLabelImportException, info.labeling.exceptions.ConfigException, info.labeling.exceptions.SesameSparqlException {
         String uuid = UniqueIdentifier.getUUID();
         try {
-            //vocabulary[0];prefLabel[1];altLabel[2];note[3];definition[4];
+            //vocabulary[0];prefLabel[1];altLabel[2];scopeNote[3];definition[4];
             //broader[5];narrower[6];related[7];broadMatch[8];narrowMatch[9];relatedMatch[10];
             //closeMatch[11];exactMatch[12];seeAlso[13];isDefinedBy[14];sameAs[15];contributors[16];internalID[17]
             String vocabulary = tokens[0];
             String[] prefLabel = tokens[1].split(";");
             String[] altLabel = tokens[2].split(";");
-            String[] note = tokens[3].split(";");
+            String[] scopeNote = tokens[3].split(";");
             String[] definition = tokens[4].split(";");
             //String prefLang = tokens[5];
             String[] broadMatch = tokens[8].split(";");
@@ -147,7 +146,7 @@ public class CSV implements Runnable {
             label = "";
             label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
             label += "<" + rdf.getPrefixItem("dct:license") + "> ";
-            label += "<" + Config.LICENCE + "> ";
+            label += "<" + "http://creativecommons.org/licenses/by/4.0/" + "> ";
             label += ". ";
             TRIPLE_LIST.add(label);
             // dcelements identifier
@@ -167,9 +166,10 @@ public class CSV implements Runnable {
             // ls status type
             label = "";
             label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("ls:hasStausType") + "> ";
+            label += "<" + rdf.getPrefixItem("ls:hasStatusType") + "> ";
             label += "<" + rdf.getPrefixItem("ls:Active") + "> ";
             label += ". ";
+			TRIPLE_LIST.add(label);
             // skos prefLabel (multiple, obligatory)
             for (int i = 0; i < prefLabel.length; i = i + 2) {
                 if (i==0) {
@@ -178,13 +178,6 @@ public class CSV implements Runnable {
                     label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
                     label += "<" + rdf.getPrefixItem("ls:preferredLabel") + "> ";
                     label += "\"" + prefLabel[i] + "\"@" + prefLabel[i + 1] + " ";
-                    label += ". ";
-                    TRIPLE_LIST.add(label);
-                    // ls preferredLang
-                    label = "";
-                    label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
-                    label += "<" + rdf.getPrefixItem("ls:preferredLang") + "> ";
-                    label += "\"" + prefLabel[i + 1] + "\" ";
                     label += ". ";
                     TRIPLE_LIST.add(label);
                 }
@@ -206,19 +199,19 @@ public class CSV implements Runnable {
                     TRIPLE_LIST.add(label);
                 }
             }
-            // skos note (multiple, optional)
-            if (note.length >= 1 && !note[0].equals("")) {
-                for (int i = 0; i < note.length; i = i + 2) {
+            // skos scopeNote (multiple, optional)
+            if (scopeNote.length >= 1 && !scopeNote[0].equals("")) {
+                for (int i = 0; i < scopeNote.length; i = i + 2) {
                     label = "";
                     label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
-                    label += "<" + rdf.getPrefixItem("skos:note") + "> ";
-                    label += "\"" + note[i] + "\"@" + note[i + 1] + " ";
+                    label += "<" + rdf.getPrefixItem("skos:scopeNote") + "> ";
+                    label += "\"" + scopeNote[i] + "\"@" + scopeNote[i + 1] + " ";
                     label += ". ";
                     TRIPLE_LIST.add(label);
                 }
             }
             // skos definition (multiple, optional)
-            if (definition.length >= 1 && !definition[0].equals("")) {
+            /*if (definition.length >= 1 && !definition[0].equals("")) {
                 for (int i = 0; i < definition.length; i = i + 2) {
                     label = "";
                     label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
@@ -227,7 +220,7 @@ public class CSV implements Runnable {
                     label += ". ";
                     TRIPLE_LIST.add(label);
                 }
-            }
+            }*/
             // links to resources
             if (broadMatch.length >= 1 && !broadMatch[0].equals("")) {
                 for (String broadMatch1 : broadMatch) {
@@ -289,7 +282,7 @@ public class CSV implements Runnable {
                     TRIPLE_LIST.add(label);
                 }
             }
-            if (isDefinedBy.length >= 1 && !isDefinedBy[0].equals("")) {
+            /*if (isDefinedBy.length >= 1 && !isDefinedBy[0].equals("")) {
                 for (String definedBy : isDefinedBy) {
                     label = "";
                    label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
@@ -298,8 +291,8 @@ public class CSV implements Runnable {
                     label += ". ";
                     TRIPLE_LIST.add(label);
                 }
-            }
-            if (sameAs.length >= 1 && !sameAs[0].equals("")) {
+            }*/
+            /*if (sameAs.length >= 1 && !sameAs[0].equals("")) {
                 for (String sameA : sameAs) {
                     label = "";
                     label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
@@ -308,7 +301,7 @@ public class CSV implements Runnable {
                     label += ". ";
                     TRIPLE_LIST.add(label);
                 }
-            }
+            }*/
             if (contributor.length >= 1 && !contributor[0].equals("")) {
                 for (String cont : contributor) {
                     // dcelements contributor
@@ -330,18 +323,18 @@ public class CSV implements Runnable {
             //connections
             label = "";
             label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("dct:contributor") + "> ";
+            label += "<" + rdf.getPrefixItem("skos:inScheme") + "> ";
             label += "<" + rdf.getPrefixItem("ls_voc:"+vocabulary) + "> ";
             label += ". ";
             TRIPLE_LIST.add(label);
-            label = "";
+            /*label = "";
             label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
             label += "<" + rdf.getPrefixItem("ls:sameAs") + "> ";
             label += "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
                 .replace("$host", PropertiesLocal.getPropertyParam("host"))
                 .replace("$itemid", uuid).replace("$item", "label") + "> ";
             label += ". ";
-            TRIPLE_LIST.add(label);
+            TRIPLE_LIST.add(label);*/
             /////////////////////////
             // SET REVISION CREATE //
             /////////////////////////
@@ -414,7 +407,7 @@ public class CSV implements Runnable {
         return uuid;
     }
 
-    private static boolean vocabularyExistenceCheck(String voc, String creator) throws IOException, JDOMException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ConfigException, CsvExistanceException, de.i3mainz.ls.rdfutils.exceptions.ConfigException, de.i3mainz.ls.rdfutils.exceptions.SesameSparqlException {
+    private static boolean vocabularyExistenceCheck(String voc, String creator) throws IOException, JDOMException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ConfigException, CsvExistanceException, info.labeling.exceptions.ConfigException, info.labeling.exceptions.SesameSparqlException {
         try {
             RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
@@ -461,8 +454,9 @@ public class CSV implements Runnable {
     private static boolean languageCheck(String string) throws CsvLanguageException {
         boolean result = false;
         try {
-            for (int i = 0; i < Config.LANGUAGES.length; i++) {
-                if (string.equals(Config.LANGUAGES[i])) {
+            String[] LANGUAGES = {"de", "en", "fr", "it", "es", "pl", "la", "rm", "de-std", "de-orig", "fr-std", "fr-orig", "it-std", "it-orig", "la-std", "la-orig", "rm-std", "rm-orig"};
+			for (int i = 0; i < LANGUAGES.length; i++) {
+                if (string.equals(LANGUAGES[i])) {
                     result = true;
                     break;
                 }
@@ -488,7 +482,7 @@ public class CSV implements Runnable {
         try {
             TRIPLE_LIST.clear();
             Map<Integer, String> labels = new HashMap<Integer, String>();
-            //vocabulary[0];prefLabel[1];altLabel[2];note[3];definition[4];prefLang[5];
+            //vocabulary[0];prefLabel[1];altLabel[2];scopeNote[3];definition[4];prefLang[5];
             //broader[6];narrower[7];related[8];broadMatch[9];narrowMatch[10];relatedMatch[11];
             //closeMatch[12];exactMatch[13];seeAlso[14];isDefinedBy[15];sameAs[16];contributor[17];internalID[18]
             String[] csvLine = csvContent.split("\r\n");
@@ -544,7 +538,7 @@ public class CSV implements Runnable {
                                 error = true;
                                 errorArray.add("ignored: no required prefLabel in line " + i);
                             } else {
-                                // ckeck if just one prefLabel for one language (same with note and definition)
+                                // ckeck if just one prefLabel for one language (same with scopeNote and definition)
                                 String[] elements = tokens[1].split(";");
                                 for (int j = 0; j < elements.length; j++) {
                                     if (j % 2 != 0) {
@@ -572,7 +566,7 @@ public class CSV implements Runnable {
                                     errorArray.add("ignored: altLabel language error in line " + i);
                                 }
                             }
-                            // note check (optional)
+                            // scopeNote check (optional)
                             if (!tokens[3].equals("")) {
                                 String[] elements = tokens[3].split(";");
                                 if (tokens[3].split(";").length % 2 != 0) {

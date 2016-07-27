@@ -1,7 +1,7 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.Sesame2714;
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.rdf.Sesame2714;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.IOException;
 import java.io.OutputStream;

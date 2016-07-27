@@ -1,8 +1,7 @@
 package info.labeling.v1.utils;
 
-import de.i3mainz.ls.rdfutils.exceptions.AccessDeniedException;
+import info.labeling.exceptions.AccessDeniedException;
 import java.io.IOException;
-import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.UUID;

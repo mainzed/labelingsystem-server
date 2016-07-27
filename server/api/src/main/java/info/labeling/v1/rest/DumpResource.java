@@ -1,6 +1,6 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.LSDump;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.BufferedReader;
@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

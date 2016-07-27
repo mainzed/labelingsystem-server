@@ -2,10 +2,10 @@ package info.labeling.v1.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.i3mainz.ls.rdfutils.RDF;
-import de.i3mainz.ls.rdfutils.Sesame2714;
-import de.i3mainz.ls.rdfutils.exceptions.AutocompleteLengthException;
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.rdf.RDF;
+import info.labeling.rdf.Sesame2714;
+import info.labeling.exceptions.AutocompleteLengthException;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.net.URLDecoder;
 import java.util.List;

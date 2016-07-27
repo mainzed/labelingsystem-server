@@ -1,7 +1,6 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
-import info.labeling.v1.utils.SuggestionItem;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.PropertiesLocal;
 import info.labeling.v1.utils.RetcatItems;
 import info.labeling.v1.utils.SQlite;
@@ -2061,6 +2060,7 @@ public class RetcatResource {
                 String labelValue = (String) prefLabel.get("value");
                 String labelLang = (String) prefLabel.get("xml:lang");
                 jsonOut.put("label", labelValue + "@" + labelLang);
+				jsonOut.put("type", "getty");
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -2109,6 +2109,7 @@ public class RetcatResource {
                 String labelValue = (String) prefLabel.get("value");
                 String labelLang = (String) prefLabel.get("xml:lang");
                 jsonOut.put("label", labelValue + "@" + labelLang);
+				jsonOut.put("type", "heritagedata");
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -2122,7 +2123,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelLabelingSystem(@QueryParam("url") String url) {
         try {
-            String sparqlendpoint = "http://localhost:8084/api/v1/sparql";
+            String sparqlendpoint = PropertiesLocal.getPropertyParam("api")+"/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
                     + "SELECT ?prefLabel { "
                     + "<" + url + "> ls:preferredLabel ?prefLabel. "
@@ -2157,6 +2158,7 @@ public class RetcatResource {
                 String labelValue = (String) prefLabel.get("value");
                 String labelLang = (String) prefLabel.get("xml:lang");
                 jsonOut.put("label", labelValue + "@" + labelLang);
+				jsonOut.put("type", "ls");
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -2168,7 +2170,7 @@ public class RetcatResource {
     @GET
     @Path("/label/html")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelExtern(@QueryParam("url") String url) {
+    public Response geLabelExtern(@QueryParam("url") String url, @QueryParam("type") String type) {
         try {
 			url = Utils.encodeURIUmlaut(url);
             Document doc = Jsoup.connect(url).get();
@@ -2179,6 +2181,11 @@ public class RetcatResource {
                 out = out.replace("About: ", "");
             }
             jsonOut.put("label", out);
+			if (type != null) {
+				jsonOut.put("type", type);
+			} else {
+				jsonOut.put("type", "wayback");
+			}
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2217,6 +2224,7 @@ public class RetcatResource {
             // output
             JSONObject jsonOut = new JSONObject();
             jsonOut.put("label", name);
+			jsonOut.put("type", "geonames");
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2248,6 +2256,7 @@ public class RetcatResource {
             // output
             JSONObject jsonOut = new JSONObject();
             jsonOut.put("label", title);
+			jsonOut.put("type", "pleiades");
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2279,6 +2288,7 @@ public class RetcatResource {
             // output
             JSONObject jsonOut = new JSONObject();
             jsonOut.put("label", labelValue);
+			jsonOut.put("type", "chronontology");
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))

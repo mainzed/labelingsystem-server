@@ -1,6 +1,6 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.PropertiesLocal;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

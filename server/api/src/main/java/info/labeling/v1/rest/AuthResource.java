@@ -1,6 +1,6 @@
 package info.labeling.v1.rest;
 
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.Funcs;
 import info.labeling.v1.utils.SQlite;
 import javax.ws.rs.FormParam;
