@@ -33,7 +33,6 @@ public class ResourcelabelResource {
 		}
 		if (!match) {
 			URI targetURIForRedirection = new URI(PropertiesLocal.getPropertyParam("api") + "/v1/retcat/label/html"+"?url="+url);
-			//URI targetURIForRedirection = new URI("http://localhost:8084/api" + "/v1/retcat/label/html"+"?url="+url);
 			return Response.temporaryRedirect(targetURIForRedirection).build();
 		}
 		return Response.ok().build();

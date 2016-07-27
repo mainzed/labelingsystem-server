@@ -1847,7 +1847,7 @@ public class RetcatResource {
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
                     + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<http://" + PropertiesLocal.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
+                    + "FILTER(?scheme=<"+PropertiesLocal.getPropertyParam("http_protocol")+"://" + PropertiesLocal.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                     + "} LIMIT " + LIMIT;
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
