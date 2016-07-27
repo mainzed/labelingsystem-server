@@ -1,7 +1,7 @@
 package info.labeling.rest;
 
-import de.i3mainz.ls.rdfutils.exceptions.ConfigException;
-import de.i3mainz.ls.rdfutils.exceptions.Logging;
+import info.labeling.exceptions.ConfigException;
+import info.labeling.exceptions.Logging;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
