@@ -327,14 +327,6 @@ public class CSV implements Runnable {
             label += "<" + rdf.getPrefixItem("ls_voc:"+vocabulary) + "> ";
             label += ". ";
             TRIPLE_LIST.add(label);
-            /*label = "";
-            label += "<" + rdf.getPrefixItem("ls_lab:"+uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("ls:sameAs") + "> ";
-            label += "<" + PropertiesLocal.getPropertyParam("ls_detailhtml")
-                .replace("$host", PropertiesLocal.getPropertyParam("host"))
-                .replace("$itemid", uuid).replace("$item", "label") + "> ";
-            label += ". ";
-            TRIPLE_LIST.add(label);*/
             /////////////////////////
             // SET REVISION CREATE //
             /////////////////////////

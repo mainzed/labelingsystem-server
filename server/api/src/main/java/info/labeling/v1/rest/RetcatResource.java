@@ -1653,7 +1653,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsLabelingSystemAll(@QueryParam("query") String searchword) {
         try {
-            String url = "http://" + PropertiesLocal.getPropertyParam("host") + "/api/v1/sparql";
+            String url = PropertiesLocal.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
@@ -1837,7 +1837,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
         try {
-            String url = "http://" + PropertiesLocal.getPropertyParam("host") + "/api/v1/sparql";
+            String url = PropertiesLocal.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
