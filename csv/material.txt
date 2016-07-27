@@ -1,0 +1,17 @@
+vocabularyID	prefLabel	altLabel	note	definition	broader	narrower	related	broadMatch	narrowMatch	relatedMatch	closeMatch	exactMatch	seeAlso	isDefinedBy	sameAs	contributors	internalID
+1139be37-1726-444f-8dce-45b71d1ac3ff	rock;en;Gestein;de		a naturally occurring solid aggregate of minerals or mineraloids;en									http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK					1
+1139be37-1726-444f-8dce-45b71d1ac3ff	amphibolite;en;Amphibolit;de		a holocrystalline plutonic igneous rock;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/AMPHB					2
+1139be37-1726-444f-8dce-45b71d1ac3ff	andesite;en;Andesit;de		a extrusive igneous, volcanic rock;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/AND					3
+1139be37-1726-444f-8dce-45b71d1ac3ff	hematite;en;Hämatit;de		the mineral form of iron(III) oxide (Fe2O3);en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/VHEM						4
+1139be37-1726-444f-8dce-45b71d1ac3ff	schist;en;Schiefer;de		medium-grade metamorphic rock;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/SCH					5
+1139be37-1726-444f-8dce-45b71d1ac3ff	diorite;en;Diorit;de		a grey to dark-grey intermediate intrusive igneous rock;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/DI					7
+1139be37-1726-444f-8dce-45b71d1ac3ff	flint;en;Flint;de		the sedimentary cryptocrystalline form of the mineral quartz;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/FLNT					8
+1139be37-1726-444f-8dce-45b71d1ac3ff	chert;en;Hornstein;de		a silicate-rich chemical sediment and one of the siliceous rocks;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/CHRT					9
+1139be37-1726-444f-8dce-45b71d1ac3ff	radiolarian rock;en;Radiolarit;de		a fine-grained silica-rich microcrystalline, cryptocrystalline or microfibrous sedimentary rock;en		1			http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/ROCK				http://data.bgs.ac.uk/doc/EarthMaterialClass/RockName/RADLAR					10
+1139be37-1726-444f-8dce-45b71d1ac3ff	daub;en;Hüttenlehm;de												http://dbpedia.org/page/Wattle_and_daub				11
+1139be37-1726-444f-8dce-45b71d1ac3ff	wood;en;Holz:de																12
+1139be37-1726-444f-8dce-45b71d1ac3ff	glass;en;Glas;de																13
+1139be37-1726-444f-8dce-45b71d1ac3ff	ceramics;en;Keramik;de																14
+1139be37-1726-444f-8dce-45b71d1ac3ff	textile;en;Textilien;de																15
+1139be37-1726-444f-8dce-45b71d1ac3ff	coral;en;Korallen;de																16
+1139be37-1726-444f-8dce-45b71d1ac3ff	corn;en;Getreide;de																17
