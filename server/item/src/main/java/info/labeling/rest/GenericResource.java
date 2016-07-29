@@ -1,6 +1,5 @@
 package info.labeling.rest;
 
-import info.labeling.exceptions.ConfigException;
 import info.labeling.exceptions.Logging;
 import java.io.IOException;
 import java.net.URI;
@@ -25,11 +24,11 @@ public class GenericResource {
 
 	@GET
 	@Path("/vocabulary/{vocabulary}")
-	public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+	public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
-			String HOST_API = PropertiesLocal.getPropertyParam("api");
-			String HOST_HTMLPAGE = PropertiesLocal.getPropertyParam("ls_detailhtml")
-					.replace("$host", PropertiesLocal.getPropertyParam("host"))
+			String HOST_API = ConfigProperties.getPropertyParam("api");
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("ls_detailhtml")
+					.replace("$host", ConfigProperties.getPropertyParam("host"))
 					.replace("$itemid", itemID)
 					.replace("$item", "vocabulary");
 			if (acceptHeader.startsWith("application/json")) {
@@ -65,11 +64,11 @@ public class GenericResource {
 
 	@GET
 	@Path("/label/{label}")
-	public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+	public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException,  ParserConfigurationException, TransformerException {
 		try {
-			String HOST_API = PropertiesLocal.getPropertyParam("api");
-			String HOST_HTMLPAGE = PropertiesLocal.getPropertyParam("ls_detailhtml")
-					.replace("$host", PropertiesLocal.getPropertyParam("host"))
+			String HOST_API = ConfigProperties.getPropertyParam("api");
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("ls_detailhtml")
+					.replace("$host", ConfigProperties.getPropertyParam("host"))
 					.replace("$itemid", itemID)
 					.replace("$item", "label");
 			if (acceptHeader.startsWith("application/json")) {
@@ -105,9 +104,9 @@ public class GenericResource {
 
 	@GET
 	@Path("/agent/{agent}")
-	public Response getAgent(@HeaderParam("Accept") String acceptHeader, @PathParam("agent") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+	public Response getAgent(@HeaderParam("Accept") String acceptHeader, @PathParam("agent") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
-			String HOST_API = PropertiesLocal.getPropertyParam("api");
+			String HOST_API = ConfigProperties.getPropertyParam("api");
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "agents/" + itemID + ".json");
 				return Response.temporaryRedirect(targetURIForRedirection).build();
@@ -138,9 +137,9 @@ public class GenericResource {
 
 	@GET
 	@Path("/revision/{revision}")
-	public Response getRevision(@HeaderParam("Accept") String acceptHeader, @PathParam("revision") String itemID) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
+	public Response getRevision(@HeaderParam("Accept") String acceptHeader, @PathParam("revision") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
-			String HOST_API = PropertiesLocal.getPropertyParam("api");
+			String HOST_API = ConfigProperties.getPropertyParam("api");
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "revisions/" + itemID + ".json");
 				return Response.temporaryRedirect(targetURIForRedirection).build();
