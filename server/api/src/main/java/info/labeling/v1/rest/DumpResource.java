@@ -24,6 +24,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
 import org.apache.commons.io.filefilter.FileFileFilter;
+import org.json.simple.JSONObject;
 
 @Path("/dump")
 public class DumpResource {
@@ -84,14 +85,10 @@ public class DumpResource {
 	@Path("/status")
 	public Response getStatus(@QueryParam("mode") String mode) {
 		try {
-			String html_header = "<html>";
-			html_header += "<head>";
-			html_header += "</head>";
-			html_header += "<body>";
-			String html_footer = "</body>";
-			html_footer += "</html>";
 			status();
-			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
+			JSONObject outObject = new JSONObject();
+			outObject.put("message", out);
+			return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.DumpResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -109,14 +106,10 @@ public class DumpResource {
 			tmpDirPath = fileDir + "tmpDir_1" + "/";
 			tmpDirPath2 = fileDir + "tmpDir_2" + "/";
 			dumping = true;
-			String html_header = "<html>";
-			html_header += "<head>";
-			html_header += "</head>";
-			html_header += "<body>";
-			String html_footer = "</body>";
-			html_footer += "</html>";
 			start();
-			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
+			JSONObject outObject = new JSONObject();
+			outObject.put("message", out);
+			return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			stop();
 			dumping = false;
@@ -129,14 +122,10 @@ public class DumpResource {
 	@Path("/stop")
 	public Response stopDumping() {
 		try {
-			String html_header = "<html>";
-			html_header += "<head>";
-			html_header += "</head>";
-			html_header += "<body>";
-			String html_footer = "</body>";
-			html_footer += "</html>";
 			stop();
-			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
+			JSONObject outObject = new JSONObject();
+			outObject.put("message", out);
+			return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			stop();
 			dumping = false;
@@ -159,12 +148,12 @@ public class DumpResource {
 			SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm:ss");
 			Date resultdate = new Date(startTime);
 			if (lastDumpTime.equals("") || lastDump.equals("")) {
-				out = "<p>started at: " + sdf.format(resultdate) + "</p>";
+				out = "started at: " + sdf.format(resultdate);
 			} else {
-				out = "<p>started at: " + sdf.format(resultdate) + "</p><p>last dump at: " + lastDumpTime + "</p><p>last dump: " + lastDump + "</p>";
+				out = "started at: " + sdf.format(resultdate) + ", last dump at: " + lastDumpTime + ", last dump: " + lastDump;
 			}
 		} else {
-			out = "<p>dumping not started</p>";
+			out = "dumping not started";
 		}
 	}
 
@@ -175,9 +164,9 @@ public class DumpResource {
 			Date resultdate = new Date(currentTime);
 			System.out.println("stopped at: " + sdf.format(resultdate));
 			dumping = false;
-			out = "<p>stopped at: " + sdf.format(resultdate) + "</p>";
+			out = "stopped at: " + sdf.format(resultdate);
 		} else {
-			out = "<p>dumping not started</p>";
+			out = "dumping not started";
 		}
 	}
 
