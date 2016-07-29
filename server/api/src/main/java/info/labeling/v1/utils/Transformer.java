@@ -19,7 +19,7 @@ public class Transformer {
 
 	public static String vocabulary_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject rdfObject = new JSONObject();
 		JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
@@ -126,7 +126,7 @@ public class Transformer {
 
 	public static JSONObject vocabulary_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		jsonObject.put("vocab", jsonObject.remove(rdf.getPrefixItem("ls_voc" + ":" + id)));
@@ -306,7 +306,7 @@ public class Transformer {
 
 	public static JSONObject revision_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		jsonObject.put("revision", jsonObject.remove(rdf.getPrefixItem("ls_rev" + ":" + id)));
@@ -375,7 +375,7 @@ public class Transformer {
 
 	public static String agent_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		// change id
@@ -508,7 +508,7 @@ public class Transformer {
 
 	public static JSONObject agent_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		jsonObject.put("agent", jsonObject.remove(rdf.getPrefixItem("ls_age" + ":" + id)));
@@ -640,7 +640,7 @@ public class Transformer {
 
 	public static String label_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		//JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		// change id
@@ -964,7 +964,7 @@ public class Transformer {
 
 	public static JSONObject label_GET(String json, String id, String fields, List<String[]> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
 		//init
-		RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
 		JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 		jsonObject.put("label", jsonObject.remove(rdf.getPrefixItem("ls_lab" + ":" + id)));

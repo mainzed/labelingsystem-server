@@ -13,7 +13,7 @@ import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.UniqueIdentifierException;
 import info.labeling.v1.restconfig.PATCH;
 import info.labeling.v1.utils.Transformer;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,7 +59,7 @@ public class AgentsResource {
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
                     + "?s a ls:Agent . "
@@ -90,7 +90,7 @@ public class AgentsResource {
                 }
             }
             // QUERY TRIPLESTORE
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             HashSet<String> ids = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "identifier");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
@@ -101,7 +101,7 @@ public class AgentsResource {
             for (String element : ids) {
                 String item = "ls_age";
                 query = Utils.getAllElementsForItemID(item, element);
-                result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+                result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
                 List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
                 List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
                 if (result.size() < 1) {
@@ -170,10 +170,10 @@ public class AgentsResource {
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getAgent(@PathParam("agent") String agent, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -241,10 +241,10 @@ public class AgentsResource {
     @Produces("application/json;charset=UTF-8")
     public Response getAgent_JSON(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -278,10 +278,10 @@ public class AgentsResource {
     @Produces("application/xml;charset=UTF-8")
     public Response getAgent_XML(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -308,10 +308,10 @@ public class AgentsResource {
     @Produces("application/rdf+xml;charset=UTF-8")
     public Response getAgentRDF_XML(@PathParam("agent") String agent) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -338,10 +338,10 @@ public class AgentsResource {
     @Produces("text/turtle;charset=UTF-8")
     public Response getAgentRDF_Turtle(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -367,10 +367,10 @@ public class AgentsResource {
     @Produces("text/n3;charset=UTF-8")
     public Response getAgentRDF_N3(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -396,10 +396,10 @@ public class AgentsResource {
     @Produces("application/json;charset=UTF-8")
     public Response getAgentRDF_JSONRDF(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -433,10 +433,10 @@ public class AgentsResource {
     @Produces("application/ld+json;charset=UTF-8")
     public Response getAgentRDF_JSONLD(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_age";
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -485,12 +485,12 @@ public class AgentsResource {
             json = Transformer.agent_POST(json, itemID);
             String triples = createAgentSPARQLUPDATE(item, itemID);
             // input triples
-            Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
+            Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), triples);
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, itemID);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -517,18 +517,18 @@ public class AgentsResource {
             String item = "ls_age";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
             json = Transformer.agent_POST(json, agent);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putAgentSPARQLUPDATE(agent));
-            Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putAgentSPARQLUPDATE(agent));
+            Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -555,20 +555,20 @@ public class AgentsResource {
             String item = "ls_age";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
             json = Transformer.agent_POST(json, agent);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchAgentSPARQLUPDATE(agent, json));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), patchAgentSPARQLUPDATE(agent, json));
             if (!json.contains("flush")) {
-                Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
+                Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
             }
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -593,12 +593,12 @@ public class AgentsResource {
             String item = "ls_age";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, agent);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteAgentSPARQLUPDATE(agent));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteAgentSPARQLUPDATE(agent));
             // get result als json
             String out = Transformer.empty_JSON("agent").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
@@ -609,7 +609,7 @@ public class AgentsResource {
     }
 
     private static String createAgentSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Agent . ";
@@ -621,7 +621,7 @@ public class AgentsResource {
     }    
 
     private static String putAgentSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?agent ?p ?o. } "
@@ -636,7 +636,7 @@ public class AgentsResource {
     }
 
     private static String patchAgentSPARQLUPDATE(String id, String json) throws IOException, ParseException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
         JSONObject agentObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_age" + ":" + id));
         List<String> deleteList = new ArrayList<String>();
@@ -705,7 +705,7 @@ public class AgentsResource {
     }
 
     private static String deleteAgentSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?agent ?p ?o. } "

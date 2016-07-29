@@ -1,6 +1,6 @@
 package de.i3mainz.utils;
 
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -8,15 +8,15 @@ public class PropertiesLocalTest {
 
 	@Test
 	public void testGetPropertyParam() throws Exception {
-		assertNotNull(PropertiesLocal.getPropertyParam(PropertiesLocal.getHOST()));
-		assertNotNull(PropertiesLocal.getPropertyParam(PropertiesLocal.getLSDETAIL()));
-		assertNotNull(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()));
-		assertNotNull(PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()));
+		assertNotNull(ConfigProperties.getPropertyParam(ConfigProperties.getHOST()));
+		assertNotNull(ConfigProperties.getPropertyParam(ConfigProperties.getLSDETAIL()));
+		assertNotNull(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()));
+		assertNotNull(ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()));
 	}
 	
 	@Test
 	public void givenValidFileShouldReturnTrue() throws Exception {
-		assertTrue(PropertiesLocal.loadpropertyFile(PropertiesLocal.getFileName()));
+		assertTrue(ConfigProperties.loadpropertyFile(ConfigProperties.getFileName()));
 	}
 
 }

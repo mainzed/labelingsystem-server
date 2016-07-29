@@ -2,7 +2,7 @@ package info.labeling.v1.rest;
 
 import info.labeling.rdf.Sesame2714;
 import info.labeling.exceptions.Logging;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
@@ -155,8 +155,8 @@ public class SparqlResource {
         @Override
         public void write(OutputStream output) throws IOException, WebApplicationException {
             try {
-                Sesame2714.SPARQLqueryOutputFileOS(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()),
-                        PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), QUERY, FORMAT, output);
+                Sesame2714.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+                        ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), QUERY, FORMAT, output);
             } catch (Exception e) {
             }
         }

@@ -1,7 +1,7 @@
 package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
 import info.labeling.v1.utils.SQlite;
 import info.labeling.v1.utils.SuggestionItem;
@@ -1340,7 +1340,7 @@ public class RetcatResource {
     public Response getResultsGEONAMES(@QueryParam("query") String searchword) {
         try {
             searchword = Utils.encodeURIComponent(searchword);
-            String url_string = "http://api.geonames.org/searchJSON?q=" + searchword + "&maxRows=" + LIMIT + "&username=" + PropertiesLocal.getPropertyParam("geonames");
+            String url_string = "http://api.geonames.org/searchJSON?q=" + searchword + "&maxRows=" + LIMIT + "&username=" + ConfigProperties.getPropertyParam("geonames");
             URL url = new URL(url_string);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Accept", "application/json");
@@ -1653,7 +1653,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsLabelingSystemAll(@QueryParam("query") String searchword) {
         try {
-            String url = PropertiesLocal.getPropertyParam("api") + "/v1/sparql";
+            String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
@@ -1837,7 +1837,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
         try {
-            String url = PropertiesLocal.getPropertyParam("api") + "/v1/sparql";
+            String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
@@ -1847,7 +1847,7 @@ public class RetcatResource {
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
                     + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<"+PropertiesLocal.getPropertyParam("http_protocol")+"://" + PropertiesLocal.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
+                    + "FILTER(?scheme=<"+ConfigProperties.getPropertyParam("http_protocol")+"://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                     + "} LIMIT " + LIMIT;
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -2123,7 +2123,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelLabelingSystem(@QueryParam("url") String url) {
         try {
-            String sparqlendpoint = PropertiesLocal.getPropertyParam("api")+"/v1/sparql";
+            String sparqlendpoint = ConfigProperties.getPropertyParam("api")+"/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
                     + "SELECT ?prefLabel { "
                     + "<" + url + "> ls:preferredLabel ?prefLabel. "
@@ -2199,7 +2199,7 @@ public class RetcatResource {
     public Response geLabelGeoNames(@QueryParam("url") String url) {
         try {
             url = url.replace("http://sws.geonames.org/", "");
-            url = "http://api.geonames.org/get?geonameId=" + url + "&username=" + PropertiesLocal.getPropertyParam("geonames");
+            url = "http://api.geonames.org/get?geonameId=" + url + "&username=" + ConfigProperties.getPropertyParam("geonames");
             // query for xml
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();

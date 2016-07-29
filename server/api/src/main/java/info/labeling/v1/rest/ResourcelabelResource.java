@@ -2,7 +2,7 @@ package info.labeling.v1.rest;
 
 import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.SesameSparqlException;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
 import java.io.IOException;
 import java.net.URI;
@@ -32,7 +32,7 @@ public class ResourcelabelResource {
 			}
 		}
 		if (!match) {
-			URI targetURIForRedirection = new URI(PropertiesLocal.getPropertyParam("api") + "/v1/retcat/label/html"+"?url="+url);
+			URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/label/html"+"?url="+url);
 			return Response.temporaryRedirect(targetURIForRedirection).build();
 		}
 		return Response.ok().build();

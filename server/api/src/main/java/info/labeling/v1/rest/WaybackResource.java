@@ -1,7 +1,7 @@
 package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -24,7 +24,7 @@ public class WaybackResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getWaybackLink(@QueryParam("url") String url) {
 		try {
-			URL obj = new URL(PropertiesLocal.getPropertyParam("waybackapi").replace("$url", url));
+			URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			String urlParameters = "";

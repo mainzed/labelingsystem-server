@@ -2,7 +2,7 @@ package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.LSDump;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -51,7 +51,7 @@ public class DumpResource {
 	@GET
 	public Response getList() {
 		try {
-			fileDir = PropertiesLocal.getPropertyParam("dump_server");
+			fileDir = ConfigProperties.getPropertyParam("dump_server");
 			String html_header = "<html>";
 			html_header += "<head>";
 			html_header += "</head>";
@@ -102,10 +102,10 @@ public class DumpResource {
 	@Path("/start")
 	public Response startDumping() {
 		try {
-			fileDir = PropertiesLocal.getPropertyParam("dump_server");
-			filePath = PropertiesLocal.getPropertyParam("dump_web");
-			downloadLink = PropertiesLocal.getPropertyParam("sesame_server") + "/repositories/" + PropertiesLocal.getPropertyParam("repository") + "/statements?Accept=text/plain";
-			size_url = PropertiesLocal.getPropertyParam("sesame_server") + "/repositories/" + PropertiesLocal.getPropertyParam("repository") + "/size";
+			fileDir = ConfigProperties.getPropertyParam("dump_server");
+			filePath = ConfigProperties.getPropertyParam("dump_web");
+			downloadLink = ConfigProperties.getPropertyParam("sesame_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/statements?Accept=text/plain";
+			size_url = ConfigProperties.getPropertyParam("sesame_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/size";
 			tmpDirPath = fileDir + "tmpDir_1" + "/";
 			tmpDirPath2 = fileDir + "tmpDir_2" + "/";
 			dumping = true;

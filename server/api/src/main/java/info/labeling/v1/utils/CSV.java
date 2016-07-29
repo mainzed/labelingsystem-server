@@ -87,7 +87,7 @@ public class CSV implements Runnable {
             String[] isDefinedBy = tokens[14].split(";");
             String[] sameAs = tokens[15].split(";");
             String[] contributor = tokens[16].split(";");
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String label = "";
             // ls label
             label = "";
@@ -401,7 +401,7 @@ public class CSV implements Runnable {
 
     private static boolean vocabularyExistenceCheck(String voc, String creator) throws IOException, JDOMException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ConfigException, CsvExistanceException, info.labeling.exceptions.ConfigException, info.labeling.exceptions.SesameSparqlException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
                     + "?v a ls:Vocabulary . "
@@ -409,8 +409,8 @@ public class CSV implements Runnable {
                     + "?v dc:identifier ?identifier. "
                     + "FILTER (?identifier=\"$identifier\") }";
             query = query.replace("$identifier", voc);
-            List<BindingSet> voc_result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()),
-                    PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> voc_result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+                    ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> voc_true = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(voc_result, "v");
             return voc_true.size() > 0;
         } catch (RepositoryException e) {
@@ -470,7 +470,7 @@ public class CSV implements Runnable {
         int importedlabels = 0;
         int importedrelations = 0;
         boolean error = false;
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         try {
             TRIPLE_LIST.clear();
             Map<Integer, String> labels = new HashMap<Integer, String>();
@@ -919,8 +919,8 @@ public class CSV implements Runnable {
                 }
                 pw.close();
                 if (!validator) {
-                    Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()),
-                            PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), "LOAD <" + ImportcsvResource.FILELINK + ">");
+                    Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+                            ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), "LOAD <" + ImportcsvResource.FILELINK + ">");
                 }
             }
         } catch (Exception e) {

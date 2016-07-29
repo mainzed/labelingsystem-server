@@ -6,7 +6,7 @@ import info.labeling.rdf.RDF;
 import info.labeling.rdf.Sesame2714;
 import info.labeling.exceptions.AutocompleteLengthException;
 import info.labeling.exceptions.Logging;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.net.URLDecoder;
 import java.util.List;
 import javax.ws.rs.Produces;
@@ -34,7 +34,7 @@ public class AutocompleteResource {
             if (substing.length() <= minLength) {
                 throw new AutocompleteLengthException();
             } else {
-                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
                 String query = rdf.getPREFIXSPARQL();
                 query += "SELECT * WHERE { "
                         + "?s a ls:Label . "
@@ -43,7 +43,7 @@ public class AutocompleteResource {
                         + "} "
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
                 List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
                 List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
@@ -77,7 +77,7 @@ public class AutocompleteResource {
             if (substing.length() <= minLength) {
                 throw new AutocompleteLengthException();
             } else {
-                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
                 String query = rdf.getPREFIXSPARQL();
                 query += "SELECT * WHERE { "
                         + "?s a ls:Label . "
@@ -94,7 +94,7 @@ public class AutocompleteResource {
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
 
-                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
                 List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
                 List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
@@ -128,7 +128,7 @@ public class AutocompleteResource {
             if (substing.length() <= minLength) {
                 throw new AutocompleteLengthException();
             } else {
-                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
                 String query = rdf.getPREFIXSPARQL();
                 query += "SELECT * WHERE { "
                         + "?s a ls:Agent . "
@@ -137,7 +137,7 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
                 List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
                 List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();
@@ -171,7 +171,7 @@ public class AutocompleteResource {
             if (substing.length() <= minLength) {
                 throw new AutocompleteLengthException();
             } else {
-                RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
                 String query = rdf.getPREFIXSPARQL();
                 query += "SELECT * WHERE { "
                         + "?s a ls:Vocabulary . "
@@ -180,7 +180,7 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam("repository"), PropertiesLocal.getPropertyParam("sesame_server"), query);
+                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
                 List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
                 List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();

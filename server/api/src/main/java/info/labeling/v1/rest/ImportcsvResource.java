@@ -4,7 +4,7 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.CSV;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -54,8 +54,8 @@ public class ImportcsvResource {
                 mode = MODE;
                 creator = CREATOR;
                 validator = Boolean.valueOf(VALIDATOR);
-                SHARE_WEB = PropertiesLocal.getPropertyParam("share_web");
-                SERVER_UPLOAD_LOCATION_FOLDER = PropertiesLocal.getPropertyParam("share_server");
+                SHARE_WEB = ConfigProperties.getPropertyParam("share_web");
+                SERVER_UPLOAD_LOCATION_FOLDER = ConfigProperties.getPropertyParam("share_server");
             }
             CONTEXT = String.valueOf(System.currentTimeMillis());
             FILENAME = CONTEXT + "_" + CREATOR.replace(" ", "") + ".ttl";

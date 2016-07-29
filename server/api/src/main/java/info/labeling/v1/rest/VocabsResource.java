@@ -14,7 +14,7 @@ import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.UniqueIdentifierException;
 import info.labeling.v1.restconfig.PATCH;
 import info.labeling.v1.utils.Transformer;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -72,7 +72,7 @@ public class VocabsResource {
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
                     + "?s ?p ?o . "
@@ -124,7 +124,7 @@ public class VocabsResource {
             }
             // QUERY TRIPLESTORE
 			long ctm_start = System.currentTimeMillis();
-			List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+			List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
 			List<String> s = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
 			List<String> p = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> o = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -210,10 +210,10 @@ public class VocabsResource {
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
     public Response getVocabulary(@PathParam("vocabulary") String vocabulary, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -281,10 +281,10 @@ public class VocabsResource {
     @Produces("application/json;charset=UTF-8")
     public Response getVocabulary_JSON(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -318,10 +318,10 @@ public class VocabsResource {
     @Produces("application/xml;charset=UTF-8")
     public Response getVocabulary_XML(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -348,10 +348,10 @@ public class VocabsResource {
     @Produces("application/rdf+xml;charset=UTF-8")
     public Response getVocabularyRDF_XML(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -378,10 +378,10 @@ public class VocabsResource {
     @Produces("text/turtle;charset=UTF-8")
     public Response getVocabularyRDF_Turtle(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -407,10 +407,10 @@ public class VocabsResource {
     @Produces("text/n3;charset=UTF-8")
     public Response getVocabularyRDF_N3(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -436,10 +436,10 @@ public class VocabsResource {
     @Produces("application/json;charset=UTF-8")
     public Response getVocabularyRDF_JSONRDF(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -473,10 +473,10 @@ public class VocabsResource {
     @Produces("application/ld+json;charset=UTF-8")
     public Response getVocabularyRDF_JSONLD(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -510,10 +510,10 @@ public class VocabsResource {
     @Produces("application/rdf+xml;charset=UTF-8")
     public Response getVocabularyRDF_SKOS(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -524,7 +524,7 @@ public class VocabsResource {
             }
 			item = "ls_voc";
             query = Utils.getAllLabelsForVocabulary(vocabulary);
-            result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> labels = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "id");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
@@ -532,7 +532,7 @@ public class VocabsResource {
             for (int i = 0; i < labels.size(); i++) {
                 item = "ls_lab";
 				query = Utils.getAllElementsForItemID(item, labels.get(i));
-				result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+				result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
 				predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 				objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 				if (labels.size() < 1) {
@@ -568,12 +568,12 @@ public class VocabsResource {
             json = Transformer.vocabulary_POST(json, itemID);
             String triples = createVocabularySPARQLUPDATE(item, itemID, user);
             // input triples
-            Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), triples);
+            Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), triples);
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, itemID);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -600,19 +600,19 @@ public class VocabsResource {
             String item = "ls_voc";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
             json = Transformer.vocabulary_POST(json, vocabulary);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularySPARQLUPDATE(vocabulary));
-            Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularySPARQLUPDATE(vocabulary));
+            Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -639,21 +639,21 @@ public class VocabsResource {
             String item = "ls_voc";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
             json = Transformer.vocabulary_POST(json, vocabulary);
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), patchVocabularySPARQLUPDATE(vocabulary, json));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), patchVocabularySPARQLUPDATE(vocabulary, json));
             if (!json.contains("flush")) {
-                Sesame2714.inputRDFfromRDFJSONString(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), json);
+                Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
             }
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -678,18 +678,18 @@ public class VocabsResource {
             String item = "ls_voc";
             // check if resource exists
             String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> resultExist = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), queryExist);
+            List<BindingSet> resultExist = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
             // insert data
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularyREVISION(item, vocabulary, user));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularySPARQLUPDATE(vocabulary));
-            Sesame2714.SPARQLupdate(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularyREVISION(item, vocabulary, user));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularySPARQLUPDATE(vocabulary));
+            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
             // get result als json
-            RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = Utils.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = Sesame2714.SPARQLquery(PropertiesLocal.getPropertyParam(PropertiesLocal.getREPOSITORY()), PropertiesLocal.getPropertyParam(PropertiesLocal.getSESAMESERVER()), query);
+            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
             List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
@@ -712,7 +712,7 @@ public class VocabsResource {
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Vocabulary . ";
@@ -741,7 +741,7 @@ public class VocabsResource {
 
     private static String putVocabularyREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
         String typeArray[] = type.split(",");
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         Calendar calender = Calendar.getInstance();
@@ -775,7 +775,7 @@ public class VocabsResource {
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " ls:hasStatusType ls:Deleted . ";
@@ -794,7 +794,7 @@ public class VocabsResource {
     }
 
     private static String putVocabularySPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?vocabulary ?p ?o. } "
@@ -809,7 +809,7 @@ public class VocabsResource {
     }
 
     private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
         JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_voc" + ":" + id));
         List<String> deleteList = new ArrayList<String>();
@@ -869,7 +869,7 @@ public class VocabsResource {
     }
 
     private static String deleteVocabularySPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?vocabulary ?p ?o. } "
@@ -884,7 +884,7 @@ public class VocabsResource {
     }
 
     private static String deleteVocabularyStatusTypeSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(PropertiesLocal.getPropertyParam("host"));
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?vocabulary ls:hasStatusType ls:Active. } "
