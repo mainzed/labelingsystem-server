@@ -68,7 +68,8 @@ public class VocabsResource {
             @QueryParam("creator") String creator,
             @QueryParam("contributor") String contributor,
             @QueryParam("statusType") String statusType,
-            @QueryParam("releaseType") String releaseType)
+            @QueryParam("releaseType") String releaseType,
+			@QueryParam("draft") String draft)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
@@ -81,10 +82,12 @@ public class VocabsResource {
                     + "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:contributor ?contributor . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:title ?title . } " // because of sorting
-                    + "OPTIONAL { ?s ls:hasReleaseType ?releaseType . } " // because of filtering
                     + "OPTIONAL { ?s ls:hasStatusType ?statusType . } "; // because of filtering
             // FILTERING
-            if (creator != null) {
+            if (draft == null) {
+				query += "?s ls:hasReleaseType ls:Public . ";
+			}
+			if (creator != null) {
                 query += "FILTER(?creator=\"" + creator + "\") ";
             }
             if (contributor != null) {

@@ -5,39 +5,39 @@ import java.util.HashSet;
 
 public class SuggestionItem {
 	
-	private String id = "";
+	private String url = "";
 	private String schemeTitle = "";
-	private HashSet<String> label = new HashSet();
-	private HashSet<String> definition = new HashSet();
-	private HashSet<HashMap<String,String>> broader = new HashSet<HashMap<String,String>>();
-	private HashSet<HashMap<String,String>> narrower = new HashSet<HashMap<String,String>>();
+	private HashSet<String> labels = new HashSet();
+	private HashSet<String> descriptions = new HashSet();
+	private HashSet<HashMap<String,String>> broaderTerms = new HashSet<HashMap<String,String>>();
+	private HashSet<HashMap<String,String>> narrowerTerms = new HashSet<HashMap<String,String>>();
 
-	public SuggestionItem(String ID) {
-		id = ID;
+	public SuggestionItem(String URL) {
+		url = URL;
 	}
 	
-	public String getId() {
-		return id;
+	public String getURL() {
+		return url;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setURL(String url) {
+		this.url = url;
 	}
 
-	public HashSet<HashMap<String, String>> getBroader() {
-		return broader;
+	public HashSet<HashMap<String, String>> getBroaderTerms() {
+		return broaderTerms;
 	}
 
-	public void setBroader(HashMap<String, String> broader) {
-		this.broader.add(broader);
+	public void setBroaderTerm(HashMap<String, String> broader) {
+		this.broaderTerms.add(broader);
 	}
 
-	public HashSet<HashMap<String, String>> getNarrower() {
-		return narrower;
+	public HashSet<HashMap<String, String>> getNarrowerTerms() {
+		return narrowerTerms;
 	}
 
-	public void setNarrower(HashMap<String, String> narrower) {
-		this.narrower.add(narrower);
+	public void setNarrowerTerm(HashMap<String, String> narrower) {
+		this.narrowerTerms.add(narrower);
 	}
 
 	public String getSchemeTitle() {
@@ -48,20 +48,20 @@ public class SuggestionItem {
 		this.schemeTitle = schemeTitle;
 	}
 
-	public HashSet<String> getLabel() {
-		return label;
+	public HashSet<String> getLabels() {
+		return labels;
 	}
 
 	public void setLabel(String label) {
-		this.label.add(label);
+		this.labels.add(label);
 	}
 
-	public HashSet<String> getDefinition() {
-		return definition;
+	public HashSet<String> getDescriptions() {
+		return descriptions;
 	}
 
-	public void setDefinition(String definition) {
-		this.definition.add(definition);
+	public void setDescription(String description) {
+		this.descriptions.add(description);
 	}
 	
 	
