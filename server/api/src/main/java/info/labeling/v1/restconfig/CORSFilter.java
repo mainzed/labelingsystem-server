@@ -3,7 +3,7 @@ package info.labeling.v1.restconfig;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import info.labeling.v1.utils.PropertiesLocal;
+import info.labeling.v1.utils.ConfigProperties;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,13 +15,13 @@ public class CORSFilter implements ContainerResponseFilter {
         String method = request.getMethod();
         try {
             if (method.equals("GET")) {
-                response.getHttpHeaders().add("Access-Control-Allow-Origin", PropertiesLocal.getPropertyParam("get_origin"));
+                response.getHttpHeaders().add("Access-Control-Allow-Origin", ConfigProperties.getPropertyParam("get_origin"));
             } else {
-                response.getHttpHeaders().add("Access-Control-Allow-Origin", PropertiesLocal.getPropertyParam("other_origin"));
+                response.getHttpHeaders().add("Access-Control-Allow-Origin", ConfigProperties.getPropertyParam("other_origin"));
                 //response.getHttpHeaders().add("Access-Control-Allow-Origin", "null");
             }
             response.getHttpHeaders().add("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, PATCH");
-            response.getHttpHeaders().add("Access-Control-Allow-Headers", "Content-Type, Accept");
+            response.getHttpHeaders().add("Access-Control-Allow-Headers", "Content-Type, Accept, Accept-Encoding");
             response.getHttpHeaders().add("Access-Control-Allow-Credentials", "false");
         } catch (IOException ex) {
             Logger.getLogger(CORSFilter.class.getName()).log(Level.SEVERE, null, ex);
