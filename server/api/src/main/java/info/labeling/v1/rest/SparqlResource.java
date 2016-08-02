@@ -1,6 +1,6 @@
 package info.labeling.v1.rest;
 
-import info.labeling.rdf.Sesame2714;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.ConfigProperties;
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class SparqlResource {
         @Override
         public void write(OutputStream output) throws IOException, WebApplicationException {
             try {
-                Sesame2714.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+                RDF4J_20M3.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
                         ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), QUERY, FORMAT, output);
             } catch (Exception e) {
             }
