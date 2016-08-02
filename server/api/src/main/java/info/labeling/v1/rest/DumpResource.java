@@ -3,6 +3,7 @@ package info.labeling.v1.rest;
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.LSDump;
 import info.labeling.v1.utils.ConfigProperties;
+import info.labeling.v1.utils.Dump;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -20,6 +21,8 @@ import java.util.List;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
@@ -48,7 +51,7 @@ public class DumpResource {
 	private static int maxDumps = 100;
 	public static String numberOfTriples = "";
 	public static int dumbNo = -1;
-
+	
 	@GET
 	public Response getList() {
 		try {
@@ -63,18 +66,32 @@ public class DumpResource {
 			out = "<h1>Index of Labeling System Dumps</h1>";
 			if (fileList.size() > 0) {
 				out += "<table style=\"width:75%\" border='1'>";
-				out += "<tr><th>Name</th><th>Last modified</th><th>Size</th><th>Triples</th></tr>";
+				out += "<tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
 				for (String file : fileList) {
-					numberOfTriples = "";
-					try {
-						numberOfTriples = (file.split("#")[0]).split("-")[2].replace(".tar.gz", "") + " triples";
-					} catch (Exception e) {
-					}
-					out += "<tr><td width='25%'><a href='" + filePath + file.split("#")[0] + "'>" + file.split("#")[0] + "</a></td><td width='25%'>" + file.split("#")[2] + "</td><td width='25%'>" + file.split("#")[1] + " KB</td><td width='25%'> " + numberOfTriples + "</td></tr>";
+					out += "<tr>"
+							+ "<td width='25%'><a href='#'>" + file.split("#")[0] + "</a></td>"
+							+ "<td width='25%'>" + file.split("#")[2] + "</td>"
+							+ "<td width='25%'>" + file.split("#")[1] + " KB</td>"
+							+ "</tr>";
 				}
 				out += "</table>";
 			}
 			return Response.ok(html_header + out + html_footer).header("Content-Type", "text/html;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.DumpResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/repository/{repo}")
+	@Produces("application/json;charset=UTF-8")
+	public Response getDump(@PathParam("repo") String repo) {
+		try {
+			String dumpFile = Dump.writeFile(repo);
+			JSONObject out = new JSONObject();
+			out.put("file", dumpFile);
+			return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.DumpResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();

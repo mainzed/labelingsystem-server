@@ -813,8 +813,7 @@ public class VocabsResource {
 
     private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_voc" + ":" + id));
+        JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
         List<String> deleteList = new ArrayList<String>();
         // for patch
         JSONArray flushArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("flush"));

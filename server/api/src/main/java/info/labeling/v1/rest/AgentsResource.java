@@ -18,7 +18,9 @@ import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -62,6 +64,7 @@ public class AgentsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT * WHERE { "
+                    + "?s ?p ?o . "
                     + "?s a ls:Agent . "
                     + "?s dc:identifier ?identifier . "
                     + "OPTIONAL { ?s foaf:accountName ?name . } " // because of sorting
@@ -90,51 +93,58 @@ public class AgentsResource {
                 }
             }
             // QUERY TRIPLESTORE
+            long ctm_start = System.currentTimeMillis();
             List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            HashSet<String> ids = Sesame2714.getValuesFromBindingSet_UNIQUESET(result, "identifier");
+            List<String> s = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+            List<String> p = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> o = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            System.out.print("querytime: ");
+            System.out.println(System.currentTimeMillis() - ctm_start);
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
-            JSONObject out = new JSONObject();
-            JSONObject outObject = new JSONObject();
-            JSONArray outArray = new JSONArray();
-            for (String element : ids) {
-                String item = "ls_age";
-                query = Utils.getAllElementsForItemID(item, element);
-                result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-                List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-                List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-                if (result.size() < 1) {
-                    throw new ResourceNotAvailableException();
-                }
-                for (int j = 0; j < predicates.size(); j++) {
-                    rdf.setModelTriple(item + ":" + element, predicates.get(j), objects.get(j));
-                }
-                if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
-                    outObject = Transformer.agent_GET(rdf.getModel("RDF/JSON"), element);
-                    outArray.add(outObject);
-                }
-                out.put("agents", outArray);
+            for (int i = 0; i < s.size(); i++) {
+                rdf.setModelTriple(s.get(i), p.get(i), o.get(i));
             }
+            JSONArray outArray = new JSONArray();
+            if (acceptHeader.contains("application/json") || acceptHeader.contains("text/html")) {
+                JSONObject jsonObject = (JSONObject) new JSONParser().parse(rdf.getModel("RDF/JSON"));
+                Set keys = jsonObject.keySet();
+                Iterator a = keys.iterator();
+                while (a.hasNext()) {
+                    String key = (String) a.next();
+                    JSONObject tmpObject = (JSONObject) jsonObject.get(key);
+                    JSONArray idArray = (JSONArray) tmpObject.get(rdf.getPrefixItem("dc:identifier"));
+                    JSONObject idObject = (JSONObject) idArray.get(0);
+                    String h = (String) idObject.get("value");
+                    JSONObject tmpObject2 = new JSONObject();
+                    tmpObject2.put(key, tmpObject);
+                    String hh = tmpObject2.toString();
+                    JSONObject tmp = Transformer.agent_GET(hh, h);
+                    outArray.add(tmp);
+                }
+            }
+            System.out.print("finaltime: ");
+            System.out.println(System.currentTimeMillis() - ctm_start);
             if (acceptHeader.contains("application/json")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).build();
                 } else {
-                    return Response.ok(out).build();
+                    return Response.ok(outArray).build();
                 }
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
                 if (pretty) {
                     JsonParser parser = new JsonParser();
-                    JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                    JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                     Gson gson = new GsonBuilder().setPrettyPrinting().create();
                     return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
                 } else {
-                    return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                    return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
                 }
             } else if (acceptHeader.contains("application/xml")) {
                 return Response.ok(rdf.getModel("RDF/XML")).build();
@@ -148,11 +158,11 @@ public class AgentsResource {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else if (pretty) {
                 JsonParser parser = new JsonParser();
-                JsonObject json = parser.parse(out.toString()).getAsJsonObject();
+                JsonObject json = parser.parse(outArray.toString()).getAsJsonObject();
                 Gson gson = new GsonBuilder().setPrettyPrinting().create();
                 return Response.ok(gson.toJson(json)).header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
-                return Response.ok(out).header("Content-Type", "application/json;charset=UTF-8").build();
+                return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
             }
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
@@ -473,17 +483,13 @@ public class AgentsResource {
         try {
             // get variables
             String item = "ls_age";
-            String itemID = "";
             // parse name
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-            JSONObject agentObject = (JSONObject) jsonObject.get("agent");
-            JSONArray nameArray = (JSONArray) agentObject.get("name");
-            for (Object element : nameArray) {
-                itemID = (String) element;
-            }
+            String itemID = (String) jsonObject.get("name");
+            String groupID = (String) jsonObject.get("group");
             // create triples
             json = Transformer.agent_POST(json, itemID);
-            String triples = createAgentSPARQLUPDATE(item, itemID);
+            String triples = createAgentSPARQLUPDATE(item, itemID, groupID);
             // input triples
             Sesame2714.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
             Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), triples);
@@ -608,17 +614,18 @@ public class AgentsResource {
         }
     }
 
-    private static String createAgentSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String createAgentSPARQLUPDATE(String item, String itemid, String groupid) throws ConfigException, IOException, UniqueIdentifierException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Agent . ";
         triples += item + ":" + itemid + " a foaf:Agent . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
-		triples += item + ":" + itemid + " foaf:accountName \"" + itemid + "\"" + " . ";
+        triples += item + ":" + itemid + " foaf:accountName \"" + itemid + "\"" + " . ";
+        triples += item + ":" + itemid + " ls:inGroup \"" + groupid + "\"" + " . ";
         triples += " }";
         return triples;
-    }    
+    }
 
     private static String putAgentSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -637,8 +644,7 @@ public class AgentsResource {
 
     private static String patchAgentSPARQLUPDATE(String id, String json) throws IOException, ParseException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        JSONObject agentObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("ls_age" + ":" + id));
+        JSONObject agentObject = (JSONObject) new JSONParser().parse(json);
         List<String> deleteList = new ArrayList<String>();
         // for patch
         JSONArray flushArray = (JSONArray) agentObject.get(rdf.getPrefixItem("flush"));
