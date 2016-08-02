@@ -51,7 +51,7 @@ public class DumpResource {
 	private static int maxDumps = 100;
 	public static String numberOfTriples = "";
 	public static int dumbNo = -1;
-	
+
 	@GET
 	public Response getList() {
 		try {
@@ -69,7 +69,7 @@ public class DumpResource {
 				out += "<tr><th>Name</th><th>Last modified</th><th>Size</th></tr>";
 				for (String file : fileList) {
 					out += "<tr>"
-							+ "<td width='25%'><a href='#'>" + file.split("#")[0] + "</a></td>"
+							+ "<td width='25%'><a href='" + ConfigProperties.getPropertyParam("dump_web") + file.split("#")[0] + "'>" + file.split("#")[0] + "</a></td>"
 							+ "<td width='25%'>" + file.split("#")[2] + "</td>"
 							+ "<td width='25%'>" + file.split("#")[1] + " KB</td>"
 							+ "</tr>";
@@ -82,7 +82,7 @@ public class DumpResource {
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
-	
+
 	@GET
 	@Path("/repository/{repo}")
 	@Produces("application/json;charset=UTF-8")
