@@ -7,8 +7,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 public class Utils {
-
-    public static String getAllElementsForItemID(String item, String itemid) throws ConfigException, IOException {
+	
+	public static String getAllElementsForItemID(String item, String itemid) throws ConfigException, IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT * WHERE { ";
