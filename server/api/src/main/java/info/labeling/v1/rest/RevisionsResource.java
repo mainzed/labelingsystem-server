@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import info.labeling.rdf.RDF;
-import info.labeling.rdf.Sesame2714;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.exceptions.ConfigException;
 import info.labeling.exceptions.Logging;
 import info.labeling.exceptions.RdfException;
@@ -32,7 +32,7 @@ import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.openrdf.query.BindingSet;
+import org.eclipse.rdf4j.query.BindingSet;
 
 @Path("/revisions")
 public class RevisionsResource {
@@ -54,10 +54,10 @@ public class RevisionsResource {
                     + " } ";
             // QUERY TRIPLESTORE
             long ctm_start = System.currentTimeMillis();
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> s = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-            List<String> p = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> o = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> s = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+            List<String> p = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> o = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             System.out.print("querytime: ");
             System.out.println(System.currentTimeMillis() - ctm_start);
             if (result.size() < 1) {
@@ -143,9 +143,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -214,9 +214,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -251,9 +251,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -281,9 +281,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -311,9 +311,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -340,9 +340,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -369,9 +369,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -406,9 +406,9 @@ public class RevisionsResource {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_rev";
             String query = Utils.getAllElementsForItemID(item, revision);
-            List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> predicates = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+            List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+            List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException();
             }
@@ -440,7 +440,7 @@ public class RevisionsResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response deleteRevision(@PathParam("revision") String revision) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteRevisionSPARQLUPDATE(revision));
+            RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteRevisionSPARQLUPDATE(revision));
             // get result als json
             String out = Transformer.empty_JSON("revision").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();

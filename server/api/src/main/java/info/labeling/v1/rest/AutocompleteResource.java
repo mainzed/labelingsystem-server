@@ -3,7 +3,7 @@ package info.labeling.v1.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import info.labeling.rdf.RDF;
-import info.labeling.rdf.Sesame2714;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.exceptions.AutocompleteLengthException;
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.ConfigProperties;
@@ -17,7 +17,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.openrdf.query.BindingSet;
+import org.eclipse.rdf4j.query.BindingSet;
 
 @Path("/autocomplete")
 public class AutocompleteResource {
@@ -43,9 +43,9 @@ public class AutocompleteResource {
                         + "} "
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
-                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
                 JSONArray jsonarray_suggestions = new JSONArray(); 
                 for (int i=0; i<suggestion_uri.size(); i++) {
@@ -94,9 +94,9 @@ public class AutocompleteResource {
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
 
-                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
-                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
                 JSONArray jsonarray_suggestions = new JSONArray(); 
                 for (int i=0; i<suggestion_uri.size(); i++) {
@@ -137,9 +137,9 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
-                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();
                 JSONArray jsonarray_suggestions = new JSONArray();
                 for (int i = 0; i < suggestion_uri.size(); i++) {
@@ -180,9 +180,9 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("sesame_server"), query);
-                List<String> suggestion_uri = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();
                 JSONArray jsonarray_suggestions = new JSONArray();
                 for (int i = 0; i < suggestion_uri.size(); i++) {

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 //import de.i3mainz.ls.Config.Config;
 import info.labeling.rdf.RDF;
-import info.labeling.rdf.Sesame2714;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.exceptions.ConfigException;
 import info.labeling.exceptions.CsvExistanceException;
 import info.labeling.exceptions.CsvLabelImportException;
@@ -28,10 +28,10 @@ import java.util.logging.Logger;
 import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.repository.RepositoryException;
 
 /**
  * CLASS (implements Runnable) to import a CSV file to the triplestore
@@ -409,9 +409,9 @@ public class CSV implements Runnable {
                     + "?v dc:identifier ?identifier. "
                     + "FILTER (?identifier=\"$identifier\") }";
             query = query.replace("$identifier", voc);
-            List<BindingSet> voc_result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+            List<BindingSet> voc_result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
                     ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-            List<String> voc_true = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(voc_result, "v");
+            List<String> voc_true = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(voc_result, "v");
             return voc_true.size() > 0;
         } catch (RepositoryException e) {
             throw new CsvExistanceException();
@@ -919,7 +919,7 @@ public class CSV implements Runnable {
                 }
                 pw.close();
                 if (!validator) {
-                    Sesame2714.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
+                    RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
                             ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), "LOAD <" + ImportcsvResource.FILELINK + ">");
                 }
             }

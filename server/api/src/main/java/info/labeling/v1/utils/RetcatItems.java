@@ -1,16 +1,16 @@
 package info.labeling.v1.utils;
 
 import info.labeling.rdf.RDF;
-import info.labeling.rdf.Sesame2714;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.SesameSparqlException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.openrdf.query.BindingSet;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryEvaluationException;
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.repository.RepositoryException;
 
 public class RetcatItems {
 
@@ -44,10 +44,10 @@ public class RetcatItems {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT * WHERE { ?s a ls:Vocabulary. ?s ls:hasReleaseType ls:Public. ?s dc:title ?title. ?s dc:identifier ?id. }";
-        List<BindingSet> result = Sesame2714.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
-        List<String> uris = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-        List<String> titles = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "title");
-        List<String> ids = Sesame2714.getValuesFromBindingSet_ORDEREDLIST(result, "id");
+        List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+        List<String> uris = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+        List<String> titles = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "title");
+        List<String> ids = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "id");
         if (!result.isEmpty()) {
             for (int i = 0; i < uris.size(); i++) {
                 retcatList.add(new String[]{titles.get(i).split("@")[0].replace("\"", ""), ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/" + ids.get(i), ConfigProperties.getPropertyParam("api") + "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "ls", relTypeSKOS, titles.get(i).split("@")[1].replace("\"", "")});

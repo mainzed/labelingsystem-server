@@ -118,8 +118,8 @@ public class DumpResource {
 		try {
 			fileDir = ConfigProperties.getPropertyParam("dump_server");
 			filePath = ConfigProperties.getPropertyParam("dump_web");
-			downloadLink = ConfigProperties.getPropertyParam("sesame_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/statements?Accept=text/plain";
-			size_url = ConfigProperties.getPropertyParam("sesame_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/size";
+			downloadLink = ConfigProperties.getPropertyParam("ts_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/statements?Accept=text/plain";
+			size_url = ConfigProperties.getPropertyParam("ts_server") + "/repositories/" + ConfigProperties.getPropertyParam("repository") + "/size";
 			tmpDirPath = fileDir + "tmpDir_1" + "/";
 			tmpDirPath2 = fileDir + "tmpDir_2" + "/";
 			dumping = true;

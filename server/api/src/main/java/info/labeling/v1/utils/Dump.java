@@ -24,7 +24,7 @@ public class Dump {
 				}
 			}
 			// download dump
-			URL link = new URL(ConfigProperties.getPropertyParam("sesame_server") + "/repositories/" + repo + "/statements?Accept=text/plain");
+			URL link = new URL(ConfigProperties.getPropertyParam("ts_server") + "/repositories/" + repo + "/statements?Accept=text/plain");
 			InputStream in = new BufferedInputStream(link.openStream());
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			byte[] buf = new byte[1024];
