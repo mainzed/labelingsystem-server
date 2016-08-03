@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import javax.servlet.ServletOutputStream;
-import org.eclipse.rdf4j.model.Value;
+/*import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.query.TupleQuery;
 import org.eclipse.rdf4j.query.TupleQueryResult;
@@ -33,11 +33,11 @@ import org.eclipse.rdf4j.query.resultio.text.tsv.SPARQLResultsTSVWriter;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
-import org.eclipse.rdf4j.rio.RDFFormat;
+import org.eclipse.rdf4j.rio.RDFFormat;*/
 
 public class RDF4J_20M3 {
 
-    public static List<BindingSet> SPARQLquery(String repositoryID, String rdf4jServer, String queryString) throws RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException {
+    /*public static List<BindingSet> SPARQLquery(String repositoryID, String rdf4jServer, String queryString) throws RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException {
         List<BindingSet> BindingList = new ArrayList();
         try {
             Repository repo = new HTTPRepository(rdf4jServer, repositoryID);
@@ -255,7 +255,7 @@ public class RDF4J_20M3 {
             throw new SesameSparqlException(e.getMessage());
         }
         return out;
-    }
+    }*/
 
 }
 
