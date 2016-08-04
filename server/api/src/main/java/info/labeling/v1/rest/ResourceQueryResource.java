@@ -27,7 +27,7 @@ public class ResourceQueryResource {
 		boolean match = false;
 		for (String[] arrayItem : retcatlist) {
 			if (retcat.contains(arrayItem[0])) {
-				URI targetURIForRedirection = new URI(arrayItem[1]+"?query="+query);
+				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + arrayItem[1]+"?query="+query);
 				return Response.temporaryRedirect(targetURIForRedirection).build();
 			}
 		}

@@ -4,6 +4,7 @@ import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.SesameSparqlException;
 import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
+import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,7 +28,7 @@ public class ResourcelabelResource {
 		boolean match = false;
 		for (String[] arrayItem : retcatlist) {
 			if (url.contains(arrayItem[3])) {
-				URI targetURIForRedirection = new URI(arrayItem[2]+"?url="+url+"&type="+arrayItem[4]);
+				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + arrayItem[2]+"?url="+url+"&type="+arrayItem[4]);
 				return Response.temporaryRedirect(targetURIForRedirection).build();
 			}
 		}

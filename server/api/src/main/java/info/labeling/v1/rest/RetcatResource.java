@@ -142,6 +142,46 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
+	
+	@GET
+	@Path("/waybacklink")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getWaybackLink(@QueryParam("url") String url) {
+		try {
+			URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			String urlParameters = "";
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.writeBytes(urlParameters);
+			wr.flush();
+			wr.close();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			// init output
+			JSONObject jsonOut = new JSONObject();
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("archived_snapshots");
+			JSONObject resultsObject2 = (JSONObject) resultsObject.get("closest");
+			String wburl = null;
+			try {
+				wburl = (String) resultsObject2.get("url");
+			} catch (Exception e) {
+				throw new NullPointerException("no url available");
+			}
+			jsonOut.put("url", wburl);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.WaybackResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
 
     /**
      * *************
@@ -1998,6 +2038,238 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
+	
+	@GET
+    @Path("/query/skosmos/finto")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getResultsSKOSMOS_FINTO(@QueryParam("query") String searchword) {
+        try {
+            searchword = Utils.encodeURIComponent(searchword);
+            String url_string = "http://finto.fi/rest/v1/search?query=*"+searchword+"*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=allars%20koko%20ponduskategorier%20ysa%20yso%20juho%20jupo%20keko%20okm-tieteenala%20liito%20mero%20puho%20tsr%20afo%20kassu%20mesh%20tero%20maotao%20musa%20muso%20valo%20kauno%20kito%20kto&limit=" + LIMIT;
+            URL url = new URL(url_string);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            br.close();
+            // init output
+            JSONArray outArray = new JSONArray();
+            // fill objects
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
+            for (Object element : resultsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                String uriValue = (String) tmpElement.get("uri");
+                autosuggests.put(uriValue, new SuggestionItem(uriValue));
+                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
+				String labelValue = (String) tmpElement.get("prefLabel");
+                tmpAutosuggest.setLabel(labelValue);
+				String vocabValue = (String) tmpElement.get("vocab");
+				tmpAutosuggest.setSchemeTitle(vocabValue);
+				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
+                JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
+                // query for broader
+                if (boraderArray != null) {
+                    for (Object item : boraderArray) {
+                        JSONObject tmpObject = (JSONObject) item;
+                        HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        hstmp.put(uriValueTmp, labelValueTmp);
+                        tmpAutosuggest.setBroaderTerm(hstmp);
+                    }
+                }
+                // query for narrower
+                if (narrowerArray != null) {
+                    for (Object item : boraderArray) {
+                        JSONObject tmpObject = (JSONObject) item;
+                        HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        hstmp.put(uriValueTmp, labelValueTmp);
+                        tmpAutosuggest.setNarrowerTerm(hstmp);
+                    }
+                }
+			}
+            // fill output json
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
+                JSONObject suggestionObject = new JSONObject();
+                // url
+                suggestionObject.put("url", tmpAS.getURL());
+                // labels
+                suggestionObject.put("labels", tmpAS.getLabels());
+                // scheme
+                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
+                // descriptions
+                suggestionObject.put("descriptions", tmpAS.getDescriptions());
+                // broader
+                Set broaderTerms = tmpAS.getBroaderTerms();
+                JSONArray broaderArrayNew = new JSONArray();
+                if (broaderTerms.size() > 0) {
+                    for (Object element : broaderTerms) {
+                        Map hm = (Map) element;
+                        Iterator entries = hm.entrySet().iterator();
+                        while (entries.hasNext()) {
+                            Map.Entry thisEntry = (Map.Entry) entries.next();
+                            String key = (String) thisEntry.getKey();
+                            String value = (String) thisEntry.getValue();
+                            JSONObject broaderObjectTmp = new JSONObject();
+                            broaderObjectTmp.put("uri", key);
+                            broaderObjectTmp.put("label", value);
+                            broaderArrayNew.add(broaderObjectTmp);
+                        }
+                    }
+                }
+                suggestionObject.put("broaderTerms", broaderArrayNew);
+                // narrrower
+                Set narrrowerTerms = tmpAS.getNarrowerTerms();
+                JSONArray narrrowerArrayNew = new JSONArray();
+                if (narrrowerTerms.size() > 0) {
+                    for (Object element : narrrowerTerms) {
+                        Map hm = (Map) element;
+                        Iterator entries = hm.entrySet().iterator();
+                        while (entries.hasNext()) {
+                            Map.Entry thisEntry = (Map.Entry) entries.next();
+                            String key = (String) thisEntry.getKey();
+                            String value = (String) thisEntry.getValue();
+                            JSONObject narrrowerObjectTmp = new JSONObject();
+                            narrrowerObjectTmp.put("uri", key);
+                            narrrowerObjectTmp.put("label", value);
+                            narrrowerArrayNew.add(narrrowerObjectTmp);
+                        }
+                    }
+                }
+                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
+                // add information to output
+                outArray.add(suggestionObject);
+            }
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+	
+	@GET
+    @Path("/query/skosmos/fao")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getResultsSKOSMOS_FAO(@QueryParam("query") String searchword) {
+        try {
+            searchword = Utils.encodeURIComponent(searchword);
+            String url_string = "http://oek1.fao.org/skosmos/rest/v1/search?query=*"+searchword+"*&lang=en&type=skos:Concept&fields=narrower%20broader&limit=" + LIMIT;
+            URL url = new URL(url_string);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = br.readLine()) != null) {
+                response.append(inputLine);
+            }
+            br.close();
+            // init output
+            JSONArray outArray = new JSONArray();
+            // fill objects
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
+            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
+            for (Object element : resultsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                String uriValue = (String) tmpElement.get("uri");
+                autosuggests.put(uriValue, new SuggestionItem(uriValue));
+                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
+				String labelValue = (String) tmpElement.get("prefLabel");
+                tmpAutosuggest.setLabel(labelValue);
+				String vocabValue = (String) tmpElement.get("vocab");
+				tmpAutosuggest.setSchemeTitle(vocabValue);
+				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
+                JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
+                // query for broader
+                if (boraderArray != null) {
+                    for (Object item : boraderArray) {
+                        JSONObject tmpObject = (JSONObject) item;
+                        HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        hstmp.put(uriValueTmp, labelValueTmp);
+                        tmpAutosuggest.setBroaderTerm(hstmp);
+                    }
+                }
+                // query for narrower
+                if (narrowerArray != null) {
+                    for (Object item : boraderArray) {
+                        JSONObject tmpObject = (JSONObject) item;
+                        HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        hstmp.put(uriValueTmp, labelValueTmp);
+                        tmpAutosuggest.setNarrowerTerm(hstmp);
+                    }
+                }
+			}
+            // fill output json
+            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+                SuggestionItem tmpAS = entry.getValue();
+                JSONObject suggestionObject = new JSONObject();
+                // url
+                suggestionObject.put("url", tmpAS.getURL());
+                // labels
+                suggestionObject.put("labels", tmpAS.getLabels());
+                // scheme
+                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
+                // descriptions
+                suggestionObject.put("descriptions", tmpAS.getDescriptions());
+                // broader
+                Set broaderTerms = tmpAS.getBroaderTerms();
+                JSONArray broaderArrayNew = new JSONArray();
+                if (broaderTerms.size() > 0) {
+                    for (Object element : broaderTerms) {
+                        Map hm = (Map) element;
+                        Iterator entries = hm.entrySet().iterator();
+                        while (entries.hasNext()) {
+                            Map.Entry thisEntry = (Map.Entry) entries.next();
+                            String key = (String) thisEntry.getKey();
+                            String value = (String) thisEntry.getValue();
+                            JSONObject broaderObjectTmp = new JSONObject();
+                            broaderObjectTmp.put("uri", key);
+                            broaderObjectTmp.put("label", value);
+                            broaderArrayNew.add(broaderObjectTmp);
+                        }
+                    }
+                }
+                suggestionObject.put("broaderTerms", broaderArrayNew);
+                // narrrower
+                Set narrrowerTerms = tmpAS.getNarrowerTerms();
+                JSONArray narrrowerArrayNew = new JSONArray();
+                if (narrrowerTerms.size() > 0) {
+                    for (Object element : narrrowerTerms) {
+                        Map hm = (Map) element;
+                        Iterator entries = hm.entrySet().iterator();
+                        while (entries.hasNext()) {
+                            Map.Entry thisEntry = (Map.Entry) entries.next();
+                            String key = (String) thisEntry.getKey();
+                            String value = (String) thisEntry.getValue();
+                            JSONObject narrrowerObjectTmp = new JSONObject();
+                            narrrowerObjectTmp.put("uri", key);
+                            narrrowerObjectTmp.put("label", value);
+                            narrrowerArrayNew.add(narrrowerObjectTmp);
+                        }
+                    }
+                }
+                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
+                // add information to output
+                outArray.add(suggestionObject);
+            }
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
 
     /**
      * *************
@@ -2271,6 +2543,71 @@ public class RetcatResource {
             JSONObject jsonOut = new JSONObject();
             jsonOut.put("label", labelValue);
             jsonOut.put("type", "chronontology");
+            return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+	
+	@GET
+    @Path("/label/skosmos/finto")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response geLabelSkosmosFinto(@QueryParam("url") String url) {
+        try {
+            // query for json
+            String vocab = url.split("/")[4];
+			url = Utils.encodeURIComponent(url);
+			url = "http://api.finto.fi/rest/v1/"+vocab+"/label?lang=en&uri="+url;
+			URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+            String labelValue = (String) jsonObject.get("prefLabel");
+            // output
+            JSONObject jsonOut = new JSONObject();
+            jsonOut.put("label", labelValue);
+            jsonOut.put("type", "fao");
+            return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+	
+	@GET
+    @Path("/label/skosmos/fao")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response geLabelSkosmosFao(@QueryParam("url") String url) {
+        try {
+            // query for json
+            url = Utils.encodeURIComponent(url);
+			url = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri="+url;
+			URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+            String labelValue = (String) jsonObject.get("prefLabel");
+            // output
+            JSONObject jsonOut = new JSONObject();
+            jsonOut.put("label", labelValue);
+            jsonOut.put("type", "fao");
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
