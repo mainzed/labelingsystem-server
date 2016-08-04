@@ -73,6 +73,12 @@ public class RDF4J_20M3 {
                     } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#string>")) {
                         valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#string>", "");
                         valuestring = valuestring.substring(1, valuestring.length() - 1);
+                    } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#integer>")) {
+                        valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#integer>", "");
+                        valuestring = valuestring.substring(1, valuestring.length() - 1);
+                    } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#double>")) {
+                        valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#double>", "");
+                        valuestring = valuestring.substring(1, valuestring.length() - 1);
                     } else {
                         valuestring = valuestring.substring(1, valuestring.length() - 1);
                     }
@@ -101,6 +107,12 @@ public class RDF4J_20M3 {
                         valuestring = "\"" + valuestring.substring(1, valuestring.length());
                     } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#string>")) {
                         valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#string>", "");
+                        valuestring = valuestring.substring(1, valuestring.length() - 1);
+                    } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#integer>")) {
+                        valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#integer>", "");
+                        valuestring = valuestring.substring(1, valuestring.length() - 1);
+                    } else if (valuestring.contains("^^<http://www.w3.org/2001/XMLSchema#double>")) {
+                        valuestring = valuestring.replace("^^<http://www.w3.org/2001/XMLSchema#double>", "");
                         valuestring = valuestring.substring(1, valuestring.length() - 1);
                     } else {
                         valuestring = valuestring.substring(1, valuestring.length() - 1);

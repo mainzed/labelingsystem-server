@@ -9,7 +9,7 @@ public class ConfigProperties {
     private static final Properties prop = new Properties();
 	private static final String fileName = "config.properties";
 	private static final String HOST = "host";
-	private static final String SESAMESERVER = "ts_server";
+	private static final String SESAMESERVER = "sesame_server";
 	private static final String REPOSITORY = "repository";
 	private static final String LSDETAILHTML = "ls_detailhtml";
     

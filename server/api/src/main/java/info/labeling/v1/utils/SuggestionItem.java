@@ -6,8 +6,11 @@ import java.util.HashSet;
 public class SuggestionItem {
 	
 	private String url = "";
+	private String id = "";
 	private String schemeTitle = "";
+	private String schemeURI = "";
 	private HashSet<String> labels = new HashSet();
+	private HashSet<String> altLabels = new HashSet();
 	private HashSet<String> descriptions = new HashSet();
 	private HashSet<HashMap<String,String>> broaderTerms = new HashSet<HashMap<String,String>>();
 	private HashSet<HashMap<String,String>> narrowerTerms = new HashSet<HashMap<String,String>>();
@@ -55,6 +58,14 @@ public class SuggestionItem {
 	public void setLabel(String label) {
 		this.labels.add(label);
 	}
+	
+	public HashSet<String> getAltLabels() {
+		return altLabels;
+	}
+
+	public void setAltLabel(String label) {
+		this.altLabels.add(label);
+	}
 
 	public HashSet<String> getDescriptions() {
 		return descriptions;
@@ -63,7 +74,21 @@ public class SuggestionItem {
 	public void setDescription(String description) {
 		this.descriptions.add(description);
 	}
-	
-	
+
+	public String getSchemeURI() {
+		return schemeURI;
+	}
+
+	public void setSchemeURI(String schemeURI) {
+		this.schemeURI = schemeURI;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 }
