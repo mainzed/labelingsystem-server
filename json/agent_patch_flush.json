@@ -1,5 +1,0 @@
-{
-	"agent": {
-		"flush": ["homepage","img","lat","lon"]
-	}
-}

@@ -1,3 +1,0 @@
-vocabularyID	prefLabel	altLabel	note	definition	broader	narrower	related	broadMatch	narrowMatch	relatedMatch	closeMatch	exactMatch	seeAlso	isDefinedBy	sameAs	contributors	internalID
-175c24d2-35dd-44a8-a6e6-162ed0b9aba3	Normalisiertes Vornamen-Bundle;de		Beschreibt Vornamen, die heute in ihrer Sprache in genau dieser Schreibweise gebräuchlich sind.;de														1
-175c24d2-35dd-44a8-a6e6-162ed0b9aba3	Vornamenvariante;de		Diese Klasse beschreibt Vornamen in einer Schreibweise, die heute gebräuchlich sein kann, aber nicht sein muss. Sie umfasst also heutige und historische (nicht mehr gebräuchliche) Schreibvarianten eines Vornamens.;de														2
