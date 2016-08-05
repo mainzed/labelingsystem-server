@@ -44,8 +44,8 @@
 </html>
 
 <script>
-    var UPDATE_ADDRESS = "http://localhost:80/api/v1/importcsv/mode/update";
-    var FINISH_ADDRESS = "http://localhost:80/api/v1/importcsv/mode/finish";
+    var UPDATE_ADDRESS = "http://143.93.114.135/api/v1/importcsv/mode/update";
+    var FINISH_ADDRESS = "http://143.93.114.135/api/v1/importcsv/mode/finish";
     var updateTime = 3000; // default:2000
     var status = -1;
 
@@ -74,7 +74,7 @@
             validator = false;
         }
         $.ajax({
-            url: "http://localhost:80/api/v1/importcsv/mode/"+mode+"/creator/"+user+"/validator/"+validator,
+            url: "http://143.93.114.135/api/v1/importcsv/mode/"+mode+"/creator/"+user+"/validator/"+validator,
             type: 'POST',
             data: formData,
             async: false,
