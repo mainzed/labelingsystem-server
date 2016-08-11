@@ -12,6 +12,10 @@ RESTful API to provide cool URIs for Labeling System items
 
 just a small test (will be deleted)
 
+##Wiki
+
+[Labeling System Wiki](/wiki)
+
 ##Development
 
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
