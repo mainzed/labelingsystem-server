@@ -189,6 +189,8 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				if (value.contains("Active")) {
 					value = "active";
+				} else if (value.contains("Deprecated")) {
+					value = "deprecated";
 				} else {
 					value = "deleted";
 				}
@@ -1078,6 +1080,8 @@ public class Transformer {
 				String value = (String) obj.get("value");
 				if (value.contains("Active")) {
 					value = "active";
+				} else if (value.contains("Deprecated")) {
+					value = "deprecated";
 				} else {
 					value = "deleted";
 				}

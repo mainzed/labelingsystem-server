@@ -824,6 +824,42 @@ public class LabelsResource {
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
+	
+	@DELETE
+	@Path("/{label}/deprecated/user/{user}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response setDeprecatedLabel(@PathParam("label") String label, @PathParam("user") String user) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+		try {
+			String item = "ls_lab";
+			// check if resource exists
+			String queryExist = Utils.getAllElementsForItemID(item, label);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			if (resultExist.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			// insert data
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deprecatedLabelREVISION(item, label, user));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteLabelStatusTypeSPARQLUPDATE(label));
+			// get result als json
+			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			List<String[]> retcatlist = RetcatItems.getAllItems();
+			String query = Utils.getAllElementsForItemID(item, label);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < predicates.size(); i++) {
+				rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
+			}
+			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist).toJSONString();
+			return Response.status(Response.Status.CREATED).entity(out).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.LabelsResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
 
 	private static String createLabelSPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
 		String revID = UniqueIdentifier.getUUID();
@@ -907,6 +943,30 @@ public class LabelsResource {
 		triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
 		triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeleteRevision" + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeleteRevision" + " . ";
+		triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+		triples += " }";
+		return triples;
+	}
+	
+	private static String deprecatedLabelREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
+		String revID = UniqueIdentifier.getUUID();
+		Calendar calender = Calendar.getInstance();
+		Date date = calender.getTime();
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+		String dateiso = formatter.format(date);
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		String prefixes = rdf.getPREFIXSPARQL();
+		String triples = prefixes + "INSERT DATA { ";
+		triples += item + ":" + itemid + " ls:hasStatusType ls:Deprecated . ";
+		triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
+		triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
+		triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
+		triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
+		triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
+		triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
+		triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
+		triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeprecatedRevision" + "\"" + " . ";
+		triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeprecatedRevision" + " . ";
 		triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
 		triples += " }";
 		return triples;

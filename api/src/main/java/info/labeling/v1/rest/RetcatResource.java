@@ -1,6 +1,7 @@
 package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
+import info.labeling.rdf.RDF;
 import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
 import info.labeling.v1.utils.SQlite;
@@ -37,10 +38,6 @@ public class RetcatResource {
 
     private final String LIMIT = "20";
 
-    /**
-     * **************
-     * RETCAT LISTS * **************
-     */
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatList() {
@@ -183,10 +180,6 @@ public class RetcatResource {
 		}
 	}
 
-    /**
-     * *************
-     * RETCAT QUERY * *************
-     */
     @GET
     @Path("/query/heritagedata/historicengland")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -2271,10 +2264,6 @@ public class RetcatResource {
         }
     }
 
-    /**
-     * *************
-     * RETCAT LABEL * *************
-     */
     @GET
     @Path("/label/getty")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -2377,10 +2366,12 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelLabelingSystem(@QueryParam("url") String url) {
         try {
-            String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
-                    + "SELECT ?prefLabel { "
+                    + "SELECT * { "
                     + "<" + url + "> ls:preferredLabel ?prefLabel. "
+					+ "<" + url + "> ls:hasStatusType ?statusType. "
                     + " }";
             URL obj = new URL(sparqlendpoint);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -2411,8 +2402,11 @@ public class RetcatResource {
                 JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) prefLabel.get("value");
                 String labelLang = (String) prefLabel.get("xml:lang");
+				JSONObject statusType = (JSONObject) tmpElement.get("statusType");
+				String stValue = (String) statusType.get("value");
                 jsonOut.put("label", labelValue + "@" + labelLang);
                 jsonOut.put("type", "ls");
+				jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"),""));
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {

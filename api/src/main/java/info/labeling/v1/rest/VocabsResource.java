@@ -750,6 +750,44 @@ public class VocabsResource {
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
+	
+	@DELETE
+	@Path("/{vocabulary}/deprecated/user/{user}")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response setDeprecatedVocabulary(@PathParam("vocabulary") String vocabulary, @PathParam("user") String user) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+		try {
+			String item = "ls_voc";
+			// check if resource exists
+			String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
+			if (resultExist.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			// insert data
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedVocabularyREVISION(item, vocabulary, user));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
+			// set deprecated labels
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
+			// get result als json
+			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			String query = Utils.getAllElementsForItemID(item, vocabulary);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+			if (result.size() < 1) {
+				throw new ResourceNotAvailableException();
+			}
+			for (int i = 0; i < predicates.size(); i++) {
+				rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
+			}
+			String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+			return Response.status(Response.Status.CREATED).entity(out).build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.VocabsResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
 
 	private static String createVocabularySPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
 		String revID = UniqueIdentifier.getUUID();
@@ -837,6 +875,30 @@ public class VocabsResource {
 		triples += " }";
 		return triples;
 	}
+	
+	private static String deprecatedVocabularyREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
+        String revID = UniqueIdentifier.getUUID();
+        Calendar calender = Calendar.getInstance();
+        Date date = calender.getTime();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String dateiso = formatter.format(date);
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        String prefixes = rdf.getPREFIXSPARQL();
+        String triples = prefixes + "INSERT DATA { ";
+        triples += item + ":" + itemid + " ls:hasStatusType ls:Deprecated . ";
+        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
+        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
+        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
+        triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
+        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
+        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
+        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
+        triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeprecatedRevision" + "\"" + " . ";
+        triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeprecatedRevision" + " . ";
+        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        triples += " }";
+        return triples;
+    }
 
 	private static String putVocabularySPARQLUPDATE(String id) throws IOException {
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -938,6 +1000,36 @@ public class VocabsResource {
 				+ "FILTER (?identifier=\"$identifier\") "
 				+ "}";
 		update = update.replace("$identifier", id);
+		return update;
+	}
+	
+	private static String deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(String vocid) throws IOException {
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		String prefixes = rdf.getPREFIXSPARQL();
+		String update = prefixes
+				+ "DELETE { ?label ls:hasStatusType ls:Active. } "
+				+ "WHERE { "
+				+ "?label ls:hasStatusType ls:Active. "
+				+ "?label skos:inScheme ?vocab. "
+				+ "?vocab dc:identifier ?identifier. "
+				+ "FILTER (?identifier=\"$identifier\") "
+				+ "}";
+		update = update.replace("$identifier", vocid);
+		return update;
+	}
+	
+	private static String addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(String vocid) throws IOException {
+		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		String prefixes = rdf.getPREFIXSPARQL();
+		String update = prefixes
+				+ "INSERT { ?label ls:hasStatusType ls:Deprecated. } "
+				+ "WHERE { "
+				+ "?label ls:hasStatusType ls:Active. "
+				+ "?label skos:inScheme ?vocab. "
+				+ "?vocab dc:identifier ?identifier. "
+				+ "FILTER (?identifier=\"$identifier\") "
+				+ "}";
+		update = update.replace("$identifier", vocid);
 		return update;
 	}
 
