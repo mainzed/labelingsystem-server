@@ -14,7 +14,7 @@ just a small test (will be deleted)
 
 ##Wiki
 
-[Labeling System Wiki](/wiki)
+[Labeling System Wiki](../../wiki)
 
 ##Development
 
