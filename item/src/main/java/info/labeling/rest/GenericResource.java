@@ -1,9 +1,14 @@
 package info.labeling.rest;
 
 import info.labeling.exceptions.Logging;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Path;
@@ -12,6 +17,9 @@ import javax.ws.rs.core.Response;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.jdom.JDOMException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 @Path("/")
 public class GenericResource {
@@ -27,10 +35,7 @@ public class GenericResource {
 	public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
 			String HOST_API = ConfigProperties.getPropertyParam("api");
-			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("ls_detailhtml")
-					.replace("$host", ConfigProperties.getPropertyParam("host"))
-					.replace("$itemid", itemID)
-					.replace("$item", "vocabulary");
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + itemID + "/labels";
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".json");
 				return Response.temporaryRedirect(targetURIForRedirection).build();
@@ -64,13 +69,47 @@ public class GenericResource {
 
 	@GET
 	@Path("/label/{label}")
-	public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException,  ParserConfigurationException, TransformerException {
+	public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
+			// get vocabID
+			String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "sparql";
+			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/>"
+					+ "SELECT ?vocid { "
+					+ "<http://" + ConfigProperties.getPropertyParam("host") + "/item/label/" + itemID + "> skos:inScheme ?scheme. "
+					+ "?scheme dc:identifier ?vocid. "
+					+ " }";
+			URL obj = new URL(sparqlendpoint);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Accept", "application/sparql-results+json");
+			String urlParameters = "query=" + sparql;
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			wr.writeBytes(urlParameters);
+			wr.flush();
+			wr.close();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			// parse SPARQL results json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
+			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
+			// create unique list of ids
+			String vocID = "";
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				JSONObject vocid = (JSONObject) tmpElement.get("vocid");
+				vocID = (String) vocid.get("value");
+			}
+			// init out
 			String HOST_API = ConfigProperties.getPropertyParam("api");
-			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("ls_detailhtml")
-					.replace("$host", ConfigProperties.getPropertyParam("host"))
-					.replace("$itemid", itemID)
-					.replace("$item", "label");
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + vocID + "/labels/" + itemID;
+			// output
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".json");
 				return Response.temporaryRedirect(targetURIForRedirection).build();
