@@ -155,8 +155,8 @@ public class SparqlResource {
         @Override
         public void write(OutputStream output) throws IOException, WebApplicationException {
             try {
-                RDF4J_20M3.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()),
-                        ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), QUERY, FORMAT, output);
+                RDF4J_20M3.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam("repository"),
+                        ConfigProperties.getPropertyParam("ts_server"), QUERY, FORMAT, output);
             } catch (Exception e) {
             }
         }

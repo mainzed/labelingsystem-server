@@ -4,7 +4,6 @@ import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.exceptions.SesameSparqlException;
 import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
-import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;

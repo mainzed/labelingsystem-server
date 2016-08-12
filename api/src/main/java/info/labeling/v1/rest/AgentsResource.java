@@ -100,7 +100,7 @@ public class AgentsResource {
 			}
 			// QUERY TRIPLESTORE
 			long ctm_start = System.currentTimeMillis();
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> s = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
 			List<String> p = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> o = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -204,7 +204,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -290,7 +290,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -332,7 +332,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -362,7 +362,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -392,7 +392,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -421,7 +421,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -450,7 +450,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -487,7 +487,7 @@ public class AgentsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -532,12 +532,12 @@ public class AgentsResource {
 			json = Transformer.agent_POST(json, itemID);
 			String triples = createAgentSPARQLUPDATE(item, itemID, groupID);
 			// input triples
-			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), triples);
+			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, itemID);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -564,18 +564,18 @@ public class AgentsResource {
 			String item = "ls_age";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
 			json = Transformer.agent_POST(json, agent);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putAgentSPARQLUPDATE(agent));
-			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putAgentSPARQLUPDATE(agent));
+			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -602,20 +602,20 @@ public class AgentsResource {
 			String item = "ls_age";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
 			json = Transformer.agent_POST(json, agent);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), patchAgentSPARQLUPDATE(agent, json));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), patchAgentSPARQLUPDATE(agent, json));
 			if (!json.contains("flush")) {
-				RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+				RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			}
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -640,12 +640,12 @@ public class AgentsResource {
 			String item = "ls_age";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, agent);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteAgentSPARQLUPDATE(agent));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteAgentSPARQLUPDATE(agent));
 			// get result als json
 			String out = Transformer.empty_JSON("agent").toJSONString();
 			return Response.status(Response.Status.CREATED).entity(out).build();

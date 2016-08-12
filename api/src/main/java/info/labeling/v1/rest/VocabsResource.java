@@ -134,7 +134,7 @@ public class VocabsResource {
 			}
 			// QUERY TRIPLESTORE
 			long ctm_start = System.currentTimeMillis();
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> s = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
 			List<String> p = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> o = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
@@ -238,7 +238,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -324,7 +324,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -366,7 +366,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -396,7 +396,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -426,7 +426,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -455,7 +455,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -484,7 +484,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -521,7 +521,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -558,7 +558,7 @@ public class VocabsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_voc";
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -569,7 +569,7 @@ public class VocabsResource {
 			}
 			item = "ls_voc";
 			query = Utils.getAllLabelsForVocabulary(vocabulary);
-			result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> labels = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "id");
 			if (result.size() < 1) {
 				throw new ResourceNotAvailableException();
@@ -577,7 +577,7 @@ public class VocabsResource {
 			for (int i = 0; i < labels.size(); i++) {
 				item = "ls_lab";
 				query = Utils.getAllElementsForItemID(item, labels.get(i));
-				result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+				result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 				predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 				objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 				if (labels.size() < 1) {
@@ -613,12 +613,12 @@ public class VocabsResource {
 			json = Transformer.vocabulary_POST(json, itemID);
 			String triples = createVocabularySPARQLUPDATE(item, itemID, user);
 			// input triples
-			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), triples);
+			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, itemID);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -645,19 +645,19 @@ public class VocabsResource {
 			String item = "ls_voc";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
 			json = Transformer.vocabulary_POST(json, vocabulary);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularySPARQLUPDATE(vocabulary));
-			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularySPARQLUPDATE(vocabulary));
+			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -684,21 +684,21 @@ public class VocabsResource {
 			String item = "ls_voc";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
 			json = Transformer.vocabulary_POST(json, vocabulary);
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), putVocabularyREVISION(item, vocabulary, user, type));
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), patchVocabularySPARQLUPDATE(vocabulary, json));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), patchVocabularySPARQLUPDATE(vocabulary, json));
 			if (!json.contains("flush")) {
-				RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), json);
+				RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			}
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
@@ -723,18 +723,18 @@ public class VocabsResource {
 			String item = "ls_voc";
 			// check if resource exists
 			String queryExist = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), queryExist);
+			List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException();
 			}
 			// insert data
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularyREVISION(item, vocabulary, user));
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularySPARQLUPDATE(vocabulary));
-			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyREVISION(item, vocabulary, user));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularySPARQLUPDATE(vocabulary));
+			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = Utils.getAllElementsForItemID(item, vocabulary);
-			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam(ConfigProperties.getREPOSITORY()), ConfigProperties.getPropertyParam(ConfigProperties.getSESAMESERVER()), query);
+			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
 			if (result.size() < 1) {
