@@ -8,21 +8,18 @@ import com.jamesmurty.utils.XMLBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-
 /**
- * ERROR MESSAGE for catch exceptions
+ * CLASS for show errormessages
  *
  * @author Florian Thiery M.Sc.
- * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 18.02.2015
  */
 public class Logging {
 
 	/**
 	 * XML ERROR MESSAGE for catch exceptions
 	 *
-	 * @param exception
-	 * @param endClass
+	 * @param exception this exception
+	 * @param endClass class path where exception tree ends
 	 * @return error message XML
 	 * @throws javax.xml.parsers.ParserConfigurationException
 	 * @throws javax.xml.transform.TransformerException
@@ -46,8 +43,8 @@ public class Logging {
 	/**
 	 * JSON ERROR MESSAGE for catch exceptions
 	 *
-	 * @param exception
-	 * @param endClass
+	 * @param exception this exception
+	 * @param endClass class path where exception tree ends
 	 * @return error message JSON
 	 */
 	public static String getMessageJSON(Exception exception, String endClass) {
@@ -72,8 +69,8 @@ public class Logging {
 	/**
 	 * TEXT ERROR MESSAGE for catch exceptions
 	 *
-	 * @param exception
-	 * @param endClass
+	 * @param exception this exception
+	 * @param endClass class path where exception tree ends
 	 * @return error message TEXT
 	 */
 	public static String getMessageTEXT(Exception exception, String endClass) {

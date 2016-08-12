@@ -21,15 +21,35 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+/**
+ * CLASS for creating cool URIs
+ *
+ * @author Florian Thiery M.Sc.
+ */
 @Path("/")
 public class GenericResource {
 
+	/**
+	 * get general information
+	 * @return info object
+	 * @throws URISyntaxException 
+	 */
 	@GET
 	public Response getInfo() throws URISyntaxException {
 		URI targetURIForRedirection = new URI("http://labeling.link");
 		return Response.temporaryRedirect(targetURIForRedirection).build();
 	}
 
+	/**
+	 * get vocabulary object
+	 * @param acceptHeader accept Header
+	 * @param itemID vocabulary id
+	 * @return vocabulary object
+	 * @throws IOException
+	 * @throws JDOMException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException 
+	 */
 	@GET
 	@Path("/vocabulary/{vocabulary}")
 	public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
@@ -67,6 +87,16 @@ public class GenericResource {
 		}
 	}
 
+	/**
+	 * get label object
+	 * @param acceptHeader accept Header
+	 * @param itemID label id
+	 * @return label object
+	 * @throws IOException
+	 * @throws JDOMException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException 
+	 */
 	@GET
 	@Path("/label/{label}")
 	public Response getLabel(@HeaderParam("Accept") String acceptHeader, @PathParam("label") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
@@ -141,6 +171,16 @@ public class GenericResource {
 		}
 	}
 
+	/**
+	 * get agent object
+	 * @param acceptHeader accept Header
+	 * @param itemID agent id
+	 * @return agent object
+	 * @throws IOException
+	 * @throws JDOMException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException 
+	 */
 	@GET
 	@Path("/agent/{agent}")
 	public Response getAgent(@HeaderParam("Accept") String acceptHeader, @PathParam("agent") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
@@ -174,6 +214,16 @@ public class GenericResource {
 		}
 	}
 
+	/**
+	 * get revision object
+	 * @param acceptHeader accept Header
+	 * @param itemID revision id
+	 * @return revision object
+	 * @throws IOException
+	 * @throws JDOMException
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException 
+	 */
 	@GET
 	@Path("/revision/{revision}")
 	public Response getRevision(@HeaderParam("Accept") String acceptHeader, @PathParam("revision") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
