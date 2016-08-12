@@ -2405,8 +2405,7 @@ public class RetcatResource {
 				JSONObject statusType = (JSONObject) tmpElement.get("statusType");
 				String stValue = (String) statusType.get("value");
                 jsonOut.put("label", labelValue + "@" + labelLang);
-                jsonOut.put("type", "ls");
-				jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"),""));
+                jsonOut.put("type", "ls"+"+"+stValue.replace(rdf.getPrefixItem("ls:"),""));
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
