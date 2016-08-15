@@ -1,6 +1,7 @@
 package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
+import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.rdf.RDF;
 import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
@@ -139,46 +140,46 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-	
-	@GET
-	@Path("/waybacklink")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getWaybackLink(@QueryParam("url") String url) {
-		try {
-			URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("GET");
-			String urlParameters = "";
-			con.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(urlParameters);
-			wr.flush();
-			wr.close();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-			String inputLine;
-			StringBuilder response = new StringBuilder();
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			// init output
-			JSONObject jsonOut = new JSONObject();
-			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-			JSONObject resultsObject = (JSONObject) jsonObject.get("archived_snapshots");
-			JSONObject resultsObject2 = (JSONObject) resultsObject.get("closest");
-			String wburl = null;
-			try {
-				wburl = (String) resultsObject2.get("url");
-			} catch (Exception e) {
-				throw new NullPointerException("no url available");
-			}
-			jsonOut.put("url", wburl);
-			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.WaybackResource"))
-					.header("Content-Type", "application/json;charset=UTF-8").build();
-		}
-	}
+
+    @GET
+    @Path("/waybacklink")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getWaybackLink(@QueryParam("url") String url) {
+        try {
+            URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            String urlParameters = "";
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.writeBytes(urlParameters);
+            wr.flush();
+            wr.close();
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            // init output
+            JSONObject jsonOut = new JSONObject();
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+            JSONObject resultsObject = (JSONObject) jsonObject.get("archived_snapshots");
+            JSONObject resultsObject2 = (JSONObject) resultsObject.get("closest");
+            String wburl = null;
+            try {
+                wburl = (String) resultsObject2.get("url");
+            } catch (Exception e) {
+                throw new NullPointerException("no url available");
+            }
+            jsonOut.put("url", wburl);
+            return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.WaybackResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
 
     @GET
     @Path("/query/heritagedata/historicengland")
@@ -2031,14 +2032,14 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-	
-	@GET
+
+    @GET
     @Path("/query/skosmos/finto")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsSKOSMOS_FINTO(@QueryParam("query") String searchword) {
         try {
             searchword = Utils.encodeURIComponent(searchword);
-            String url_string = "http://finto.fi/rest/v1/search?query=*"+searchword+"*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=allars%20koko%20ponduskategorier%20ysa%20yso%20juho%20jupo%20keko%20okm-tieteenala%20liito%20mero%20puho%20tsr%20afo%20kassu%20mesh%20tero%20maotao%20musa%20muso%20valo%20kauno%20kito%20kto&limit=" + LIMIT;
+            String url_string = "http://finto.fi/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=allars%20koko%20ponduskategorier%20ysa%20yso%20juho%20jupo%20keko%20okm-tieteenala%20liito%20mero%20puho%20tsr%20afo%20kassu%20mesh%20tero%20maotao%20musa%20muso%20valo%20kauno%20kito%20kto&limit=" + LIMIT;
             URL url = new URL(url_string);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -2059,19 +2060,19 @@ public class RetcatResource {
                 String uriValue = (String) tmpElement.get("uri");
                 autosuggests.put(uriValue, new SuggestionItem(uriValue));
                 SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-				String labelValue = (String) tmpElement.get("prefLabel");
+                String labelValue = (String) tmpElement.get("prefLabel");
                 tmpAutosuggest.setLabel(labelValue);
-				String vocabValue = (String) tmpElement.get("vocab");
-				tmpAutosuggest.setSchemeTitle(vocabValue);
-				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
+                String vocabValue = (String) tmpElement.get("vocab");
+                tmpAutosuggest.setSchemeTitle(vocabValue);
+                JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
                 JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
                 // query for broader
                 if (boraderArray != null) {
                     for (Object item : boraderArray) {
                         JSONObject tmpObject = (JSONObject) item;
                         HashMap<String, String> hstmp = new HashMap();
-						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        String uriValueTmp = (String) tmpObject.get("uri");
+                        String labelValueTmp = (String) tmpObject.get("prefLabel");
                         hstmp.put(uriValueTmp, labelValueTmp);
                         tmpAutosuggest.setBroaderTerm(hstmp);
                     }
@@ -2081,13 +2082,13 @@ public class RetcatResource {
                     for (Object item : boraderArray) {
                         JSONObject tmpObject = (JSONObject) item;
                         HashMap<String, String> hstmp = new HashMap();
-						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        String uriValueTmp = (String) tmpObject.get("uri");
+                        String labelValueTmp = (String) tmpObject.get("prefLabel");
                         hstmp.put(uriValueTmp, labelValueTmp);
                         tmpAutosuggest.setNarrowerTerm(hstmp);
                     }
                 }
-			}
+            }
             // fill output json
             for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
                 SuggestionItem tmpAS = entry.getValue();
@@ -2147,14 +2148,14 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-	
-	@GET
+
+    @GET
     @Path("/query/skosmos/fao")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getResultsSKOSMOS_FAO(@QueryParam("query") String searchword) {
         try {
             searchword = Utils.encodeURIComponent(searchword);
-            String url_string = "http://oek1.fao.org/skosmos/rest/v1/search?query=*"+searchword+"*&lang=en&type=skos:Concept&fields=narrower%20broader&limit=" + LIMIT;
+            String url_string = "http://oek1.fao.org/skosmos/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&limit=" + LIMIT;
             URL url = new URL(url_string);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -2175,19 +2176,19 @@ public class RetcatResource {
                 String uriValue = (String) tmpElement.get("uri");
                 autosuggests.put(uriValue, new SuggestionItem(uriValue));
                 SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-				String labelValue = (String) tmpElement.get("prefLabel");
+                String labelValue = (String) tmpElement.get("prefLabel");
                 tmpAutosuggest.setLabel(labelValue);
-				String vocabValue = (String) tmpElement.get("vocab");
-				tmpAutosuggest.setSchemeTitle(vocabValue);
-				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
+                String vocabValue = (String) tmpElement.get("vocab");
+                tmpAutosuggest.setSchemeTitle(vocabValue);
+                JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
                 JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
                 // query for broader
                 if (boraderArray != null) {
                     for (Object item : boraderArray) {
                         JSONObject tmpObject = (JSONObject) item;
                         HashMap<String, String> hstmp = new HashMap();
-						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        String uriValueTmp = (String) tmpObject.get("uri");
+                        String labelValueTmp = (String) tmpObject.get("prefLabel");
                         hstmp.put(uriValueTmp, labelValueTmp);
                         tmpAutosuggest.setBroaderTerm(hstmp);
                     }
@@ -2197,13 +2198,13 @@ public class RetcatResource {
                     for (Object item : boraderArray) {
                         JSONObject tmpObject = (JSONObject) item;
                         HashMap<String, String> hstmp = new HashMap();
-						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
+                        String uriValueTmp = (String) tmpObject.get("uri");
+                        String labelValueTmp = (String) tmpObject.get("prefLabel");
                         hstmp.put(uriValueTmp, labelValueTmp);
                         tmpAutosuggest.setNarrowerTerm(hstmp);
                     }
                 }
-			}
+            }
             // fill output json
             for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
                 SuggestionItem tmpAS = entry.getValue();
@@ -2367,11 +2368,11 @@ public class RetcatResource {
     public Response geLabelLabelingSystem(@QueryParam("url") String url) {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
+            String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
                     + "SELECT * { "
-                    + "<" + url + "> ls:preferredLabel ?prefLabel. "
-					+ "<" + url + "> ls:hasStatusType ?statusType. "
+                    + "OPTIONAL { <" + url + "> ls:preferredLabel ?prefLabel. } "
+                    + "<" + url + "> ls:hasStatusType ?statusType. "
                     + " }";
             URL obj = new URL(sparqlendpoint);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -2397,15 +2398,26 @@ public class RetcatResource {
             JSONObject resultsObject = (JSONObject) jsonObject.get("results");
             JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
             // create unique list of ids
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) prefLabel.get("value");
-                String labelLang = (String) prefLabel.get("xml:lang");
-				JSONObject statusType = (JSONObject) tmpElement.get("statusType");
-				String stValue = (String) statusType.get("value");
-                jsonOut.put("label", labelValue + "@" + labelLang);
-                jsonOut.put("type", "ls"+"+"+stValue.replace(rdf.getPrefixItem("ls:"),""));
+            if (!bindingsArray.isEmpty()) {
+                for (Object element : bindingsArray) {
+                    JSONObject tmpElement = (JSONObject) element;
+                    JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
+                    String labelValue = "";
+                    String labelLang = "";
+                    String stValue = "";
+                    if (prefLabel != null) {
+                        labelValue = (String) prefLabel.get("value");
+                        labelLang = (String) prefLabel.get("xml:lang");
+                        jsonOut.put("label", labelValue + "@" + labelLang);
+                    } else {
+                        jsonOut.put("label", "");
+                    }
+                    JSONObject statusType = (JSONObject) tmpElement.get("statusType");
+                    stValue = (String) statusType.get("value");
+                    jsonOut.put("type", "ls" + "+" + stValue.replace(rdf.getPrefixItem("ls:"), ""));
+                }
+            } else {
+                throw new ResourceNotAvailableException();
             }
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -2542,17 +2554,17 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-	
-	@GET
+
+    @GET
     @Path("/label/skosmos/finto")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelSkosmosFinto(@QueryParam("url") String url) {
         try {
             // query for json
             String vocab = url.split("/")[4];
-			url = Utils.encodeURIComponent(url);
-			url = "http://api.finto.fi/rest/v1/"+vocab+"/label?lang=en&uri="+url;
-			URL obj = new URL(url);
+            url = Utils.encodeURIComponent(url);
+            url = "http://api.finto.fi/rest/v1/" + vocab + "/label?lang=en&uri=" + url;
+            URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
@@ -2575,16 +2587,16 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-	
-	@GET
+
+    @GET
     @Path("/label/skosmos/fao")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geLabelSkosmosFao(@QueryParam("url") String url) {
         try {
             // query for json
             url = Utils.encodeURIComponent(url);
-			url = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri="+url;
-			URL obj = new URL(url);
+            url = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + url;
+            URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
