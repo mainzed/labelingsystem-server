@@ -67,6 +67,32 @@ public class RetcatResource {
     }
 
     @GET
+    @Path("/{retcat}")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getRetcatDetails(@PathParam("retcat") String retcat) {
+        try {
+            JSONArray outArray = new JSONArray();
+            for (String[] itemArray : RetcatItems.getAllItems()) {
+                if (retcat.equals(itemArray[0])) {
+                    JSONObject tmpRETCAT = new JSONObject();
+                    tmpRETCAT.put("name", itemArray[0]);
+                    tmpRETCAT.put("queryURL", itemArray[1]);
+                    tmpRETCAT.put("labelURL", itemArray[2]);
+                    tmpRETCAT.put("prefix", itemArray[3]);
+                    tmpRETCAT.put("group", itemArray[4]);
+                    tmpRETCAT.put("type", itemArray[5]);
+                    tmpRETCAT.put("language", itemArray[6]);
+                    outArray.add(tmpRETCAT);
+                }
+            }
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    @GET
     @Path("/vocabulary/{vocabulary}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatListByVocabulary(@PathParam("vocabulary") String vocabulary) {
@@ -78,7 +104,7 @@ public class RetcatResource {
             List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> vocabname = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "vocab");
             String vocabretcat = vocabname.get(0).split("@")[0];
-            vocabretcat = vocabretcat.substring(1,vocabretcat.length()-1);
+            vocabretcat = vocabretcat.substring(1, vocabretcat.length() - 1);
             // get retcat items
             String newRetcatString = SQlite.getRetcatByVocabulary(vocabulary);
             newRetcatString += "," + vocabretcat;
@@ -189,7 +215,7 @@ public class RetcatResource {
             jsonOut.put("url", wburl);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.WaybackResource"))
+            return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
@@ -206,8 +232,8 @@ public class RetcatResource {
                     + "?Subject skos:prefLabel ?prefLabel . "
                     + "?scheme rdfs:label ?schemeTitle . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
+                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
+                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
                     + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/mda_obj> || ?scheme=<http://purl.org/heritagedata/schemes/eh_period> || ?scheme=<http://purl.org/heritagedata/schemes/agl_et> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmt2> || ?scheme=<http://purl.org/heritagedata/schemes/560> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tbm> || ?scheme=<http://purl.org/heritagedata/schemes/eh_com> || ?scheme=<http://purl.org/heritagedata/schemes/eh_evd> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmc>) "
                     + "} LIMIT " + LIMIT;
@@ -265,13 +291,13 @@ public class RetcatResource {
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
                 String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
+                tmpAutosuggest.setSchemeTitle(schemeValue);
                 // get scopeNote
                 JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -311,58 +337,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -382,8 +357,8 @@ public class RetcatResource {
                     + "?Subject skos:prefLabel ?prefLabel . "
                     + "?scheme rdfs:label ?schemeTitle . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
+                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
+                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
                     + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/2> || ?scheme=<http://purl.org/heritagedata/schemes/3> || ?scheme=<http://purl.org/heritagedata/schemes/1>) "
                     + "} LIMIT " + LIMIT;
@@ -441,13 +416,13 @@ public class RetcatResource {
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
                 String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
+                tmpAutosuggest.setSchemeTitle(schemeValue);
                 // get scopeNote
                 JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -487,58 +462,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -558,8 +482,12 @@ public class RetcatResource {
                     + "?Subject skos:prefLabel ?prefLabel . "
                     + "?scheme rdfs:label ?schemeTitle . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm .} "
+                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
+                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
+                    //+ "FILTER(LANGMATCHES(LANG(?prefLabel), \"en\")) "
+                    //+ "FILTER(LANGMATCHES(LANG(?scopeNote), \"en\")) "
+                    //+ "FILTER(LANGMATCHES(LANG(?BroaderPreferredTerm), \"en\")) "
+                    //+ "FILTER(LANGMATCHES(LANG(?NarrowerPreferredTerm), \"en\")) "
                     + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/11> || ?scheme=<http://purl.org/heritagedata/schemes/10> || ?scheme=<http://purl.org/heritagedata/schemes/12> || ?scheme=<http://purl.org/heritagedata/schemes/17> || ?scheme=<http://purl.org/heritagedata/schemes/19> || ?scheme=<http://purl.org/heritagedata/schemes/14> || ?scheme=<http://purl.org/heritagedata/schemes/15> || ?scheme=<http://purl.org/heritagedata/schemes/18> || ?scheme=<http://purl.org/heritagedata/schemes/20> || ?scheme=<http://purl.org/heritagedata/schemes/13> || ?scheme=<http://purl.org/heritagedata/schemes/21> || ?scheme=<http://purl.org/heritagedata/schemes/22>) "
                     + "} LIMIT " + LIMIT;
@@ -617,13 +545,13 @@ public class RetcatResource {
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
                 String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
+                tmpAutosuggest.setSchemeTitle(schemeValue);
                 // get scopeNote
                 JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -663,58 +591,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -798,7 +675,7 @@ public class RetcatResource {
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -838,58 +715,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1013,58 +839,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1189,58 +964,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1283,60 +1007,10 @@ public class RetcatResource {
                 if (descriptionValue != null) {
                     tmpAutosuggest.setDescription(descriptionValue);
                 }
+                tmpAutosuggest.setSchemeTitle("DBpedia");
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "DBpedia");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1381,60 +1055,10 @@ public class RetcatResource {
                 String lat = (String) tmpElement.get("lat");
                 String lon = (String) tmpElement.get("lng");
                 tmpAutosuggest.setDescription(adminName1 + ", " + countryName + " [" + lat + " " + lon + "]");
+                tmpAutosuggest.setSchemeTitle("GeoNames");
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "GeoNames");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1478,61 +1102,11 @@ public class RetcatResource {
                     if (descriptionValue != null) {
                         tmpAutosuggest.setDescription(descriptionValue);
                     }
+                    tmpAutosuggest.setSchemeTitle("Pleides Places");
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "Pleiades Places");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1576,6 +1150,7 @@ public class RetcatResource {
                 if (descriptionValue != null) {
                     tmpAutosuggest.setDescription(descriptionValue);
                 }
+                tmpAutosuggest.setSchemeTitle("ChronOntology");
                 JSONArray isPartOfValue = (JSONArray) resourceObject.get("isPartOf");
                 JSONArray hasPartValue = (JSONArray) resourceObject.get("hasPart");
                 // query for broader
@@ -1636,58 +1211,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "ChronOntology");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1705,7 +1229,8 @@ public class RetcatResource {
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme dc:title ?schemeTitle . "
-                    + "?Subject skos:prefLabel ?prefLabel . "
+                    + "?Subject skos:prefLabel ?pl . "
+                    + "?Subject ls:preferredLabel ?prefLabel . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
@@ -1765,13 +1290,13 @@ public class RetcatResource {
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
                 String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
+                tmpAutosuggest.setSchemeTitle(schemeValue);
                 // get scopeNote
                 JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -1811,58 +1336,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "Labeling System");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -1880,7 +1354,8 @@ public class RetcatResource {
                     + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme dc:title ?schemeTitle . "
-                    + "?Subject skos:prefLabel ?prefLabel . "
+                    + "?Subject skos:prefLabel ?pl . "
+                    + "?Subject ls:preferredLabel ?prefLabel . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
@@ -1941,13 +1416,13 @@ public class RetcatResource {
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
                 String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue + "@" + schemeLang);
+                tmpAutosuggest.setSchemeTitle(schemeValue);
                 // get scopeNote
                 JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
                 if (scopeNoteObject != null) {
                     String scopeNoteValue = (String) scopeNoteObject.get("value");
                     String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
+                    tmpAutosuggest.setDescription(scopeNoteValue);
                 }
                 // get broader 
                 String broaderVL = "";
@@ -1987,58 +1462,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", "Labeling System");
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2103,58 +1527,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2219,58 +1592,7 @@ public class RetcatResource {
                 }
             }
             // fill output json
-            for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-                SuggestionItem tmpAS = entry.getValue();
-                JSONObject suggestionObject = new JSONObject();
-                // url
-                suggestionObject.put("url", tmpAS.getURL());
-                // labels
-                suggestionObject.put("labels", tmpAS.getLabels());
-                // scheme
-                suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-                // descriptions
-                suggestionObject.put("descriptions", tmpAS.getDescriptions());
-                // broader
-                Set broaderTerms = tmpAS.getBroaderTerms();
-                JSONArray broaderArrayNew = new JSONArray();
-                if (broaderTerms.size() > 0) {
-                    for (Object element : broaderTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject broaderObjectTmp = new JSONObject();
-                            broaderObjectTmp.put("uri", key);
-                            broaderObjectTmp.put("label", value);
-                            broaderArrayNew.add(broaderObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
-                        Map hm = (Map) element;
-                        Iterator entries = hm.entrySet().iterator();
-                        while (entries.hasNext()) {
-                            Map.Entry thisEntry = (Map.Entry) entries.next();
-                            String key = (String) thisEntry.getKey();
-                            String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
-                        }
-                    }
-                }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-                // add information to output
-                outArray.add(suggestionObject);
-            }
+            outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
@@ -2631,6 +1953,67 @@ public class RetcatResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
+    }
+
+    private JSONArray fillOutputJSONforQuery(Map<String, SuggestionItem> autosuggests) {
+        JSONArray outArray = new JSONArray();
+        for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
+            SuggestionItem tmpAS = entry.getValue();
+            JSONObject suggestionObject = new JSONObject();
+            // url
+            suggestionObject.put("uri", tmpAS.getURL());
+            // labels
+            suggestionObject.put("label", tmpAS.getLabels().iterator().next());
+            // scheme
+            suggestionObject.put("scheme", tmpAS.getSchemeTitle());
+            // descriptions
+            if (tmpAS.getDescriptions().size() > 0) {
+                suggestionObject.put("description", tmpAS.getDescriptions().iterator().next());
+            } else {
+                suggestionObject.put("description", "");
+            }
+            // broader
+            Set broaderTerms = tmpAS.getBroaderTerms();
+            JSONArray broaderArrayNew = new JSONArray();
+            if (broaderTerms.size() > 0) {
+                for (Object element : broaderTerms) {
+                    Map hm = (Map) element;
+                    Iterator entries = hm.entrySet().iterator();
+                    while (entries.hasNext()) {
+                        Map.Entry thisEntry = (Map.Entry) entries.next();
+                        String key = (String) thisEntry.getKey();
+                        String value = (String) thisEntry.getValue();
+                        JSONObject broaderObjectTmp = new JSONObject();
+                        broaderObjectTmp.put("uri", key);
+                        broaderObjectTmp.put("label", value);
+                        broaderArrayNew.add(broaderObjectTmp);
+                    }
+                }
+            }
+            suggestionObject.put("broaderTerms", broaderArrayNew);
+            // narrrower
+            Set narrrowerTerms = tmpAS.getNarrowerTerms();
+            JSONArray narrrowerArrayNew = new JSONArray();
+            if (narrrowerTerms.size() > 0) {
+                for (Object element : narrrowerTerms) {
+                    Map hm = (Map) element;
+                    Iterator entries = hm.entrySet().iterator();
+                    while (entries.hasNext()) {
+                        Map.Entry thisEntry = (Map.Entry) entries.next();
+                        String key = (String) thisEntry.getKey();
+                        String value = (String) thisEntry.getValue();
+                        JSONObject narrrowerObjectTmp = new JSONObject();
+                        narrrowerObjectTmp.put("uri", key);
+                        narrrowerObjectTmp.put("label", value);
+                        narrrowerArrayNew.add(narrrowerObjectTmp);
+                    }
+                }
+            }
+            suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
+            // add information to output array
+            outArray.add(suggestionObject);
+        }
+        return outArray;
     }
 
 }
