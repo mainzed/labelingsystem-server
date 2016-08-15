@@ -1,14 +1,16 @@
 #Labeling System - Server Applications
 
-##api
+##Applications
+
+###api
 
 RESTful API for Labeling System applications
 
-##item
+###item
 
 RESTful API to provide cool URIs for Labeling System items
 
-##guitest
+###guitest
 
 just a small test (will be deleted)
 
