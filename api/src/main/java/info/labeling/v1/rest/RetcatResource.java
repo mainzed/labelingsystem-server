@@ -3,6 +3,7 @@ package info.labeling.v1.rest;
 import info.labeling.exceptions.Logging;
 import info.labeling.exceptions.ResourceNotAvailableException;
 import info.labeling.rdf.RDF;
+import info.labeling.rdf.RDF4J_20M3;
 import info.labeling.v1.utils.ConfigProperties;
 import info.labeling.v1.utils.RetcatItems;
 import info.labeling.v1.utils.SQlite;
@@ -16,6 +17,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.Consumes;
@@ -27,6 +29,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -68,7 +71,17 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatListByVocabulary(@PathParam("vocabulary") String vocabulary) {
         try {
+            // get vocab name
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            String query = rdf.getPREFIXSPARQL();
+            query += "SELECT ?vocab WHERE { ?v a ls:Vocabulary. ?v dc:identifier ?id. ?v dc:title ?vocab. FILTER(?id=\"" + vocabulary + "\")}";
+            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+            List<String> vocabname = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "vocab");
+            String vocabretcat = vocabname.get(0).split("@")[0];
+            vocabretcat = vocabretcat.substring(1,vocabretcat.length()-1);
+            // get retcat items
             String newRetcatString = SQlite.getRetcatByVocabulary(vocabulary);
+            newRetcatString += "," + vocabretcat;
             String[] retcatItems = newRetcatString.split(",");
             // output json
             JSONArray outArray = new JSONArray();
@@ -247,7 +260,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -267,7 +280,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -285,7 +298,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {
@@ -423,7 +436,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -443,7 +456,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -461,7 +474,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {
@@ -599,7 +612,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -619,7 +632,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -637,7 +650,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {
@@ -775,7 +788,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -794,7 +807,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -812,7 +825,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {
@@ -1747,7 +1760,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -1767,7 +1780,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -1785,7 +1798,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {
@@ -1923,7 +1936,7 @@ public class RetcatResource {
                 JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
                 String labelValue = (String) labelObject.get("value");
                 String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
+                tmpAutosuggest.setLabel(labelValue);
                 // get Scheme
                 JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
                 String schemeValue = (String) schemeObject.get("value");
@@ -1943,7 +1956,7 @@ public class RetcatResource {
                 if (broaderObject != null) {
                     String broaderValue = (String) broaderObject.get("value");
                     String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "") + "@" + broaderLang.replace("<", "").replace(">", "");
+                    broaderVL = broaderValue.replace("<", "").replace(">", "");
                 }
                 JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
                 if (broaderURIObject != null) {
@@ -1961,7 +1974,7 @@ public class RetcatResource {
                 if (narrowerObject != null) {
                     String narrowerValue = (String) narrowerObject.get("value");
                     String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "") + "@" + narrowerLang.replace("<", "").replace(">", "");
+                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
                 }
                 JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
                 if (narrowerURIObject != null) {

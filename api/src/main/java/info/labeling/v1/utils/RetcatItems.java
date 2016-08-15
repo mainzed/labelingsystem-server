@@ -34,11 +34,11 @@ public class RetcatItems {
 		List<String> ids = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "id");
 		if (!result.isEmpty()) {
 			for (int i = 0; i < uris.size(); i++) {
-				retcatList.add(new String[]{titles.get(i).split("@")[0].replace("\"", ""), "/v1/retcat/query/" + ids.get(i), "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "ls", relTypeSKOS, titles.get(i).split("@")[1].replace("\"", "")});
+				retcatList.add(new String[]{titles.get(i).split("@")[0].replace("\"", ""), "/v1/retcat/query/labelingsystem/" + ids.get(i), "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "ls", relTypeSKOS, titles.get(i).split("@")[1].replace("\"", "")});
 			}
 		}
 		// OWN VOCABULARY IN LOCAL LABELING SYSTEM
-		retcatList.add(new String[]{"Hierarchy", "/v1/retcat/query/labelingsystem/:id", "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "vocab", relTypeHierarchy, ""});
+		//retcatList.add(new String[]{"Hierarchy", "/v1/retcat/query/labelingsystem/:id", "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "vocab", relTypeHierarchy, ""});
 
 		// SKOS CONCEPTS
 		// GETTY
