@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import v1.utils.retcat.RetcatItem;
 
 @Path("/resourcelabel")
 public class ResourcelabelResource {
@@ -23,11 +24,11 @@ public class ResourcelabelResource {
 	@GET
 	@Produces("application/json;charset=UTF-8")
 	public Response redirectToRetcat(@QueryParam("url") String url) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
-		List<String[]> retcatlist = RetcatItems.getAllItems();
+		List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 		boolean match = false;
-		for (String[] arrayItem : retcatlist) {
-			if (url.contains(arrayItem[3])) {
-				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + arrayItem[2]+"?url="+url+"&type="+arrayItem[4]);
+		for (RetcatItem item : retcatlist) {
+			if (url.contains(item.getPrefix())) {
+				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getLabelURL() + "?url="+url+"&type="+item.getType());
 				return Response.temporaryRedirect(targetURIForRedirection).build();
 			}
 		}

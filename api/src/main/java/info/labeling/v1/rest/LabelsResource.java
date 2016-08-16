@@ -51,6 +51,7 @@ import org.json.simple.JSONObject;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import v1.utils.retcat.RetcatItem;
 
 @Path("/labels")
 public class LabelsResource {
@@ -77,7 +78,7 @@ public class LabelsResource {
 		try {
 			// QUERY STRING
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = rdf.getPREFIXSPARQL();
 			query += "SELECT ?s ?p ?o WHERE { "
 					+ "?s ?p ?o . "
@@ -236,7 +237,7 @@ public class LabelsResource {
 	public Response getLabel(@PathParam("label") String label, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String item = "ls_lab";
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -323,7 +324,7 @@ public class LabelsResource {
 	public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String item = "ls_lab";
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -687,7 +688,7 @@ public class LabelsResource {
 			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = Utils.getAllElementsForItemID(item, itemID);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -727,7 +728,7 @@ public class LabelsResource {
 			RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -769,7 +770,7 @@ public class LabelsResource {
 			}
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -806,7 +807,7 @@ public class LabelsResource {
 			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -842,7 +843,7 @@ public class LabelsResource {
 			RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-			List<String[]> retcatlist = RetcatItems.getAllItems();
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String query = Utils.getAllElementsForItemID(item, label);
 			List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");

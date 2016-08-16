@@ -14,6 +14,7 @@ import org.json.simple.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import v1.utils.retcat.RetcatItem;
 
 public class Transformer {
 
@@ -936,7 +937,7 @@ public class Transformer {
 		}
 	}
 
-	public static JSONObject label_GET(String json, String id, String fields, List<String[]> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+	public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
 		//init
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
@@ -1159,11 +1160,10 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-
-				for (String[] arrayItem : retcatlist) {
-					if (value.contains(arrayItem[3])) {
+				for (RetcatItem item : retcatlist) {
+					if (value.contains(item.getPrefix())) {
 						match = true;
-						tmpObject.put("type", arrayItem[4]);
+						tmpObject.put("type", item.getType());
 					}
 				}
 				if (!match) {
@@ -1187,10 +1187,10 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				for (String[] arrayItem : retcatlist) {
-					if (value.contains(arrayItem[3])) {
+				for (RetcatItem item : retcatlist) {
+					if (value.contains(item.getPrefix())) {
 						match = true;
-						tmpObject.put("type", arrayItem[4]);
+						tmpObject.put("type", item.getType());
 					}
 				}
 				if (!match) {
@@ -1214,10 +1214,10 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				for (String[] arrayItem : retcatlist) {
-					if (value.contains(arrayItem[3])) {
+				for (RetcatItem item : retcatlist) {
+					if (value.contains(item.getPrefix())) {
 						match = true;
-						tmpObject.put("type", arrayItem[4]);
+						tmpObject.put("type", item.getType());
 					}
 				}
 				if (!match) {
@@ -1241,10 +1241,10 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				for (String[] arrayItem : retcatlist) {
-					if (value.contains(arrayItem[3])) {
+				for (RetcatItem item : retcatlist) {
+					if (value.contains(item.getPrefix())) {
 						match = true;
-						tmpObject.put("type", arrayItem[4]);
+						tmpObject.put("type", item.getType());
 					}
 				}
 				if (!match) {
@@ -1268,10 +1268,10 @@ public class Transformer {
 				tmpObject.put("url", value);
 				// get retcat info
 				boolean match = false;
-				for (String[] arrayItem : retcatlist) {
-					if (value.contains(arrayItem[3])) {
+				for (RetcatItem item : retcatlist) {
+					if (value.contains(item.getPrefix())) {
 						match = true;
-						tmpObject.put("type", arrayItem[4]);
+						tmpObject.put("type", item.getType());
 					}
 				}
 				if (!match) {

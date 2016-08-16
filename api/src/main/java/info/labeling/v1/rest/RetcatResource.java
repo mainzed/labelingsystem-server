@@ -14,6 +14,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,6 +60,7 @@ public class RetcatResource {
 				tmpRETCAT.put("group", item.getGroup());
 				tmpRETCAT.put("type", item.getType());
 				tmpRETCAT.put("language", item.getLanguage());
+				tmpRETCAT.put("quality", item.getQuality());
 				outArray.add(tmpRETCAT);
 			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -85,8 +87,49 @@ public class RetcatResource {
 					tmpRETCAT.put("group", item.getGroup());
 					tmpRETCAT.put("type", item.getType());
 					tmpRETCAT.put("language", item.getLanguage());
+					tmpRETCAT.put("quality", item.getQuality());
 					outArray.add(tmpRETCAT);
 				}
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/info/qualities")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getRetcatQualities() {
+		try {
+			JSONArray outArray = new JSONArray();
+			HashSet<String> qualityList = new HashSet();
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				qualityList.add(item.getQuality());
+			}
+			for (String item: qualityList) {
+				outArray.add(item);
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "info.labeling.v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/info/groups")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getRetcatGroups() {
+		try {
+			JSONArray outArray = new JSONArray();
+			HashSet<String> groupList = new HashSet();
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				groupList.add(item.getGroup());
+			}
+			for (String item: groupList) {
+				outArray.add(item);
 			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
@@ -127,6 +170,7 @@ public class RetcatResource {
 						tmpRETCAT.put("group", item.getGroup());
 						tmpRETCAT.put("type", item.getType());
 						tmpRETCAT.put("language", item.getLanguage());
+						tmpRETCAT.put("quality", item.getQuality());
 						outArray.add(tmpRETCAT);
 					}
 				}
@@ -173,6 +217,7 @@ public class RetcatResource {
 						tmpRETCAT.put("group", item.getGroup());
 						tmpRETCAT.put("type", item.getType());
 						tmpRETCAT.put("language", item.getLanguage());
+						tmpRETCAT.put("quality", item.getQuality());
 						outArray.add(tmpRETCAT);
 					}
 				}

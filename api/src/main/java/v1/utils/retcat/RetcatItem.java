@@ -10,8 +10,9 @@ public class RetcatItem {
 	private String group = "";
 	private String type = "";
 	private String language = "";
+	private String quality = "";
 
-	public RetcatItem(String name, String description, String queryURL, String labelURL, String prefix, String group, String type, String language) {
+	public RetcatItem(String name, String description, String queryURL, String labelURL, String prefix, String group, String type, String language, String quality) {
 		this.name = name;
 		this.description = description;
 		this.queryURL = queryURL;
@@ -20,6 +21,7 @@ public class RetcatItem {
 		this.group = group;
 		this.type = type;
 		this.language = language;
+		this.quality = quality;
 	}
 
 	public String getName() {
@@ -84,6 +86,14 @@ public class RetcatItem {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public String getQuality() {
+		return quality;
+	}
+
+	public void setQuality(String quality) {
+		this.quality = quality;
 	}
 	
 }
