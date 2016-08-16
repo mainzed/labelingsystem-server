@@ -1,3 +1,4 @@
 /api/target/
 /item/target/
 /guitest/target/
+api/src/main/java/info/labeling/v1/utils/ConfigProperties.java
