@@ -5,11 +5,11 @@
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
-			<param-value>info.labeling.v1.rest</param-value>
+			<param-value>v1.rest</param-value>
 		</init-param>
 		<init-param>
 			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-			<param-value>info.labeling.v1.restconfig.CORSFilter</param-value>
+			<param-value>v1.restconfig.CORSFilter</param-value>
 		</init-param>
 		<!-- http://javaevangelist.blogspot.de/2012/01/jersey-tip-of-day-use-gzip-compression.html-->
 		<init-param>

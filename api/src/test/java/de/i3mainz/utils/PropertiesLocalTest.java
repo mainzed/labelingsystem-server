@@ -1,6 +1,6 @@
 package de.i3mainz.utils;
 
-import info.labeling.v1.utils.ConfigProperties;
+import v1.utils.config.ConfigProperties;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

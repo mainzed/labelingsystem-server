@@ -1,10 +1,10 @@
 package v1.utils.retcat;
 
-import info.labeling.rdf.RDF;
-import info.labeling.exceptions.ResourceNotAvailableException;
-import info.labeling.exceptions.SesameSparqlException;
-import info.labeling.rdf.RDF4J_20M3;
-import info.labeling.v1.utils.ConfigProperties;
+import rdf.RDF;
+import exceptions.ResourceNotAvailableException;
+import exceptions.SesameSparqlException;
+import rdf.RDF4J_20M3;
+import v1.utils.config.ConfigProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class RetcatItems {
 		// LOCAL LABELING SYSTEM
 		retcatList.add(new RetcatItem("Local Labeling System", 
 				"The local Labeling System vocabularies.", 
-				ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/labelingsystem", ConfigProperties.getPropertyParam("api") + "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "", "high"));
+				"/v1/retcat/query/labelingsystem", "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "", "high"));
 		// ADD LOCAL PUBLIC LABELING SYSTEM VOCABULARIES
 		/*RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String prefixes = rdf.getPREFIXSPARQL();
@@ -45,7 +45,7 @@ public class RetcatItems {
 				"/v1/retcat/query/getty/tgn", "/v1/retcat/label/getty", "//vocab.getty.edu", "common reference thesauri (CH)", "getty", "en", "high"));
 		retcatList.add(new RetcatItem("Getty ULAN", 
 				"ULAN is a structured vocabulary, including names, biographies, related people, and other metadata about artists, architects, firms, studios, museums, patrons, sitters, and other people and groups involved in the creation and study of art and architecture.", 
-				"/v1/retcat/query/getty/ulan", "/v1/retcat/label/getty", "//vocab.getty.edu", "common reference thesauri (CH) reference thesauri (CH)", "getty", "en", "high"));
+				"/v1/retcat/query/getty/ulan", "/v1/retcat/label/getty", "//vocab.getty.edu", "common reference thesauri (CH)", "getty", "en", "high"));
 		// HERITAGE DATA
 		retcatList.add(new RetcatItem("Heritage Data Historic England", 
 				"FISH Archaeological Sciences Thesaurus + FISH Building Materials Thesaurus + FISH Event Types Thesaurus + FISH Archaeological Objects Thesaurus + FISH Maritime Craft Types Thesaurus FISH Thesaurus of Monument Types + Historic England Periods Authority File + Components + Evidence.", 
