@@ -41,7 +41,7 @@ import v1.utils.retcat.RetcatItem;
 @Path("/retcat")
 public class RetcatResource {
 
-	private final String LIMIT = "20";
+	private final int LIMIT = 20;
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -285,7 +285,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
 					+ "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
 					+ "FILTER(?scheme=<http://purl.org/heritagedata/schemes/mda_obj> || ?scheme=<http://purl.org/heritagedata/schemes/eh_period> || ?scheme=<http://purl.org/heritagedata/schemes/agl_et> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmt2> || ?scheme=<http://purl.org/heritagedata/schemes/560> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tbm> || ?scheme=<http://purl.org/heritagedata/schemes/eh_com> || ?scheme=<http://purl.org/heritagedata/schemes/eh_evd> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmc>) "
-					+ "} LIMIT " + LIMIT;
+					+ "}";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -304,7 +304,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -336,6 +335,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -384,6 +384,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "heritagedata";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -410,7 +423,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
 					+ "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
 					+ "FILTER(?scheme=<http://purl.org/heritagedata/schemes/2> || ?scheme=<http://purl.org/heritagedata/schemes/3> || ?scheme=<http://purl.org/heritagedata/schemes/1>) "
-					+ "} LIMIT " + LIMIT;
+					+ "}";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -429,7 +442,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -461,6 +473,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -509,6 +522,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "heritagedata";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -539,7 +565,7 @@ public class RetcatResource {
 					//+ "FILTER(LANGMATCHES(LANG(?NarrowerPreferredTerm), \"en\")) "
 					+ "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
 					+ "FILTER(?scheme=<http://purl.org/heritagedata/schemes/11> || ?scheme=<http://purl.org/heritagedata/schemes/10> || ?scheme=<http://purl.org/heritagedata/schemes/12> || ?scheme=<http://purl.org/heritagedata/schemes/17> || ?scheme=<http://purl.org/heritagedata/schemes/19> || ?scheme=<http://purl.org/heritagedata/schemes/14> || ?scheme=<http://purl.org/heritagedata/schemes/15> || ?scheme=<http://purl.org/heritagedata/schemes/18> || ?scheme=<http://purl.org/heritagedata/schemes/20> || ?scheme=<http://purl.org/heritagedata/schemes/13> || ?scheme=<http://purl.org/heritagedata/schemes/21> || ?scheme=<http://purl.org/heritagedata/schemes/22>) "
-					+ "} LIMIT " + LIMIT;
+					+ "}";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -558,7 +584,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -590,6 +615,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -638,6 +664,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "heritagedata";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -665,7 +704,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
 					+ "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
 					+ "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-					+ " } ORDER BY ASC(LCASE(STR(?Term))) LIMIT " + LIMIT;
+					+ " } ORDER BY ASC(LCASE(STR(?Term)))";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -715,6 +754,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -762,6 +802,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "getty";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -788,7 +841,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject gvp:parentString ?scopeNote . } "
 					+ "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
 					+ "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-					+ " } ORDER BY ASC(LCASE(STR(?Term))) LIMIT " + LIMIT;
+					+ " } ORDER BY ASC(LCASE(STR(?Term)))";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -807,7 +860,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -886,6 +938,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "getty";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -913,7 +978,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
 					+ "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
 					+ "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-					+ " } ORDER BY ASC(LCASE(STR(?Term))) LIMIT " + LIMIT;
+					+ " } ORDER BY ASC(LCASE(STR(?Term)))";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("POST");
@@ -932,7 +997,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -1011,6 +1075,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "getty";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1039,7 +1116,6 @@ public class RetcatResource {
 			}
 			br.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// fill objects
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -1057,6 +1133,19 @@ public class RetcatResource {
 					tmpAutosuggest.setDescription(descriptionValue);
 				}
 				tmpAutosuggest.setSchemeTitle("DBpedia");
+				// get retcat info
+				String type = "dbpedia";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1085,7 +1174,6 @@ public class RetcatResource {
 			}
 			br.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// fill objects
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -1105,6 +1193,19 @@ public class RetcatResource {
 				String lon = (String) tmpElement.get("lng");
 				tmpAutosuggest.setDescription(adminName1 + ", " + countryName + " [" + lat + " " + lon + "]");
 				tmpAutosuggest.setSchemeTitle("GeoNames");
+				// get retcat info
+				String type = "geonames";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1152,6 +1253,19 @@ public class RetcatResource {
 						tmpAutosuggest.setDescription(descriptionValue);
 					}
 					tmpAutosuggest.setSchemeTitle("Pleides Places");
+					// get retcat info
+					String type = "pleiades";
+					String quality = "";
+					String group = "";
+					for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+						if (item.getType().equals(type)) {
+							quality = item.getQuality();
+							group = item.getGroup();
+						}
+					}
+					tmpAutosuggest.setType(type);
+					tmpAutosuggest.setQuality(quality);
+					tmpAutosuggest.setGroup(group);
 				}
 			}
 			// fill output json
@@ -1180,7 +1294,6 @@ public class RetcatResource {
 			}
 			br.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// fill objects
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -1258,6 +1371,19 @@ public class RetcatResource {
 						}
 					}
 				}
+				// get retcat info
+				String type = "chronontology";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1286,7 +1412,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
 					+ "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-					+ "} LIMIT " + LIMIT;
+					+ "}";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
@@ -1305,7 +1431,6 @@ public class RetcatResource {
 			}
 			in.close();
 			// init output
-			JSONObject jsonOut = new JSONObject();
 			JSONArray outArray = new JSONArray();
 			// parse SPARQL results json
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
@@ -1337,6 +1462,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -1385,6 +1511,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "ls";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1412,7 +1551,7 @@ public class RetcatResource {
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
 					+ "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
 					+ "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
-					+ "} LIMIT " + LIMIT;
+					+ "}";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
@@ -1463,6 +1602,7 @@ public class RetcatResource {
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
@@ -1511,6 +1651,19 @@ public class RetcatResource {
 					hstmpNarrower.put(narrowerURI, narrowerVL);
 					tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
 				}
+				// get retcat info
+				String type = "ls";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1576,6 +1729,19 @@ public class RetcatResource {
 						tmpAutosuggest.setNarrowerTerm(hstmp);
 					}
 				}
+				// get retcat info
+				String type = "finto";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1641,6 +1807,19 @@ public class RetcatResource {
 						tmpAutosuggest.setNarrowerTerm(hstmp);
 					}
 				}
+				// get retcat info
+				String type = "fao";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
 			}
 			// fill output json
 			outArray = fillOutputJSONforQuery(autosuggests);
@@ -1827,7 +2006,8 @@ public class RetcatResource {
 					}
 					JSONObject statusType = (JSONObject) tmpElement.get("statusType");
 					stValue = (String) statusType.get("value");
-					jsonOut.put("type", "ls" + "+" + stValue.replace(rdf.getPrefixItem("ls:"), ""));
+					jsonOut.put("type", "ls");
+					jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"), ""));
 				}
 				// get retcat info
 				String type = "ls";
@@ -2115,61 +2295,73 @@ public class RetcatResource {
 
 	private JSONArray fillOutputJSONforQuery(Map<String, SuggestionItem> autosuggests) {
 		JSONArray outArray = new JSONArray();
+		int i = 0;
 		for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-			SuggestionItem tmpAS = entry.getValue();
-			JSONObject suggestionObject = new JSONObject();
-			// url
-			suggestionObject.put("uri", tmpAS.getURL());
-			// labels
-			suggestionObject.put("label", tmpAS.getLabels().iterator().next());
-			// scheme
-			suggestionObject.put("scheme", tmpAS.getSchemeTitle());
-			// descriptions
-			if (tmpAS.getDescriptions().size() > 0) {
-				suggestionObject.put("description", tmpAS.getDescriptions().iterator().next());
-			} else {
-				suggestionObject.put("description", "");
-			}
-			// broader
-			Set broaderTerms = tmpAS.getBroaderTerms();
-			JSONArray broaderArrayNew = new JSONArray();
-			if (broaderTerms.size() > 0) {
-				for (Object element : broaderTerms) {
-					Map hm = (Map) element;
-					Iterator entries = hm.entrySet().iterator();
-					while (entries.hasNext()) {
-						Map.Entry thisEntry = (Map.Entry) entries.next();
-						String key = (String) thisEntry.getKey();
-						String value = (String) thisEntry.getValue();
-						JSONObject broaderObjectTmp = new JSONObject();
-						broaderObjectTmp.put("uri", key);
-						broaderObjectTmp.put("label", value);
-						broaderArrayNew.add(broaderObjectTmp);
+			if (i<LIMIT) {
+				SuggestionItem tmpAS = entry.getValue();
+				JSONObject suggestionObject = new JSONObject();
+				// url
+				suggestionObject.put("uri", tmpAS.getURL());
+				// labels
+				suggestionObject.put("label", tmpAS.getLabels().iterator().next());
+				// scheme
+				suggestionObject.put("scheme", tmpAS.getSchemeTitle());
+				// descriptions
+				if (tmpAS.getDescriptions().size() > 0) {
+					suggestionObject.put("description", tmpAS.getDescriptions().iterator().next());
+				} else {
+					suggestionObject.put("description", "");
+				}
+				// language
+				suggestionObject.put("lang", tmpAS.getLanguage());
+				// type
+				suggestionObject.put("type", tmpAS.getType());
+				// group
+				suggestionObject.put("group", tmpAS.getGroup());
+				// quality
+				suggestionObject.put("quality", tmpAS.getQuality());
+				// broader
+				Set broaderTerms = tmpAS.getBroaderTerms();
+				JSONArray broaderArrayNew = new JSONArray();
+				if (broaderTerms.size() > 0) {
+					for (Object element : broaderTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Map.Entry thisEntry = (Map.Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject broaderObjectTmp = new JSONObject();
+							broaderObjectTmp.put("uri", key);
+							broaderObjectTmp.put("label", value);
+							broaderArrayNew.add(broaderObjectTmp);
+						}
 					}
 				}
-			}
-			suggestionObject.put("broaderTerms", broaderArrayNew);
-			// narrrower
-			Set narrrowerTerms = tmpAS.getNarrowerTerms();
-			JSONArray narrrowerArrayNew = new JSONArray();
-			if (narrrowerTerms.size() > 0) {
-				for (Object element : narrrowerTerms) {
-					Map hm = (Map) element;
-					Iterator entries = hm.entrySet().iterator();
-					while (entries.hasNext()) {
-						Map.Entry thisEntry = (Map.Entry) entries.next();
-						String key = (String) thisEntry.getKey();
-						String value = (String) thisEntry.getValue();
-						JSONObject narrrowerObjectTmp = new JSONObject();
-						narrrowerObjectTmp.put("uri", key);
-						narrrowerObjectTmp.put("label", value);
-						narrrowerArrayNew.add(narrrowerObjectTmp);
+				suggestionObject.put("broaderTerms", broaderArrayNew);
+				// narrrower
+				Set narrrowerTerms = tmpAS.getNarrowerTerms();
+				JSONArray narrrowerArrayNew = new JSONArray();
+				if (narrrowerTerms.size() > 0) {
+					for (Object element : narrrowerTerms) {
+						Map hm = (Map) element;
+						Iterator entries = hm.entrySet().iterator();
+						while (entries.hasNext()) {
+							Map.Entry thisEntry = (Map.Entry) entries.next();
+							String key = (String) thisEntry.getKey();
+							String value = (String) thisEntry.getValue();
+							JSONObject narrrowerObjectTmp = new JSONObject();
+							narrrowerObjectTmp.put("uri", key);
+							narrrowerObjectTmp.put("label", value);
+							narrrowerArrayNew.add(narrrowerObjectTmp);
+						}
 					}
 				}
+				suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
+				// add information to output array
+				outArray.add(suggestionObject);
+				i++;
 			}
-			suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
-			// add information to output array
-			outArray.add(suggestionObject);
 		}
 		return outArray;
 	}

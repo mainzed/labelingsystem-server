@@ -20,7 +20,7 @@ public class RetcatItems {
 		// LOCAL LABELING SYSTEM
 		retcatList.add(new RetcatItem("Local Labeling System", 
 				"The local Labeling System vocabularies.", 
-				"/v1/retcat/query/labelingsystem", "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "", "high"));
+				"/v1/retcat/query/labelingsystem", "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "div", "high"));
 		// ADD LOCAL PUBLIC LABELING SYSTEM VOCABULARIES
 		/*RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String prefixes = rdf.getPREFIXSPARQL();
