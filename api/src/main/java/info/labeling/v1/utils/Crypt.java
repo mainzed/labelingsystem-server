@@ -8,7 +8,7 @@ import java.util.UUID;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-public class Funcs {
+public class Crypt {
 
 	public static String base64encode(String text) {
 		try {

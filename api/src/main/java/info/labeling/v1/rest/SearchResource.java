@@ -2,7 +2,7 @@ package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
 import info.labeling.v1.utils.ConfigProperties;
-import info.labeling.v1.utils.SuggestionItem;
+import v1.utils.retcat.SuggestionItem;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;

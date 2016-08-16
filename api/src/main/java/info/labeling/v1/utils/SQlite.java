@@ -36,7 +36,7 @@ public class SQlite {
 			}
 			// check password
 			String salt = db_password.substring(0, 25);
-			String echo = salt + Funcs.SHA1(salt + password);
+			String echo = salt + Crypt.SHA1(salt + password);
 			if (echo.equals(db_password) && activation_token.equals("-1")) {
 				ret = role;
 			} else {
@@ -50,8 +50,8 @@ public class SQlite {
 
 	public static boolean insertUser(String user, String password) throws ClassNotFoundException, IOException, NoSuchAlgorithmException {
 		// hash  password
-		String salt = Funcs.generateHash();
-		password = salt + Funcs.SHA1(salt + password);
+		String salt = Crypt.generateHash();
+		password = salt + Crypt.SHA1(salt + password);
 		boolean ret = false;
 		Class.forName(DBDRIVER);
 		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {

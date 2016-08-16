@@ -15,7 +15,7 @@ import info.labeling.exceptions.UniqueIdentifierException;
 import info.labeling.v1.restconfig.PATCH;
 import info.labeling.v1.utils.Transformer;
 import info.labeling.v1.utils.ConfigProperties;
-import info.labeling.v1.utils.RetcatItems;
+import v1.utils.retcat.RetcatItems;
 import info.labeling.v1.utils.Utils;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -1,7 +1,7 @@
 package info.labeling.v1.rest;
 
 import info.labeling.exceptions.Logging;
-import info.labeling.v1.utils.Funcs;
+import info.labeling.v1.utils.Crypt;
 import info.labeling.v1.utils.SQlite;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -132,8 +132,8 @@ public class AuthResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getHash(@FormParam("str") String str) {
 		try {
-			String salt = Funcs.generateHash();
-			String hash = salt + Funcs.SHA1(salt + str);
+			String salt = Crypt.generateHash();
+			String hash = salt + Crypt.SHA1(salt + str);
 			JSONObject jsonOut = new JSONObject();
 			jsonOut.put("hash", hash);
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
