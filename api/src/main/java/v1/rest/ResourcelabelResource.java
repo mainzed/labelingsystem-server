@@ -19,7 +19,7 @@ import org.openrdf.repository.RepositoryException;
 import v1.utils.retcat.RetcatItem;
 
 @Path("/resourcelabel")
-public class ResourcelabelResource {
+public class ResourceLabelResource {
 
 	@GET
 	@Produces("application/json;charset=UTF-8")
