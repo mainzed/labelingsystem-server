@@ -2,6 +2,7 @@ package v1.rest;
 
 import exceptions.Logging;
 import exceptions.ResourceNotAvailableException;
+import exceptions.WaybacklinkException;
 import rdf.RDF;
 import rdf.RDF4J_20M3;
 import v1.utils.config.ConfigProperties;
@@ -234,6 +235,14 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getWaybackLink(@QueryParam("url") String url) {
 		try {
+			// check if url is item in retcat
+			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+			for (RetcatItem item : retcatlist) {
+				if (url.contains(item.getPrefix())) {
+					throw new WaybacklinkException("item match in reference thesaurus catalog");
+				}
+			}
+			// get waybacklink
 			URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
@@ -259,7 +268,7 @@ public class RetcatResource {
 			try {
 				wburl = (String) resultsObject2.get("url");
 			} catch (Exception e) {
-				throw new NullPointerException("no url available");
+				throw new WaybacklinkException("no wayback url available");
 			}
 			jsonOut.put("url", wburl);
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -1705,8 +1714,9 @@ public class RetcatResource {
 				tmpAutosuggest.setLabel(labelValue);
 				String vocabValue = (String) tmpElement.get("vocab");
 				tmpAutosuggest.setSchemeTitle(vocabValue);
-				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
-				JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
+				JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
+				JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
+				tmpAutosuggest.setLanguage("en");
 				// query for broader
 				if (boraderArray != null) {
 					for (Object item : boraderArray) {
@@ -1731,6 +1741,115 @@ public class RetcatResource {
 				}
 				// get retcat info
 				String type = "finto";
+				String quality = "";
+				String group = "";
+				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					if (item.getType().equals(type)) {
+						quality = item.getQuality();
+						group = item.getGroup();
+					}
+				}
+				tmpAutosuggest.setType(type);
+				tmpAutosuggest.setQuality(quality);
+				tmpAutosuggest.setGroup(group);
+			}
+			// fill output json
+			outArray = fillOutputJSONforQuery(autosuggests);
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+
+	@GET
+	@Path("/query/skosmos/unesco")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getResultsSKOSMOS_UNESCO(@QueryParam("query") String searchword) {
+		try {
+			searchword = GeneralFunctions.encodeURIComponent(searchword);
+			String url_string = "http://vocabularies.unesco.org/browser/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=thesaurus&limit=" + LIMIT;
+			URL url = new URL(url_string);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = br.readLine()) != null) {
+				response.append(inputLine);
+			}
+			br.close();
+			// init output
+			JSONArray outArray = new JSONArray();
+			// fill objects
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONArray resultsArray = (JSONArray) jsonObject.get("results");
+			Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
+			for (Object element : resultsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				String uriValue = (String) tmpElement.get("uri");
+				autosuggests.put(uriValue, new SuggestionItem(uriValue));
+				SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
+				String labelValue = (String) tmpElement.get("prefLabel");
+				tmpAutosuggest.setLabel(labelValue);
+				String vocabValue = (String) tmpElement.get("vocab");
+				tmpAutosuggest.setSchemeTitle(vocabValue);
+				JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
+				JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
+				tmpAutosuggest.setLanguage("en");
+				// query for broader
+				if (boraderArray != null) {
+					for (Object item : boraderArray) {
+						JSONObject tmpObject = (JSONObject) item;
+						HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						//query for label
+						String broaderUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
+						broaderUrl = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + broaderUrl;
+						URL obj = new URL(broaderUrl);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						con.setRequestMethod("GET");
+						BufferedReader broaderIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String broaderInputLine;
+						StringBuilder broaderResponse = new StringBuilder();
+						while ((broaderInputLine = broaderIn.readLine()) != null) {
+							broaderResponse.append(broaderInputLine);
+						}
+						broaderIn.close();
+						// parse json
+						JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(broaderResponse.toString());
+						String broaderLabelValue = (String) broaderJsonObject.get("prefLabel");
+						hstmp.put(uriValueTmp, broaderLabelValue);
+						tmpAutosuggest.setBroaderTerm(hstmp);
+					}
+				}
+				// query for narrower
+				if (narrowerArray != null) {
+					for (Object item : boraderArray) {
+						JSONObject tmpObject = (JSONObject) item;
+						HashMap<String, String> hstmp = new HashMap();
+						String uriValueTmp = (String) tmpObject.get("uri");
+						//query for label
+						String narrowerUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
+						narrowerUrl = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + narrowerUrl;
+						URL obj = new URL(narrowerUrl);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						con.setRequestMethod("GET");
+						BufferedReader narrowerIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String  narrowerInputLine;
+						StringBuilder  narrowerResponse = new StringBuilder();
+						while (( narrowerInputLine =  narrowerIn.readLine()) != null) {
+							 narrowerResponse.append( narrowerInputLine);
+						}
+						 narrowerIn.close();
+						// parse json
+						JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse( narrowerResponse.toString());
+						String narrowerLabelValue = (String) broaderJsonObject.get("prefLabel");
+						hstmp.put(uriValueTmp, narrowerLabelValue);
+						tmpAutosuggest.setNarrowerTerm(hstmp);
+					}
+				}
+				// get retcat info
+				String type = "unesco";
 				String quality = "";
 				String group = "";
 				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
@@ -1783,16 +1902,32 @@ public class RetcatResource {
 				tmpAutosuggest.setLabel(labelValue);
 				String vocabValue = (String) tmpElement.get("vocab");
 				tmpAutosuggest.setSchemeTitle(vocabValue);
-				JSONArray boraderArray = (JSONArray) tmpElement.get("skos:broader");
-				JSONArray narrowerArray = (JSONArray) tmpElement.get("skos:narrower");
+				JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
+				JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
+				tmpAutosuggest.setLanguage("en");
 				// query for broader
 				if (boraderArray != null) {
 					for (Object item : boraderArray) {
 						JSONObject tmpObject = (JSONObject) item;
 						HashMap<String, String> hstmp = new HashMap();
 						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
-						hstmp.put(uriValueTmp, labelValueTmp);
+						//query for label
+						String broaderUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
+						broaderUrl = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + broaderUrl;
+						URL obj = new URL(broaderUrl);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						con.setRequestMethod("GET");
+						BufferedReader broaderIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String broaderInputLine;
+						StringBuilder broaderResponse = new StringBuilder();
+						while ((broaderInputLine = broaderIn.readLine()) != null) {
+							broaderResponse.append(broaderInputLine);
+						}
+						broaderIn.close();
+						// parse json
+						JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(broaderResponse.toString());
+						String broaderLabelValue = (String) broaderJsonObject.get("prefLabel");
+						hstmp.put(uriValueTmp, broaderLabelValue);
 						tmpAutosuggest.setBroaderTerm(hstmp);
 					}
 				}
@@ -1802,8 +1937,23 @@ public class RetcatResource {
 						JSONObject tmpObject = (JSONObject) item;
 						HashMap<String, String> hstmp = new HashMap();
 						String uriValueTmp = (String) tmpObject.get("uri");
-						String labelValueTmp = (String) tmpObject.get("prefLabel");
-						hstmp.put(uriValueTmp, labelValueTmp);
+						//query for label
+						String narrowerUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
+						narrowerUrl = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + narrowerUrl;
+						URL obj = new URL(narrowerUrl);
+						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+						con.setRequestMethod("GET");
+						BufferedReader narrowerIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String  narrowerInputLine;
+						StringBuilder  narrowerResponse = new StringBuilder();
+						while (( narrowerInputLine =  narrowerIn.readLine()) != null) {
+							 narrowerResponse.append( narrowerInputLine);
+						}
+						 narrowerIn.close();
+						// parse json
+						JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse( narrowerResponse.toString());
+						String narrowerLabelValue = (String) broaderJsonObject.get("prefLabel");
+						hstmp.put(uriValueTmp, narrowerLabelValue);
 						tmpAutosuggest.setNarrowerTerm(hstmp);
 					}
 				}
@@ -2231,7 +2381,7 @@ public class RetcatResource {
 			// get retcat info
 			String type = "finto";
 			String quality = "";
-			String group = "";
+			String group = "en";
 			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
@@ -2275,6 +2425,51 @@ public class RetcatResource {
 			jsonOut.put("lang", "");
 			// get retcat info
 			String type = "fao";
+			String quality = "en";
+			String group = "";
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				if (item.getType().equals(type)) {
+					quality = item.getQuality();
+					group = item.getGroup();
+				}
+			}
+			jsonOut.put("type", type);
+			jsonOut.put("quality", quality);
+			jsonOut.put("group", group);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+
+	@GET
+	@Path("/label/skosmos/unesco")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response geLabelSkosmosUnesco(@QueryParam("url") String url) {
+		try {
+			// query for json
+			url = GeneralFunctions.encodeURIComponent(url);
+			url = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + url;
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			// parse json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			String labelValue = (String) jsonObject.get("prefLabel");
+			// output
+			JSONObject jsonOut = new JSONObject();
+			jsonOut.put("label", labelValue);
+			jsonOut.put("lang", "en");
+			// get retcat info
+			String type = "fao";
 			String quality = "";
 			String group = "";
 			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
@@ -2297,7 +2492,7 @@ public class RetcatResource {
 		JSONArray outArray = new JSONArray();
 		int i = 0;
 		for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
-			if (i<LIMIT) {
+			if (i < LIMIT) {
 				SuggestionItem tmpAS = entry.getValue();
 				JSONObject suggestionObject = new JSONObject();
 				// url

@@ -16,29 +16,27 @@ import javax.ws.rs.core.Response;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import v1.utils.generalfuncs.GeneralFunctions;
 import v1.utils.retcat.RetcatItem;
 
-@Path("/resourcequery")
-public class ResourceQueryResource {
+@Path("/resourcelabel")
+public class ResourceLabelResource {
 
 	@GET
 	@Produces("application/json;charset=UTF-8")
-	public Response redirectToRetcat(@QueryParam("retcat") String retcat, @QueryParam("query") String query) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+	public Response redirectToRetcat(@QueryParam("url") String url) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
 		List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 		boolean match = false;
 		for (RetcatItem item : retcatlist) {
-			if (retcat.contains(item.getName())) {
-				query = GeneralFunctions.encodeURIComponent(query);
-				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getQueryURL() + "?query=" + query);
+			if (url.contains(item.getPrefix())) {
+				URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getLabelURL() + "?url="+url+"&type="+item.getType());
 				return Response.temporaryRedirect(targetURIForRedirection).build();
 			}
 		}
 		if (!match) {
-			return Response.status(Response.Status.NOT_FOUND).build();
-		} else {
-			return Response.ok().build();
+			URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/label/html"+"?url="+url);
+			return Response.temporaryRedirect(targetURIForRedirection).build();
 		}
+		return Response.ok().build();
 	}
 
 }
