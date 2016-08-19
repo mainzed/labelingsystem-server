@@ -1,0 +1,15 @@
+{
+	"item": {
+		"vocabID": "16b8e7e1-cd6d-4c82-807f-f08f4463b4bd",
+		"prefLabels": [{
+			"isThumbnail": true,
+			"value": "Affe",
+			"lang": "de"
+		}],
+		"scopeNote": {
+			"value": "this is a scope note",
+			"lang": "en"
+		}
+	},
+	"user": "demo"
+}

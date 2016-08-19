@@ -1,0 +1,14 @@
+{
+	"item": {
+		"title": {
+			"value": "mein test",
+			"lang": "de"
+		},
+		"description": {
+			"value": "mein Testvokabular",
+			"lang": "de"
+		},
+		"releaseType": "draft"
+	},
+	"user": "demo"
+}
