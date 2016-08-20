@@ -1368,7 +1368,7 @@ public class Transformer {
         contributor[value] (ShareRevision)
         theme[value] (DescriptionRevision)
          */
-        // title
+        // title [mendatory]
         JSONObject oldTitle = (JSONObject) oldObject.get("title");
         String oldTitleValue = (String) oldTitle.get("value");
         String oldTitleLang = (String) oldTitle.get("lang");
@@ -1378,7 +1378,7 @@ public class Transformer {
         if (!oldTitleValue.equals(newTitleValue) || !oldTitleLang.equals(newTitleLang)) {
             revisionTypes += "DescriptionRevision,";
         }
-        // description
+        // description [mendatory]
         JSONObject oldDescription = (JSONObject) oldObject.get("description");
         String oldDescriptionValue = (String) oldDescription.get("value");
         String oldDescriptionLang = (String) oldDescription.get("lang");
@@ -1388,7 +1388,7 @@ public class Transformer {
         if (!oldDescriptionValue.equals(newDescriptionValue) || !oldDescriptionLang.equals(newDescriptionLang)) {
             revisionTypes += "DescriptionRevision,";
         }
-        // releaseType
+        // releaseType [mendatory]
         String oldReleaseType = (String) oldObject.get("releaseType");
         String newReleaseType = (String) newObject.get("releaseType");
         if (!oldReleaseType.equals(newReleaseType)) {
@@ -1415,30 +1415,188 @@ public class Transformer {
         context[value] (SystemRevision)
         contributor[value] (ShareRevision)
          */
-        // scopeNote
+        // scopeNote [optional]
         JSONObject oldScopeNote = (JSONObject) oldObject.get("scopeNote");
-        String oldScopeNoteValue = (String) oldScopeNote.get("value");
-        String oldScopeNoteLang = (String) oldScopeNote.get("lang");
+        String oldScopeNoteValue = "";
+        String oldScopeNoteLang = "";
+        if (oldScopeNote != null) {
+           oldScopeNoteValue = (String) oldScopeNote.get("value");
+           oldScopeNoteLang = (String) oldScopeNote.get("lang");
+        }
         JSONObject newScopeNote = (JSONObject) newObject.get("scopeNote");
-        String newScopeNoteValue = (String) newScopeNote.get("value");
-        String newScopeNoteLang = (String) newScopeNote.get("lang");
-        if (!oldScopeNoteValue.equals(newScopeNoteValue) || !oldScopeNoteLang.equals(newScopeNoteLang)) {
+        String newScopeNoteValue = "";
+        String newScopeNoteLang = "";
+        if (oldScopeNote != null) {
+            newScopeNoteValue = (String) newScopeNote.get("value");
+            newScopeNoteLang = (String) newScopeNote.get("lang");
+        }
+        if (oldScopeNote != null && newScopeNote != null) {
+            if (!oldScopeNoteValue.equals(newScopeNoteValue) || !oldScopeNoteLang.equals(newScopeNoteLang)) {
+                revisionTypes += "DescriptionRevision,";
+            }
+        } else if (oldScopeNote == null && newScopeNote != null) {
+            revisionTypes += "DescriptionRevision,";
+        } else if (oldScopeNote != null && newScopeNote == null) {
             revisionTypes += "DescriptionRevision,";
         }
-        // prefLabel
+        // prefLabel [mendatory]
         JSONArray oldPrefLabel = (JSONArray) oldObject.get("prefLabels");
         JSONArray newPrefLabel = (JSONArray) newObject.get("prefLabels");
-        // prefLabel count
+        // prefLabel value
+        String oldPrefLabels = "";
+        for (Object item : oldPrefLabel) {
+            JSONObject tmpObject = (JSONObject) item;
+            oldPrefLabels = tmpObject.get("value")+",";
+        }
+        List<String> newPrefLabels = new ArrayList();
+        for (Object item : newPrefLabel) {
+            JSONObject tmpObject = (JSONObject) item;
+            newPrefLabels.add((String) tmpObject.get("value"));
+        }
+        // prefLabel count and text value
         if (oldPrefLabel.size() != newPrefLabel.size()) {
             revisionTypes += "DescriptionRevision,";
+        } else {
+            for (String item : newPrefLabels) {
+                if (oldPrefLabels.contains(item)) {
+                    revisionTypes += "DescriptionRevision,";
+                }
+            }
         }
-        // altLabel
+        // altLabel [optional]
         JSONArray oldAltLabel = (JSONArray) oldObject.get("altLabels");
         JSONArray newAltLabel = (JSONArray) newObject.get("altLabels");
-        // prefLabel count
-        if (oldAltLabel.size() != newAltLabel.size()) {
+        // altLabel value
+        String oldAltLabels = "";
+        List<String> newAltLabels = new ArrayList();
+        if (oldAltLabel != null && newAltLabel != null) {
+            for (Object item : oldAltLabel) {
+                JSONObject tmpObject = (JSONObject) item;
+                oldAltLabels = tmpObject.get("value")+",";
+            }
+            for (Object item : newAltLabel) {
+                JSONObject tmpObject = (JSONObject) item;
+                newAltLabels.add((String) tmpObject.get("value"));
+            }
+        } else if (oldAltLabel == null && newAltLabel != null) {
             revisionTypes += "DescriptionRevision,";
+        } else if (oldAltLabel != null && newAltLabel == null) {
+            revisionTypes += "DescriptionRevision,";
+        } 
+        // altLabel count and text value
+        if (oldAltLabel != null && newAltLabel != null) {
+            if (oldAltLabel.size() != newAltLabel.size()) {
+                revisionTypes += "DescriptionRevision,";
+            } else {
+                for (String item : newAltLabels) {
+                    if (oldAltLabels.contains(item)) {
+                        revisionTypes += "DescriptionRevision,";
+                    }
+                }
+            }
         }
+        // relations
+        JSONArray oldBroader = (JSONArray) oldObject.get("broader");
+        JSONArray newBroader = (JSONArray) newObject.get("broader");
+        JSONArray oldNarrower = (JSONArray) oldObject.get("narrower");
+        JSONArray newNarrower = (JSONArray) newObject.get("narrower");
+        JSONArray oldRelated = (JSONArray) oldObject.get("related");
+        JSONArray newRelated = (JSONArray) newObject.get("related");
+        JSONArray oldBroadMatch = (JSONArray) oldObject.get("broadMatch");
+        JSONArray newBroadMatch = (JSONArray) newObject.get("broadMatch");
+        JSONArray oldNarrowMatch = (JSONArray) oldObject.get("narrowMatch");
+        JSONArray newNarrowMatch = (JSONArray) newObject.get("narrowMatch");
+        JSONArray oldRelatedMatch = (JSONArray) oldObject.get("relatedMatch");
+        JSONArray newRelatedMatch = (JSONArray) newObject.get("relatedMatch");
+        JSONArray oldCloseMatch = (JSONArray) oldObject.get("closeMatch");
+        JSONArray newCloseMatch = (JSONArray) newObject.get("closeMatch");
+        JSONArray oldExactMatch = (JSONArray) oldObject.get("exactMatch");
+        JSONArray newExactMatch = (JSONArray) newObject.get("exactMatch");
+        JSONArray oldSeeAlso = (JSONArray) oldObject.get("seeAlso");
+        JSONArray newSeeAlso = (JSONArray) newObject.get("seeAlso");
+        // set revisions using size attribute
+        if (oldBroader != null && newBroader != null) {
+            if (oldBroader.size() != newBroader.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldBroader == null && newBroader != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldBroader != null && newBroader == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldNarrower != null && newNarrower != null) {
+            if (oldNarrower.size() != newNarrower.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldNarrower == null && newNarrower != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldNarrower != null && newNarrower == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldRelated != null && newRelated != null) {
+            if (oldRelated.size() != newRelated.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldRelated == null && newRelated != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldRelated != null && newRelated == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldBroadMatch != null && newBroadMatch != null) {
+            if (oldBroadMatch.size() != newBroadMatch.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldBroadMatch == null && newBroadMatch != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldBroadMatch != null && newBroadMatch == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldNarrowMatch != null && newNarrowMatch != null) {
+            if (oldNarrowMatch.size() != newNarrowMatch.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldNarrowMatch == null && newNarrowMatch != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldNarrowMatch != null && newNarrowMatch == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldRelatedMatch != null && newRelatedMatch != null) {
+            if (oldRelatedMatch.size() != newRelatedMatch.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldRelatedMatch == null && newRelatedMatch != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldRelatedMatch != null && newRelatedMatch == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldCloseMatch != null && newCloseMatch != null) {
+            if (oldCloseMatch.size() != newCloseMatch.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldCloseMatch == null && newCloseMatch != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldCloseMatch != null && newCloseMatch == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldExactMatch != null && newExactMatch != null) {
+            if (oldExactMatch.size() != newExactMatch.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldExactMatch == null && newExactMatch != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldExactMatch != null && newExactMatch == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        if (oldSeeAlso != null && newSeeAlso != null) {
+            if (oldSeeAlso.size() != newSeeAlso.size()) {
+                revisionTypes += "LinkingRevision,";
+            }
+        } else if (oldSeeAlso == null && newSeeAlso != null) {
+            revisionTypes += "LinkingRevision,";
+        } else if (oldSeeAlso != null && newSeeAlso == null) {
+            revisionTypes += "LinkingRevision,";
+        }
+        // all revision types
         return revisionTypes.substring(0, revisionTypes.length() - 1);
     }
 
