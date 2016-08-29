@@ -933,6 +933,7 @@ public class Transformer {
             labelObject.remove(rdf.getPrefixItem("seeAlso"));
             labelObject.remove(rdf.getPrefixItem("created"));
             labelObject.remove(rdf.getPrefixItem("modifications"));
+            labelObject.remove(rdf.getPrefixItem("revisionIDs"));
             // add object
             rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
             return rdfObject.toJSONString();
@@ -1375,26 +1376,32 @@ public class Transformer {
             String oldTitleValue = (String) oldTitle.get("value");
             String oldTitleLang = (String) oldTitle.get("lang");
             JSONObject newTitle = (JSONObject) newObject.get("title");
-            String newTitleValue = (String) newTitle.get("value");
-            String newTitleLang = (String) newTitle.get("lang");
-            if (!oldTitleValue.equals(newTitleValue) || !oldTitleLang.equals(newTitleLang)) {
-                revisionTypes += "DescriptionRevision,";
+            if (newTitle != null) {
+                String newTitleValue = (String) newTitle.get("value");
+                String newTitleLang = (String) newTitle.get("lang");
+                if (!oldTitleValue.equals(newTitleValue) || !oldTitleLang.equals(newTitleLang)) {
+                    revisionTypes += "DescriptionRevision,";
+                }
             }
             // description [mendatory]
             JSONObject oldDescription = (JSONObject) oldObject.get("description");
             String oldDescriptionValue = (String) oldDescription.get("value");
             String oldDescriptionLang = (String) oldDescription.get("lang");
             JSONObject newDescription = (JSONObject) newObject.get("description");
-            String newDescriptionValue = (String) newDescription.get("value");
-            String newDescriptionLang = (String) newDescription.get("lang");
-            if (!oldDescriptionValue.equals(newDescriptionValue) || !oldDescriptionLang.equals(newDescriptionLang)) {
-                revisionTypes += "DescriptionRevision,";
+            if (newDescription != null) {
+                String newDescriptionValue = (String) newDescription.get("value");
+                String newDescriptionLang = (String) newDescription.get("lang");
+                if (!oldDescriptionValue.equals(newDescriptionValue) || !oldDescriptionLang.equals(newDescriptionLang)) {
+                    revisionTypes += "DescriptionRevision,";
+                }
             }
             // releaseType [mendatory]
             String oldReleaseType = (String) oldObject.get("releaseType");
             String newReleaseType = (String) newObject.get("releaseType");
-            if (!oldReleaseType.equals(newReleaseType)) {
-                revisionTypes += "SystemRevision,";
+            if (newReleaseType != null) {
+                if (!oldReleaseType.equals(newReleaseType)) {
+                    revisionTypes += "SystemRevision,";
+                }
             }
         } catch (Exception e) {
             throw new RevisionTypeException(e.toString());
@@ -1403,6 +1410,7 @@ public class Transformer {
     }
 
     public static String labelDifference(String json_old, String json_new) throws ParseException, RevisionTypeException {
+
         String revisionTypes = "";
         try {
             JSONObject oldObject = (JSONObject) new JSONParser().parse(json_old);
@@ -1464,7 +1472,7 @@ public class Transformer {
                 revisionTypes += "DescriptionRevision,";
             } else {
                 for (String item : newPrefLabels) {
-                    if (oldPrefLabels.contains(item)) {
+                    if (!oldPrefLabels.contains(item)) {
                         revisionTypes += "DescriptionRevision,";
                     }
                 }
@@ -1495,7 +1503,7 @@ public class Transformer {
                     revisionTypes += "DescriptionRevision,";
                 } else {
                     for (String item : newAltLabels) {
-                        if (oldAltLabels.contains(item)) {
+                        if (!oldAltLabels.contains(item)) {
                             revisionTypes += "DescriptionRevision,";
                         }
                     }

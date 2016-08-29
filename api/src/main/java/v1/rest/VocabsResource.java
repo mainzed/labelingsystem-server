@@ -609,7 +609,7 @@ public class VocabsResource {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
             String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
+            json = (String) requestObject.get("item").toString();
             // get variables
             String item = "ls_voc";
             String itemID = UniqueIdentifier.getUUID();
@@ -649,7 +649,7 @@ public class VocabsResource {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
             String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
+            json = (String) requestObject.get("item").toString();
             String item = "ls_voc";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
@@ -658,6 +658,7 @@ public class VocabsResource {
                 throw new ResourceNotAvailableException();
             }
             // insert data
+            String json_new = json;
             json = Transformer.vocabulary_POST(json, vocabulary);
             // get json old
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -673,7 +674,7 @@ public class VocabsResource {
             }
             String json_old = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             // get difference
-            String type = Transformer.vocabularyDifference(json_old, json);
+            String type = Transformer.vocabularyDifference(json_old, json_new);
             // set triples
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularySPARQLUPDATE(vocabulary));
@@ -698,7 +699,7 @@ public class VocabsResource {
         }
     }
 
-    @PATCH
+    /*@PATCH
     @Path("/{vocabulary}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -708,7 +709,7 @@ public class VocabsResource {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
             String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
+            json = (String) requestObject.get("item").toString();
             String item = "ls_voc";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
@@ -717,6 +718,7 @@ public class VocabsResource {
                 throw new ResourceNotAvailableException();
             }
             // insert data
+            String json_new = json;
             json = Transformer.vocabulary_POST(json, vocabulary);
             // get json old
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -732,7 +734,7 @@ public class VocabsResource {
             }
             String json_old = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
             // get difference
-            String type = Transformer.vocabularyDifference(json_old, json);
+            String type = Transformer.vocabularyDifference(json_old, json_new);
             // set triples
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), patchVocabularySPARQLUPDATE(vocabulary, json));
@@ -757,8 +759,7 @@ public class VocabsResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
-    }
-
+    }*/
     @DELETE
     @Path("/{vocabulary}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -775,7 +776,14 @@ public class VocabsResource {
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyREVISION(item, vocabulary, user));
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularySPARQLUPDATE(vocabulary));
-                RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
+                //RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
+                // set deprecated labels if available
+                String queryLabels = GeneralFunctions.getAllLabelsForVocabulary(vocabulary);
+                List<BindingSet> resultLabels = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryLabels);
+                if (resultLabels.size() > 0) {
+                    RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
+                    RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
+                }
             } else if (type.equals("deprecated")) {
                 // check if resource exists
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
@@ -786,9 +794,13 @@ public class VocabsResource {
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedVocabularyREVISION(item, vocabulary, user));
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
-                // set deprecated labels
-                RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
-                RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
+                // set deprecated labels if available
+                String queryLabels = GeneralFunctions.getAllLabelsForVocabulary(vocabulary);
+                List<BindingSet> resultLabels = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryLabels);
+                if (resultLabels.size() > 0) {
+                    RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
+                    RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
+                }
             }
             // get result als json
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));

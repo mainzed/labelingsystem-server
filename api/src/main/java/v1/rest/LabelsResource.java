@@ -680,7 +680,7 @@ public class LabelsResource {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
             String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
+            json = (String) requestObject.get("item").toString();
             // get variables
             String item = "ls_lab";
             String itemID = UniqueIdentifier.getUUID();
@@ -721,7 +721,7 @@ public class LabelsResource {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
             String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
+            json = (String) requestObject.get("item").toString();
             String item = "ls_lab";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -730,6 +730,7 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException();
             }
             // insert data
+            String json_new = json;
             json = Transformer.label_POST(json, label);
             // get json old
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -745,7 +746,7 @@ public class LabelsResource {
             }
             String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, null).toJSONString();
             // get difference
-            String type = Transformer.vocabularyDifference(json_old, json);
+            String type = Transformer.labelDifference(json_old, json_new);
             // set triples
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putLabelREVISION(item, label, user, type));
             RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putLabelSPARQLUPDATE(label));
@@ -771,7 +772,7 @@ public class LabelsResource {
         }
     }
 
-    @PATCH
+    /*@PATCH
     @Path("/{label}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -831,7 +832,7 @@ public class LabelsResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
-    }
+    }*/
 
     @DELETE
     @Path("/{label}")
@@ -849,7 +850,7 @@ public class LabelsResource {
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelREVISION(item, label, user));
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelSPARQLUPDATE(label));
-                RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
+                //RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
             } else if (type.equals("deprecated")) {
                 // check if resource exists
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);

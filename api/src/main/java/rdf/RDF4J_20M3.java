@@ -45,7 +45,7 @@ public class RDF4J_20M3 {
             try (RepositoryConnection conn = repo.getConnection()) {
                 TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, queryString);
                 try (TupleQueryResult result = tupleQuery.evaluate()) {
-                    while (result.hasNext()) { 
+                    while (result.hasNext()) {
                         BindingList.add(result.next());
                     }
                 }
@@ -126,8 +126,8 @@ public class RDF4J_20M3 {
             return ValueList;
         }
     }
-    
-    public static void SPARQLupdate(String repositoryID, String rdf4jServer, String updateString) throws RepositoryException, MalformedQueryException, UpdateExecutionException, SesameSparqlException {
+
+    public static void SPARQLupdate(String repositoryID, String rdf4jServer, String updateString) throws RepositoryException, MalformedQueryException, UpdateExecutionException, SesameSparqlException, NoInputException {
         try {
             // GET NUMBER OF STATEMENTS
             int before = getNumberOfStatements(repositoryID, rdf4jServer);
@@ -144,10 +144,14 @@ public class RDF4J_20M3 {
                 throw new NoInputException();
             }
         } catch (Exception e) {
-            throw new SesameSparqlException(e.getMessage());
+            if (e.toString().contains("NoInputException")) {
+                throw new NoInputException(e.getMessage());
+            } else {
+                throw new SesameSparqlException(e.getMessage());
+            }
         }
     }
-    
+
     private static int getNumberOfStatements(String repositoryID, String rdf4jServer) throws MalformedURLException, IOException, SesameSparqlException {
         try {
             String size_url = rdf4jServer + "/repositories/" + repositoryID + "/size";
@@ -168,7 +172,7 @@ public class RDF4J_20M3 {
             throw new SesameSparqlException();
         }
     }
-    
+
     public static void inputRDFfromJSONLDString(String repositoryID, String rdf4jServer, String JSONLD) throws SesameSparqlException {
         try {
             // GET NUMBER OF STATEMENTS
@@ -210,7 +214,7 @@ public class RDF4J_20M3 {
             throw new SesameSparqlException(e.getMessage());
         }
     }
-    
+
     public static ServletOutputStream SPARQLqueryOutputFile(String repositoryID, String rdf4jServer, String queryString, String format, ServletOutputStream out) throws SesameSparqlException {
         try {
             Repository repo = new HTTPRepository(rdf4jServer, repositoryID);
@@ -239,7 +243,7 @@ public class RDF4J_20M3 {
         }
         return out;
     }
-    
+
     public static OutputStream SPARQLqueryOutputFileOS(String repositoryID, String rdf4jServer, String queryString, String format, OutputStream out) throws SesameSparqlException {
         try {
             Repository repo = new HTTPRepository(rdf4jServer, repositoryID);
@@ -270,4 +274,3 @@ public class RDF4J_20M3 {
     }
 
 }
-
