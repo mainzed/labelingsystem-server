@@ -1,11 +1,11 @@
 package v1.utils.transformer;
 
-import exceptions.RdfException;
 import v1.utils.config.ConfigProperties;
 import rdf.RDF;
 import exceptions.ResourceNotAvailableException;
 import exceptions.RevisionTypeException;
 import exceptions.SesameSparqlException;
+import exceptions.TransformRdfToApiJsonException;
 import exceptions.UniqueIdentifierException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,256 +129,266 @@ public class Transformer {
         }
     }
 
-    public static JSONObject vocabulary_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException {
-        //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        // parse json
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        jsonObject.put("vocab", jsonObject.remove(rdf.getPrefixItem("ls_voc" + ":" + id)));
-        // get items
-        JSONObject vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("vocab"));
-        // change dc:title
-        JSONArray titleArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:title"));
-        if (titleArray != null && !titleArray.isEmpty()) {
-            for (Object element : titleArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("dc:title"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                JSONObject objTmp = new JSONObject();
-                objTmp.put("value", value);
-                objTmp.put("lang", lang);
-                vocabularyObject.put(rdf.getPrefixItem("title"), objTmp);
-            }
-        }
-        // change dct:description
-        JSONArray descriptionArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:description"));
-        if (descriptionArray != null && !descriptionArray.isEmpty()) {
-            for (Object element : descriptionArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("dc:description"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                JSONObject objTmp = new JSONObject();
-                objTmp.put("value", value);
-                objTmp.put("lang", lang);
-                if (fields == null || fields.contains("description")) {
-                    vocabularyObject.put(rdf.getPrefixItem("description"), objTmp);
+    public static JSONObject vocabulary_GET(String json, String id, String fields) throws IOException, UniqueIdentifierException, ParseException, TransformRdfToApiJsonException {
+        JSONObject vocabularyObject = null;
+        try {
+            //init
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+            jsonObject.put("vocab", jsonObject.remove(rdf.getPrefixItem("ls_voc" + ":" + id)));
+            // get items
+            vocabularyObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("vocab"));
+            // change dc:title
+            JSONArray titleArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:title"));
+            if (titleArray != null && !titleArray.isEmpty()) {
+                for (Object element : titleArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dc:title"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    JSONObject objTmp = new JSONObject();
+                    objTmp.put("value", value);
+                    objTmp.put("lang", lang);
+                    vocabularyObject.put(rdf.getPrefixItem("title"), objTmp);
                 }
             }
-        }
-        // change ls:hasReleaseType
-        JSONArray releaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
-        if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
-            for (Object element : releaseTypeArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (value.contains("Draft")) {
-                    value = "draft";
-                } else {
-                    value = "public";
-                }
-                if (fields == null || fields.contains("releaseType")) {
-                    vocabularyObject.put(rdf.getPrefixItem("releaseType"), value);
-                }
-            }
-        }
-        // change ls:hasStatusType
-        JSONArray statusTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasStatusType"));
-        if (statusTypeArray != null && !statusTypeArray.isEmpty()) {
-            for (Object element : statusTypeArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (value.contains("Active")) {
-                    value = "active";
-                } else if (value.contains("Deprecated")) {
-                    value = "deprecated";
-                } else {
-                    value = "deleted";
-                }
-                if (fields == null || fields.contains("statusType")) {
-                    vocabularyObject.put(rdf.getPrefixItem("statusType"), value);
+            // change dct:description
+            JSONArray descriptionArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:description"));
+            if (descriptionArray != null && !descriptionArray.isEmpty()) {
+                for (Object element : descriptionArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dc:description"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    JSONObject objTmp = new JSONObject();
+                    objTmp.put("value", value);
+                    objTmp.put("lang", lang);
+                    if (fields == null || fields.contains("description")) {
+                        vocabularyObject.put(rdf.getPrefixItem("description"), objTmp);
+                    }
                 }
             }
-        }
-        // change dcat:theme
-        JSONArray themeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dcat:theme"));
-        if (themeArray != null && !themeArray.isEmpty()) {
-            vocabularyObject.remove(rdf.getPrefixItem("dcat:theme"));
-            JSONArray arrayTheme = new JSONArray();
-            for (Object element : themeArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayTheme.add(value);
-            }
-            if (fields == null || fields.contains("theme")) {
-                vocabularyObject.put(rdf.getPrefixItem("theme"), arrayTheme);
-            }
-        }
-        // change dc:creator
-        JSONArray creatorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:creator"));
-        if (creatorArray != null && !creatorArray.isEmpty()) {
-            for (Object element : creatorArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("dc:creator"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                vocabularyObject.put(rdf.getPrefixItem("creator"), value);
-            }
-        }
-        // change dc:contributor
-        JSONArray contributorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:contributor"));
-        if (contributorArray != null && !contributorArray.isEmpty()) {
-            vocabularyObject.remove(rdf.getPrefixItem("dc:contributor"));
-            JSONArray arrayContributor = new JSONArray();
-            for (Object element : contributorArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayContributor.add(value);
-            }
-            vocabularyObject.put(rdf.getPrefixItem("contributors"), arrayContributor);
-        }
-        // change dc:created
-        JSONArray createdArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:created"));
-        if (createdArray != null && !createdArray.isEmpty()) {
-            for (Object element : createdArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("dc:created"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (fields == null || fields.contains("created")) {
-                    vocabularyObject.put(rdf.getPrefixItem("created"), value);
+            // change ls:hasReleaseType
+            JSONArray releaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
+            if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
+                for (Object element : releaseTypeArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("Draft")) {
+                        value = "draft";
+                    } else {
+                        value = "public";
+                    }
+                    if (fields == null || fields.contains("releaseType")) {
+                        vocabularyObject.put(rdf.getPrefixItem("releaseType"), value);
+                    }
                 }
             }
-        }
-        // change dct:license
-        JSONArray licenseArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dct:license"));
-        if (licenseArray != null && !licenseArray.isEmpty()) {
-            for (Object element : licenseArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("dct:license"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (fields == null || fields.contains("license")) {
-                    vocabularyObject.put(rdf.getPrefixItem("license"), value);
+            // change ls:hasStatusType
+            JSONArray statusTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasStatusType"));
+            if (statusTypeArray != null && !statusTypeArray.isEmpty()) {
+                for (Object element : statusTypeArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("Active")) {
+                        value = "active";
+                    } else if (value.contains("Deprecated")) {
+                        value = "deprecated";
+                    } else {
+                        value = "deleted";
+                    }
+                    if (fields == null || fields.contains("statusType")) {
+                        vocabularyObject.put(rdf.getPrefixItem("statusType"), value);
+                    }
                 }
             }
-        }
-        // change dc:identifier
-        JSONArray identifierArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:identifier"));
-        for (Object element : identifierArray) {
+            // change dcat:theme
+            JSONArray themeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dcat:theme"));
+            if (themeArray != null && !themeArray.isEmpty()) {
+                vocabularyObject.remove(rdf.getPrefixItem("dcat:theme"));
+                JSONArray arrayTheme = new JSONArray();
+                for (Object element : themeArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    arrayTheme.add(value);
+                }
+                if (fields == null || fields.contains("theme")) {
+                    vocabularyObject.put(rdf.getPrefixItem("theme"), arrayTheme);
+                }
+            }
+            // change dc:creator
+            JSONArray creatorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:creator"));
+            if (creatorArray != null && !creatorArray.isEmpty()) {
+                for (Object element : creatorArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dc:creator"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    vocabularyObject.put(rdf.getPrefixItem("creator"), value);
+                }
+            }
+            // change dc:contributor
+            JSONArray contributorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:contributor"));
+            if (contributorArray != null && !contributorArray.isEmpty()) {
+                vocabularyObject.remove(rdf.getPrefixItem("dc:contributor"));
+                JSONArray arrayContributor = new JSONArray();
+                for (Object element : contributorArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    arrayContributor.add(value);
+                }
+                vocabularyObject.put(rdf.getPrefixItem("contributors"), arrayContributor);
+            }
+            // change dc:created
+            JSONArray createdArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:created"));
+            if (createdArray != null && !createdArray.isEmpty()) {
+                for (Object element : createdArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dc:created"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("created")) {
+                        vocabularyObject.put(rdf.getPrefixItem("created"), value);
+                    }
+                }
+            }
+            // change dct:license
+            JSONArray licenseArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dct:license"));
+            if (licenseArray != null && !licenseArray.isEmpty()) {
+                for (Object element : licenseArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dct:license"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("license")) {
+                        vocabularyObject.put(rdf.getPrefixItem("license"), value);
+                    }
+                }
+            }
+            // change dc:identifier
+            JSONArray identifierArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:identifier"));
+            for (Object element : identifierArray) {
+                vocabularyObject.remove(rdf.getPrefixItem("dc:identifier"));
+                JSONObject obj = (JSONObject) element;
+                String value = (String) obj.get("value");
+                vocabularyObject.put(rdf.getPrefixItem("id"), value);
+            }
+            // OPTIONAL VALUES
+            // change skos:hasTopConcept
+            JSONArray topConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
+            if (topConceptArray != null && !topConceptArray.isEmpty()) {
+                vocabularyObject.remove(rdf.getPrefixItem("skos:hasTopConcept"));
+                JSONArray arrayTopConcept = new JSONArray();
+                for (Object element : topConceptArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    arrayTopConcept.add(value);
+                }
+                if (fields == null || fields.contains("topConcepts")) {
+                    vocabularyObject.put(rdf.getPrefixItem("topConcepts"), arrayTopConcept);
+                }
+            }
+            // change dc:modified
+            JSONArray modifiedArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:modified"));
+            if (modifiedArray != null && !modifiedArray.isEmpty()) {
+                vocabularyObject.remove(rdf.getPrefixItem("dc:modified"));
+                JSONArray arrayModify = new JSONArray();
+                for (Object element : modifiedArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    arrayModify.add(value);
+                }
+                if (fields == null || fields.contains("modifications")) {
+                    vocabularyObject.put(rdf.getPrefixItem("modifications"), arrayModify);
+                }
+            }
+            // change skos:changeNote
+            JSONArray revisionsArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:changeNote"));
+            if (revisionsArray != null && !revisionsArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                for (Object element : revisionsArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("revision/")) {
+                        arrayNew.add(value.split("revision/")[1]);
+                    } else {
+                        arrayNew.add(value);
+                    }
+                }
+                if (fields == null || fields.contains("revisionIDs")) {
+                    vocabularyObject.put(rdf.getPrefixItem("revisionIDs"), arrayNew);
+                }
+            }
+            // delete items
             vocabularyObject.remove(rdf.getPrefixItem("dc:identifier"));
-            JSONObject obj = (JSONObject) element;
-            String value = (String) obj.get("value");
-            vocabularyObject.put(rdf.getPrefixItem("id"), value);
+            vocabularyObject.remove(rdf.getPrefixItem("dct:creator"));
+            vocabularyObject.remove(rdf.getPrefixItem("dct:contributor"));
+            vocabularyObject.remove(rdf.getPrefixItem("rdf:type"));
+            vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
+            vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
+        } catch (Exception e) {
+            throw new TransformRdfToApiJsonException(e.toString());
         }
-        // OPTIONAL VALUES
-        // change skos:hasTopConcept
-        JSONArray topConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
-        if (topConceptArray != null && !topConceptArray.isEmpty()) {
-            vocabularyObject.remove(rdf.getPrefixItem("skos:hasTopConcept"));
-            JSONArray arrayTopConcept = new JSONArray();
-            for (Object element : topConceptArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayTopConcept.add(value);
-            }
-            if (fields == null || fields.contains("topConcepts")) {
-                vocabularyObject.put(rdf.getPrefixItem("topConcepts"), arrayTopConcept);
-            }
-        }
-        // change dc:modified
-        JSONArray modifiedArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:modified"));
-        if (modifiedArray != null && !modifiedArray.isEmpty()) {
-            vocabularyObject.remove(rdf.getPrefixItem("dc:modified"));
-            JSONArray arrayModify = new JSONArray();
-            for (Object element : modifiedArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayModify.add(value);
-            }
-            if (fields == null || fields.contains("modifications")) {
-                vocabularyObject.put(rdf.getPrefixItem("modifications"), arrayModify);
-            }
-        }
-        // change skos:changeNote
-        JSONArray revisionsArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:changeNote"));
-        if (revisionsArray != null && !revisionsArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            for (Object element : revisionsArray) {
-                vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (value.contains("revision/")) {
-                    arrayNew.add(value.split("revision/")[1]);
-                } else {
-                    arrayNew.add(value);
-                }
-            }
-            if (fields == null || fields.contains("revisionIDs")) {
-                vocabularyObject.put(rdf.getPrefixItem("revisionIDs"), arrayNew);
-            }
-        }
-        // delete items
-        vocabularyObject.remove(rdf.getPrefixItem("dc:identifier"));
-        vocabularyObject.remove(rdf.getPrefixItem("dct:creator"));
-        vocabularyObject.remove(rdf.getPrefixItem("dct:contributor"));
-        vocabularyObject.remove(rdf.getPrefixItem("rdf:type"));
-        vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
-        vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
         // return
         return vocabularyObject;
     }
 
-    public static JSONObject revision_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
-        //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        // parse json
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        jsonObject.put("revision", jsonObject.remove(rdf.getPrefixItem("ls_rev" + ":" + id)));
-        // get items
-        JSONObject revisionObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("revision"));
-        // change dc:identifier
-        JSONArray identifierArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dc:identifier"));
-        for (Object element : identifierArray) {
-            revisionObject.remove(rdf.getPrefixItem("dc:identifier"));
-            JSONObject obj = (JSONObject) element;
-            String value = (String) obj.get("value");
-            revisionObject.put(rdf.getPrefixItem("id"), value);
-        }
-        // change dc:creator
-        JSONArray creatorArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dc:creator"));
-        if (creatorArray != null && !creatorArray.isEmpty()) {
-            for (Object element : creatorArray) {
-                revisionObject.remove(rdf.getPrefixItem("dc:creator"));
+    public static JSONObject revision_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException, TransformRdfToApiJsonException {
+        JSONObject revisionObject = null;
+        try {
+            //init
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+            jsonObject.put("revision", jsonObject.remove(rdf.getPrefixItem("ls_rev" + ":" + id)));
+            // get items
+            revisionObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("revision"));
+            // change dc:identifier
+            JSONArray identifierArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dc:identifier"));
+            for (Object element : identifierArray) {
+                revisionObject.remove(rdf.getPrefixItem("dc:identifier"));
                 JSONObject obj = (JSONObject) element;
                 String value = (String) obj.get("value");
-                revisionObject.put(rdf.getPrefixItem("creator"), value);
+                revisionObject.put(rdf.getPrefixItem("id"), value);
             }
-        }
-        // change prov:startedAtTime
-        JSONArray createdArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("prov:startedAtTime"));
-        if (createdArray != null && !createdArray.isEmpty()) {
-            for (Object element : createdArray) {
-                revisionObject.remove(rdf.getPrefixItem("prov:startedAtTime"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                revisionObject.put(rdf.getPrefixItem("date"), value);
+            // change dc:creator
+            JSONArray creatorArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dc:creator"));
+            if (creatorArray != null && !creatorArray.isEmpty()) {
+                for (Object element : creatorArray) {
+                    revisionObject.remove(rdf.getPrefixItem("dc:creator"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    revisionObject.put(rdf.getPrefixItem("creator"), value);
+                }
             }
-        }
-        // change dc:description
-        JSONArray descriptionArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dct:description"));
-        if (descriptionArray != null && !descriptionArray.isEmpty()) {
-            for (Object element : descriptionArray) {
-                revisionObject.remove(rdf.getPrefixItem("dct:description"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                revisionObject.put(rdf.getPrefixItem("type"), value);
+            // change prov:startedAtTime
+            JSONArray createdArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("prov:startedAtTime"));
+            if (createdArray != null && !createdArray.isEmpty()) {
+                for (Object element : createdArray) {
+                    revisionObject.remove(rdf.getPrefixItem("prov:startedAtTime"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    revisionObject.put(rdf.getPrefixItem("date"), value);
+                }
             }
+            // change dc:description
+            JSONArray descriptionArray = (JSONArray) revisionObject.get(rdf.getPrefixItem("dct:description"));
+            if (descriptionArray != null && !descriptionArray.isEmpty()) {
+                for (Object element : descriptionArray) {
+                    revisionObject.remove(rdf.getPrefixItem("dct:description"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    revisionObject.put(rdf.getPrefixItem("type"), value);
+                }
+            }
+            // delete items 
+            revisionObject.remove(rdf.getPrefixItem("rdf:type"));
+            revisionObject.remove(rdf.getPrefixItem("dct:creator"));
+            revisionObject.remove(rdf.getPrefixItem("dct:type"));
+        } catch (Exception e) {
+            throw new TransformRdfToApiJsonException(e.toString());
         }
-        // delete items 
-        revisionObject.remove(rdf.getPrefixItem("rdf:type"));
-        revisionObject.remove(rdf.getPrefixItem("dct:creator"));
-        revisionObject.remove(rdf.getPrefixItem("dct:type"));
         // return
         return revisionObject;
     }
@@ -494,128 +504,133 @@ public class Transformer {
         }
     }
 
-    public static JSONObject agent_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
-        //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        // parse json
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        jsonObject.put("agent", jsonObject.remove(rdf.getPrefixItem("ls_age" + ":" + id)));
-        // get items
-        JSONObject agentObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("agent"));
-        // change dc:identifier
-        JSONArray identifierArray = (JSONArray) agentObject.get(rdf.getPrefixItem("dc:identifier"));
-        if (identifierArray != null && !identifierArray.isEmpty()) {
-            for (Object element : identifierArray) {
-                agentObject.remove(rdf.getPrefixItem("dc:identifier"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("id"), value);
+    public static JSONObject agent_GET(String json, String id) throws IOException, UniqueIdentifierException, ParseException, TransformRdfToApiJsonException {
+        JSONObject agentObject = null;
+        try {
+            //init
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+            jsonObject.put("agent", jsonObject.remove(rdf.getPrefixItem("ls_age" + ":" + id)));
+            // get items
+            agentObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("agent"));
+            // change dc:identifier
+            JSONArray identifierArray = (JSONArray) agentObject.get(rdf.getPrefixItem("dc:identifier"));
+            if (identifierArray != null && !identifierArray.isEmpty()) {
+                for (Object element : identifierArray) {
+                    agentObject.remove(rdf.getPrefixItem("dc:identifier"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("id"), value);
+                }
             }
-        }
-        // change ls:inGroup
-        JSONArray groupArray = (JSONArray) agentObject.get(rdf.getPrefixItem("ls:inGroup"));
-        if (groupArray != null && !groupArray.isEmpty()) {
-            for (Object element : groupArray) {
-                agentObject.remove(rdf.getPrefixItem("ls:inGroup"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("group"), value);
+            // change ls:inGroup
+            JSONArray groupArray = (JSONArray) agentObject.get(rdf.getPrefixItem("ls:inGroup"));
+            if (groupArray != null && !groupArray.isEmpty()) {
+                for (Object element : groupArray) {
+                    agentObject.remove(rdf.getPrefixItem("ls:inGroup"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("group"), value);
+                }
             }
-        }
-        // change foaf:accountName
-        JSONArray accountNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:accountName"));
-        if (accountNameArray != null && !accountNameArray.isEmpty()) {
-            for (Object element : accountNameArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("name"), value);
+            // change foaf:accountName
+            JSONArray accountNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:accountName"));
+            if (accountNameArray != null && !accountNameArray.isEmpty()) {
+                for (Object element : accountNameArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("name"), value);
+                }
             }
-        }
-        // change foaf:mbox
-        JSONArray mboxArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:mbox"));
-        if (mboxArray != null && !mboxArray.isEmpty()) {
-            for (Object element : mboxArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("email"), value);
+            // change foaf:mbox
+            JSONArray mboxArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:mbox"));
+            if (mboxArray != null && !mboxArray.isEmpty()) {
+                for (Object element : mboxArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("email"), value);
+                }
             }
-        }
-        // change foaf:firstName
-        JSONArray firstNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:firstName"));
-        if (firstNameArray != null && !firstNameArray.isEmpty()) {
-            for (Object element : firstNameArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("firstName"), value);
+            // change foaf:firstName
+            JSONArray firstNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:firstName"));
+            if (firstNameArray != null && !firstNameArray.isEmpty()) {
+                for (Object element : firstNameArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("firstName"), value);
+                }
             }
-        }
-        // change foaf:firstName
-        JSONArray lastNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:lastName"));
-        if (lastNameArray != null && !lastNameArray.isEmpty()) {
-            for (Object element : lastNameArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:lastName"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("lastName"), value);
+            // change foaf:firstName
+            JSONArray lastNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:lastName"));
+            if (lastNameArray != null && !lastNameArray.isEmpty()) {
+                for (Object element : lastNameArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:lastName"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("lastName"), value);
+                }
             }
-        }
-        // change foaf:homepage
-        JSONArray homepageArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:homepage"));
-        if (homepageArray != null && !homepageArray.isEmpty()) {
-            for (Object element : homepageArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:homepage"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("homepage"), value);
+            // change foaf:homepage
+            JSONArray homepageArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:homepage"));
+            if (homepageArray != null && !homepageArray.isEmpty()) {
+                for (Object element : homepageArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:homepage"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("homepage"), value);
+                }
             }
-        }
-        // change foaf:img
-        JSONArray imgArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:img"));
-        if (imgArray != null && !imgArray.isEmpty()) {
-            for (Object element : imgArray) {
-                agentObject.remove(rdf.getPrefixItem("foaf:img"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                agentObject.put(rdf.getPrefixItem("img"), value);
+            // change foaf:img
+            JSONArray imgArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:img"));
+            if (imgArray != null && !imgArray.isEmpty()) {
+                for (Object element : imgArray) {
+                    agentObject.remove(rdf.getPrefixItem("foaf:img"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    agentObject.put(rdf.getPrefixItem("img"), value);
+                }
             }
-        }
-        // change geo:lat
-        JSONArray latArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lat"));
-        if (latArray != null && !latArray.isEmpty()) {
-            for (Object element : latArray) {
-                agentObject.remove(rdf.getPrefixItem("geo:lat"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                Double valueDbl = Double.parseDouble(value);
-                agentObject.put(rdf.getPrefixItem("lat"), valueDbl);
+            // change geo:lat
+            JSONArray latArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lat"));
+            if (latArray != null && !latArray.isEmpty()) {
+                for (Object element : latArray) {
+                    agentObject.remove(rdf.getPrefixItem("geo:lat"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    Double valueDbl = Double.parseDouble(value);
+                    agentObject.put(rdf.getPrefixItem("lat"), valueDbl);
+                }
             }
-        }
-        // change geo:lon
-        JSONArray lonArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lon"));
-        if (lonArray != null && !lonArray.isEmpty()) {
-            for (Object element : lonArray) {
-                agentObject.remove(rdf.getPrefixItem("geo:lon"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                Double valueDbl = Double.parseDouble(value);
-                agentObject.put(rdf.getPrefixItem("lon"), valueDbl);
+            // change geo:lon
+            JSONArray lonArray = (JSONArray) agentObject.get(rdf.getPrefixItem("geo:lon"));
+            if (lonArray != null && !lonArray.isEmpty()) {
+                for (Object element : lonArray) {
+                    agentObject.remove(rdf.getPrefixItem("geo:lon"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    Double valueDbl = Double.parseDouble(value);
+                    agentObject.put(rdf.getPrefixItem("lon"), valueDbl);
+                }
             }
+            // delete items
+            agentObject.remove(rdf.getPrefixItem("rdf:type"));
+            agentObject.remove(rdf.getPrefixItem("ls:sameAs"));
+            agentObject.remove(rdf.getPrefixItem("dc:identifier"));
+            agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
+            agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
+            agentObject.remove(rdf.getPrefixItem("foaf:firstName"));
+            agentObject.remove(rdf.getPrefixItem("foaf:lastName"));
+            agentObject.remove(rdf.getPrefixItem("foaf:homepage"));
+            agentObject.remove(rdf.getPrefixItem("foaf:img"));
+            agentObject.remove(rdf.getPrefixItem("geo:lat"));
+            agentObject.remove(rdf.getPrefixItem("geo:lon"));
+        } catch (Exception e) {
+            throw new TransformRdfToApiJsonException(e.toString());
         }
-        // delete items
-        agentObject.remove(rdf.getPrefixItem("rdf:type"));
-        agentObject.remove(rdf.getPrefixItem("ls:sameAs"));
-        agentObject.remove(rdf.getPrefixItem("dc:identifier"));
-        agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
-        agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
-        agentObject.remove(rdf.getPrefixItem("foaf:firstName"));
-        agentObject.remove(rdf.getPrefixItem("foaf:lastName"));
-        agentObject.remove(rdf.getPrefixItem("foaf:homepage"));
-        agentObject.remove(rdf.getPrefixItem("foaf:img"));
-        agentObject.remove(rdf.getPrefixItem("geo:lat"));
-        agentObject.remove(rdf.getPrefixItem("geo:lon"));
         // return
         return agentObject;
     }
@@ -941,7 +956,7 @@ public class Transformer {
         }
     }
 
-    public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, RdfException {
+    public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
         JSONObject labelObject = null;
         try {
             //init
@@ -1357,7 +1372,7 @@ public class Transformer {
             labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
             labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
         } catch (Exception e) {
-            throw new RdfException(e.toString());
+            throw new TransformRdfToApiJsonException(e.toString());
         }
         // return
         return labelObject;

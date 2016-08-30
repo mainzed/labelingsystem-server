@@ -8,6 +8,8 @@ import rdf.RDF;
 import rdf.RDF4J_20M3;
 import v1.utils.uuid.UniqueIdentifier;
 import exceptions.ConfigException;
+import exceptions.FormatException;
+import exceptions.JsonFormatException;
 import exceptions.Logging;
 import exceptions.RdfException;
 import exceptions.ResourceNotAvailableException;
@@ -143,7 +145,7 @@ public class LabelsResource {
             System.out.print("querytime: ");
             System.out.println(System.currentTimeMillis() - ctm_start);
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource is not available");
             }
             for (int i = 0; i < s.size(); i++) {
                 rdf.setModelTriple(s.get(i), p.get(i), o.get(i));
@@ -245,7 +247,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -332,7 +334,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -374,7 +376,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -404,7 +406,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -434,7 +436,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -463,7 +465,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -492,7 +494,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -529,7 +531,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -679,6 +681,9 @@ public class LabelsResource {
         try {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
+            if (requestObject.get("user") == null || requestObject.get("item") == null) {
+                throw new JsonFormatException("user or item object is null");
+            }
             String user = (String) requestObject.get("user").toString();
             json = (String) requestObject.get("item").toString();
             // get variables
@@ -698,7 +703,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + itemID + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
@@ -720,6 +725,9 @@ public class LabelsResource {
         try {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
+            if (requestObject.get("user") == null || requestObject.get("item") == null) {
+                throw new JsonFormatException("user or item object is null");
+            }
             String user = (String) requestObject.get("user").toString();
             json = (String) requestObject.get("item").toString();
             String item = "ls_lab";
@@ -727,7 +735,7 @@ public class LabelsResource {
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
             if (resultExist.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             // insert data
             String json_new = json;
@@ -739,7 +747,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -759,7 +767,7 @@ public class LabelsResource {
             predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -788,7 +796,7 @@ public class LabelsResource {
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
             if (resultExist.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             // insert data
             json = Transformer.label_POST(json, label);
@@ -799,7 +807,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -821,7 +829,7 @@ public class LabelsResource {
             predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
@@ -845,7 +853,7 @@ public class LabelsResource {
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
                 List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
                 if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException();
+                    throw new ResourceNotAvailableException("resource " + label + " is not available");
                 }
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelREVISION(item, label, user));
@@ -856,11 +864,13 @@ public class LabelsResource {
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
                 List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
                 if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException();
+                    throw new ResourceNotAvailableException("resource " + label + " is not available");
                 }
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedLabelREVISION(item, label, user));
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
+            } else {
+                throw new FormatException("wrong delete type");
             }
             // get result als json
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -870,7 +880,7 @@ public class LabelsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));

@@ -8,6 +8,8 @@ import rdf.RDF;
 import rdf.RDF4J_20M3;
 import v1.utils.uuid.UniqueIdentifier;
 import exceptions.ConfigException;
+import exceptions.FormatException;
+import exceptions.JsonFormatException;
 import exceptions.Logging;
 import exceptions.RdfException;
 import exceptions.ResourceNotAvailableException;
@@ -142,7 +144,7 @@ public class VocabsResource {
             System.out.print("querytime: ");
             System.out.println(System.currentTimeMillis() - ctm_start);
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource is not available");
             }
             for (int i = 0; i < s.size(); i++) {
                 rdf.setModelTriple(s.get(i), p.get(i), o.get(i));
@@ -243,7 +245,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -329,7 +331,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -371,7 +373,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -401,7 +403,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -431,7 +433,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -460,7 +462,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -489,7 +491,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -526,7 +528,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -563,7 +565,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -573,7 +575,7 @@ public class VocabsResource {
             result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> labels = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "id");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < labels.size(); i++) {
                 item = "ls_lab";
@@ -582,7 +584,7 @@ public class VocabsResource {
                 predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
                 objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
                 if (labels.size() < 1) {
-                    throw new ResourceNotAvailableException();
+                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
                 }
                 for (int j = 0; j < predicates.size(); j++) {
                     rdf.setModelTriple(item + ":" + labels.get(i), predicates.get(j), objects.get(j));
@@ -608,6 +610,9 @@ public class VocabsResource {
         try {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
+            if (requestObject.get("user") == null || requestObject.get("item") == null) {
+                throw new JsonFormatException("user or item object is null");
+            }
             String user = (String) requestObject.get("user").toString();
             json = (String) requestObject.get("item").toString();
             // get variables
@@ -626,7 +631,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + itemID + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
@@ -648,6 +653,9 @@ public class VocabsResource {
         try {
             // get data from request
             JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
+            if (requestObject.get("user") == null || requestObject.get("item") == null) {
+                throw new JsonFormatException("user or item object is null");
+            }
             String user = (String) requestObject.get("user").toString();
             json = (String) requestObject.get("item").toString();
             String item = "ls_voc";
@@ -655,7 +663,7 @@ public class VocabsResource {
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
             if (resultExist.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             // insert data
             String json_new = json;
@@ -667,7 +675,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -686,7 +694,7 @@ public class VocabsResource {
             predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -715,7 +723,7 @@ public class VocabsResource {
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
             if (resultExist.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             // insert data
             String json_new = json;
@@ -727,7 +735,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -748,7 +756,7 @@ public class VocabsResource {
             predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
@@ -771,7 +779,7 @@ public class VocabsResource {
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
                 List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
                 if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException();
+                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
                 }
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyREVISION(item, vocabulary, user));
@@ -789,7 +797,7 @@ public class VocabsResource {
                 String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
                 List<BindingSet> resultExist = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
                 if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException();
+                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
                 }
                 // insert data
                 RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedVocabularyREVISION(item, vocabulary, user));
@@ -801,6 +809,8 @@ public class VocabsResource {
                     RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
                     RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
                 }
+            } else {
+                throw new FormatException("wrong delete type");
             }
             // get result als json
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -809,7 +819,7 @@ public class VocabsResource {
             List<String> predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
-                throw new ResourceNotAvailableException();
+                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
