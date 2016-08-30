@@ -1,6 +1,8 @@
 package v1.rest;
 
 import exceptions.SesameSparqlException;
+import exceptions.SparqlParseException;
+import exceptions.SparqlQueryException;
 import rdf.RDF;
 import rdf.RDF4J_20M3;
 import v1.utils.config.ConfigProperties;
@@ -24,7 +26,7 @@ public class InfoResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getAPIpage() throws URISyntaxException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, IOException {
+	public Response getAPIpage() throws URISyntaxException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, IOException, SparqlQueryException, SparqlParseException {
 		JSONObject outObject = new JSONObject();
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String query = "";

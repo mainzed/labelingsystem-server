@@ -37,7 +37,7 @@ public class RDF {
     private String Instance_LABEL_ITEM = "http://$host/item/label/";
     private String Instance_AGENT_ITEM = "http://$host/item/agent/";
     private String Instance_REVISION_ITEM = "http://$host/item/revision/";
-	private String Instance_RETCATS_ITEM = "http://$host/item/retcats/";
+    private String Instance_RETCATS_ITEM = "http://$host/item/retcats/";
     private String PREFIXSPARQL = ""
             // ls vocabulary
             + "PREFIX ls: <" + PREFIX_LABELINGSYSTEM + "> "
@@ -46,7 +46,7 @@ public class RDF {
             + "PREFIX ls_lab: <" + Instance_LABEL_ITEM + "> "
             + "PREFIX ls_age: <" + Instance_AGENT_ITEM + "> "
             + "PREFIX ls_rev: <" + Instance_REVISION_ITEM + "> "
-			+ "PREFIX ls_ret: <" + Instance_RETCATS_ITEM + "> "
+            + "PREFIX ls_ret: <" + Instance_RETCATS_ITEM + "> "
             // other ontologies
             + "PREFIX skos: <" + PREFIX_SKOS + "> "
             + "PREFIX rdf: <" + PREFIX_RDF + "> "
@@ -78,7 +78,7 @@ public class RDF {
         Instance_LABEL_ITEM = Instance_LABEL_ITEM.replace("$host", HOST);
         Instance_AGENT_ITEM = Instance_AGENT_ITEM.replace("$host", HOST);
         Instance_REVISION_ITEM = Instance_REVISION_ITEM.replace("$host", HOST);
-		Instance_RETCATS_ITEM = Instance_RETCATS_ITEM.replace("$host", HOST);
+        Instance_RETCATS_ITEM = Instance_RETCATS_ITEM.replace("$host", HOST);
         PREFIXSPARQL = PREFIXSPARQL.replace("$host", HOST);
     }
 
@@ -130,14 +130,6 @@ public class RDF {
         return PREFIXSPARQL;
     }
 
-    /**
-     * set triple with literal
-     *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @throws de.i3mainz.ls.rdfutils.exceptions.RdfException
-     */
     public void setModelLiteral(String subject, String predicate, String object) throws RdfException {
         try {
             Resource s = model.createResource(getPrefixItem(subject));
@@ -145,19 +137,10 @@ public class RDF {
             Literal o = model.createLiteral(object);
             model.add(s, p, o);
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 
-    /**
-     * set triple with literal and language
-     *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @param lang
-     * @throws de.i3mainz.ls.rdfutils.exceptions.RdfException
-     */
     public void setModelLiteralLanguage(String subject, String predicate, String object, String lang) throws RdfException {
         try {
             Resource s = model.createResource(getPrefixItem(subject));
@@ -165,18 +148,10 @@ public class RDF {
             Literal o = model.createLiteral(object, lang);
             model.add(s, p, o);
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 
-    /**
-     * set triple with uri
-     *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @throws de.i3mainz.ls.rdfutils.exceptions.RdfException
-     */
     public void setModelURI(String subject, String predicate, String object) throws RdfException {
         try {
             Resource s = model.createResource(getPrefixItem(subject));
@@ -184,18 +159,10 @@ public class RDF {
             Resource o = model.createResource(getPrefixItem(object));
             model.add(s, p, o);
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 
-    /**
-     * set triple and create model statement automaticly
-     *
-     * @param subject
-     * @param predicate
-     * @param object
-     * @throws RdfException
-     */
     public void setModelTriple(String subject, String predicate, String object) throws RdfException {
         try {
             if (object.startsWith("http://") || object.contains("mailto")) {
@@ -207,16 +174,10 @@ public class RDF {
                 setModelLiteral(subject, predicate, object.replaceAll("\"", ""));
             }
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 
-    /**
-     * get RDF model as RDF/XML
-     *
-     * @return
-     * @throws de.i3mainz.ls.rdfutils.exceptions.RdfException
-     */
     public String getModel() throws RdfException {
         try {
             JenaJSONLD.init();
@@ -225,19 +186,10 @@ public class RDF {
             model.removeAll();
             return o.toString("UTF-8");
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 
-    /**
-     * get RDF model in several formats
-     * [Turtle,N-Triples,RDF/XML,RDF/JSON,TriG,NQuads]
-     *
-     * @param format
-     * @return
-     * @throws UnsupportedEncodingException
-     * @throws de.i3mainz.ls.rdfutils.exceptions.RdfException
-     */
     public String getModel(String format) throws UnsupportedEncodingException, RdfException {
         // https://jena.apache.org/documentation/io/rdf-output.html#jena_model_write_formats
         try {
@@ -247,7 +199,7 @@ public class RDF {
             model.removeAll();
             return o.toString("UTF-8");
         } catch (Exception e) {
-            throw new RdfException("[" + RDF.class.getName() + " | " + Thread.currentThread().getStackTrace()[1].getMethodName() + ": " + e + "]");
+            throw new RdfException(e.getMessage());
         }
     }
 

@@ -10,6 +10,8 @@ import exceptions.CsvExistanceException;
 import exceptions.CsvLabelImportException;
 import exceptions.CsvLanguageException;
 import exceptions.SesameSparqlException;
+import exceptions.SparqlParseException;
+import exceptions.SparqlQueryException;
 import exceptions.UniqueIdentifierException;
 import v1.rest.ImportcsvResource;
 import v1.utils.config.ConfigProperties;
@@ -401,7 +403,7 @@ public class CSV implements Runnable {
 		return uuid;
 	}
 
-	private static boolean vocabularyExistenceCheck(String voc, String creator) throws IOException, JDOMException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ConfigException, CsvExistanceException, exceptions.ConfigException, exceptions.SesameSparqlException {
+	private static boolean vocabularyExistenceCheck(String voc, String creator) throws IOException, JDOMException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ConfigException, CsvExistanceException, exceptions.ConfigException, exceptions.SesameSparqlException, SparqlQueryException, SparqlParseException {
 		try {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = rdf.getPREFIXSPARQL();
