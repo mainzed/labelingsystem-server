@@ -744,7 +744,8 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
-            String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, null).toJSONString();
+            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist).toJSONString();
             // get difference
             String type = Transformer.labelDifference(json_old, json_new);
             // set triples
@@ -753,7 +754,6 @@ public class LabelsResource {
             RDF4J_20M3.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
             // get result als json
             rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             query = GeneralFunctions.getAllElementsForItemID(item, label);
             result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             predicates = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "p");

@@ -1,5 +1,6 @@
 package v1.utils.transformer;
 
+import exceptions.RdfException;
 import v1.utils.config.ConfigProperties;
 import rdf.RDF;
 import exceptions.ResourceNotAvailableException;
@@ -940,419 +941,424 @@ public class Transformer {
         }
     }
 
-    public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
-        //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        // parse json
-        JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-        jsonObject.put("label", jsonObject.remove(rdf.getPrefixItem("ls_lab" + ":" + id)));
-        // get items
-        JSONObject labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("label"));
-        // change skos:inScheme
-        JSONArray vocabArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:inScheme"));
-        if (vocabArray != null && !vocabArray.isEmpty()) {
-            for (Object element : vocabArray) {
-                labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String arrayNew;
-                if (value.contains("vocabulary/")) {
-                    arrayNew = value.split("vocabulary/")[1];
-                } else {
-                    arrayNew = value;
-                }
-                if (fields == null || fields.contains("vocabID")) {
-                    labelObject.put(rdf.getPrefixItem("vocabID"), arrayNew);
-                }
-            }
-        }
-        // change dc:creator
-        JSONArray creatorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:creator"));
-        if (creatorArray != null && !creatorArray.isEmpty()) {
-            for (Object element : creatorArray) {
-                labelObject.remove(rdf.getPrefixItem("dc:creator"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                labelObject.put(rdf.getPrefixItem("creator"), value);
-            }
-        }
-        // change dc:contrubutor
-        JSONArray contributorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:contributor"));
-        if (contributorArray != null && !contributorArray.isEmpty()) {
-            labelObject.remove(rdf.getPrefixItem("dc:contributor"));
-            JSONArray arrayNew = new JSONArray();
-            for (Object element : contributorArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayNew.add(value);
-            }
-            labelObject.put(rdf.getPrefixItem("contributors"), arrayNew);
-        }
-        // change dc:identifier
-        JSONArray identifierArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:identifier"));
-        if (identifierArray != null && !identifierArray.isEmpty()) {
-            for (Object element : identifierArray) {
-                labelObject.remove(rdf.getPrefixItem("dc:identifier"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                labelObject.put(rdf.getPrefixItem("id"), value);
-            }
-        }
-        // change dct:license
-        JSONArray licenseArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dct:license"));
-        if (licenseArray != null && !licenseArray.isEmpty()) {
-            for (Object element : licenseArray) {
-                labelObject.remove(rdf.getPrefixItem("dct:license"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (fields == null || fields.contains("license")) {
-                    labelObject.put(rdf.getPrefixItem("license"), value);
-                }
-            }
-        }
-        // get thumbnail
-        JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
-        String thumbnail = "";
-        if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-            for (Object element : preferredLabelArray) {
-                labelObject.remove(rdf.getPrefixItem("ls:preferredLabel"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                thumbnail = value + "@" + lang;
-            }
-        }
-        // change skos:prefLabel
-        JSONArray prefLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:prefLabel"));
-        if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:prefLabel"));
-            for (Object element : prefLabelArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                JSONObject objTmp = new JSONObject();
-                objTmp.put("value", value);
-                objTmp.put("lang", lang);
-                if (thumbnail.equals(value + "@" + lang)) {
-                    objTmp.put("isThumbnail", true);
-                } else {
-                    objTmp.put("isThumbnail", false);
-                }
-                arrayNew.add(objTmp);
-            }
-            labelObject.put(rdf.getPrefixItem("prefLabels"), arrayNew);
-        }
-        // change skos:altLabel
-        JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
-        if (altLabelArray != null && !altLabelArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
-            for (Object element : altLabelArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                JSONObject objTmp = new JSONObject();
-                objTmp.put("value", value);
-                objTmp.put("lang", lang);
-                arrayNew.add(objTmp);
-            }
-            labelObject.put(rdf.getPrefixItem("altLabels"), arrayNew);
-        }
-        // change skos:scopeNote
-        JSONArray scopeNoteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:scopeNote"));
-        if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
-            labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
-            JSONObject objTmp = new JSONObject();
-            for (Object element : scopeNoteArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                String lang = (String) obj.get("lang");
-                objTmp.put("value", value);
-                objTmp.put("lang", lang);
-            }
-            if (fields == null || fields.contains("scopeNote")) {
-                labelObject.put(rdf.getPrefixItem("scopeNote"), objTmp);
-            }
-        }
-        // change ls:hasStatusType
-        JSONArray statusTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasStatusType"));
-        if (statusTypeArray != null && !statusTypeArray.isEmpty()) {
-            for (Object element : statusTypeArray) {
-                labelObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (value.contains("Active")) {
-                    value = "active";
-                } else if (value.contains("Deprecated")) {
-                    value = "deprecated";
-                } else {
-                    value = "deleted";
-                }
-                if (fields == null || fields.contains("statusType")) {
-                    labelObject.put(rdf.getPrefixItem("statusType"), value);
-                }
-            }
-        }
-        // change ls:context
-        JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasContext"));
-        if (contextArray != null && !contextArray.isEmpty()) {
-            for (Object element : contextArray) {
-                labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (fields == null || fields.contains("context")) {
-                    labelObject.put(rdf.getPrefixItem("context"), value);
-                }
-            }
-        }
-        // change skos:related
-        JSONArray relatedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:related"));
-        if (relatedArray != null && !relatedArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:related"));
-            for (Object element : relatedArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
-                arrayNew.add(value);
-            }
-            if (fields == null || fields.contains("related")) {
-                labelObject.put(rdf.getPrefixItem("related"), arrayNew);
-            }
-        }
-        // change skos:broader
-        JSONArray broaderArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broader"));
-        if (broaderArray != null && !broaderArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:broader"));
-            for (Object element : broaderArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
-                arrayNew.add(value);
-            }
-            if (fields == null || fields.contains("broader")) {
-                labelObject.put(rdf.getPrefixItem("broader"), arrayNew);
-            }
-        }
-        // change skos:narrower
-        JSONArray narrowerArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrower"));
-        if (narrowerArray != null && !narrowerArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:narrower"));
-            for (Object element : narrowerArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
-                arrayNew.add(value);
-            }
-            if (fields == null || fields.contains("narrower")) {
-                labelObject.put(rdf.getPrefixItem("narrower"), arrayNew);
-            }
-        }
-        // change skos:closeMatch
-        JSONArray closeMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:closeMatch"));
-        if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:closeMatch"));
-            for (Object element : closeMatchArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                // get retcat info
-                boolean match = false;
-                for (RetcatItem item : retcatlist) {
-                    if (value.contains(item.getPrefix())) {
-                        match = true;
-                        tmpObject.put("type", item.getType());
+    public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, RdfException {
+        JSONObject labelObject = null;
+        try {
+            //init
+            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            // parse json
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+            jsonObject.put("label", jsonObject.remove(rdf.getPrefixItem("ls_lab" + ":" + id)));
+            // get items
+            labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("label"));
+            // change skos:inScheme
+            JSONArray vocabArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:inScheme"));
+            if (vocabArray != null && !vocabArray.isEmpty()) {
+                for (Object element : vocabArray) {
+                    labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String arrayNew;
+                    if (value.contains("vocabulary/")) {
+                        arrayNew = value.split("vocabulary/")[1];
+                    } else {
+                        arrayNew = value;
+                    }
+                    if (fields == null || fields.contains("vocabID")) {
+                        labelObject.put(rdf.getPrefixItem("vocabID"), arrayNew);
                     }
                 }
-                if (!match) {
-                    tmpObject.put("type", "wayback");
-                }
-                arrayNew.add(tmpObject);
             }
-            if (fields == null || fields.contains("closeMatch")) {
-                labelObject.put(rdf.getPrefixItem("closeMatch"), arrayNew);
-            }
-        }
-        // change skos:exactMatch
-        JSONArray exactMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:exactMatch"));
-        if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:exactMatch"));
-            for (Object element : exactMatchArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                // get retcat info
-                boolean match = false;
-                for (RetcatItem item : retcatlist) {
-                    if (value.contains(item.getPrefix())) {
-                        match = true;
-                        tmpObject.put("type", item.getType());
-                    }
-                }
-                if (!match) {
-                    tmpObject.put("type", "wayback");
-                }
-                arrayNew.add(tmpObject);
-            }
-            if (fields == null || fields.contains("exactMatch")) {
-                labelObject.put(rdf.getPrefixItem("exactMatch"), arrayNew);
-            }
-        }
-        // change skos:relatedMatch
-        JSONArray relatedMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:relatedMatch"));
-        if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:relatedMatch"));
-            for (Object element : relatedMatchArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                // get retcat info
-                boolean match = false;
-                for (RetcatItem item : retcatlist) {
-                    if (value.contains(item.getPrefix())) {
-                        match = true;
-                        tmpObject.put("type", item.getType());
-                    }
-                }
-                if (!match) {
-                    tmpObject.put("type", "wayback");
-                }
-                arrayNew.add(tmpObject);
-            }
-            if (fields == null || fields.contains("relatedMatch")) {
-                labelObject.put(rdf.getPrefixItem("relatedMatch"), arrayNew);
-            }
-        }
-        // change skos:narrowMatch
-        JSONArray narrowMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrowMatch"));
-        if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:narrowMatch"));
-            for (Object element : narrowMatchArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                // get retcat info
-                boolean match = false;
-                for (RetcatItem item : retcatlist) {
-                    if (value.contains(item.getPrefix())) {
-                        match = true;
-                        tmpObject.put("type", item.getType());
-                    }
-                }
-                if (!match) {
-                    tmpObject.put("type", "wayback");
-                }
-                arrayNew.add(tmpObject);
-            }
-            if (fields == null || fields.contains("altLabel")) {
-                labelObject.put(rdf.getPrefixItem("narrowMatch"), arrayNew);
-            }
-        }
-        // change skos:broadMatch
-        JSONArray broadMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broadMatch"));
-        if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("skos:broadMatch"));
-            for (Object element : broadMatchArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                // get retcat info
-                boolean match = false;
-                for (RetcatItem item : retcatlist) {
-                    if (value.contains(item.getPrefix())) {
-                        match = true;
-                        tmpObject.put("type", item.getType());
-                    }
-                }
-                if (!match) {
-                    tmpObject.put("type", "wayback");
-                }
-                arrayNew.add(tmpObject);
-            }
-            if (fields == null || fields.contains("broadMatch")) {
-                labelObject.put(rdf.getPrefixItem("broadMatch"), arrayNew);
-            }
-        }
-        // change rdfs:seeAlso
-        JSONArray seeAlsoArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:seeAlso"));
-        if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            labelObject.remove(rdf.getPrefixItem("rdfs:seeAlso"));
-            for (Object element : seeAlsoArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("url", value);
-                tmpObject.put("type", "wayback");
-                arrayNew.add(tmpObject);
-            }
-            if (fields == null || fields.contains("seeAlso")) {
-                labelObject.put(rdf.getPrefixItem("seeAlso"), arrayNew);
-            }
-        }
-        // change dc:created
-        JSONArray createdArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:created"));
-        if (createdArray != null && !createdArray.isEmpty()) {
-            for (Object element : createdArray) {
-                labelObject.remove(rdf.getPrefixItem("dc:created"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (fields == null || fields.contains("created")) {
-                    labelObject.put(rdf.getPrefixItem("created"), value);
+            // change dc:creator
+            JSONArray creatorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:creator"));
+            if (creatorArray != null && !creatorArray.isEmpty()) {
+                for (Object element : creatorArray) {
+                    labelObject.remove(rdf.getPrefixItem("dc:creator"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    labelObject.put(rdf.getPrefixItem("creator"), value);
                 }
             }
-        }
-        // change dc:modified
-        JSONArray modifiedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:modified"));
-        if (modifiedArray != null && !modifiedArray.isEmpty()) {
-            labelObject.remove(rdf.getPrefixItem("dc:modified"));
-            JSONArray arrayModify = new JSONArray();
-            for (Object element : modifiedArray) {
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                arrayModify.add(value);
-            }
-            if (fields == null || fields.contains("modifications")) {
-                labelObject.put(rdf.getPrefixItem("modifications"), arrayModify);
-            }
-        }
-        // change skos:changeNote
-        JSONArray revisionsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:changeNote"));
-        if (revisionsArray != null && !revisionsArray.isEmpty()) {
-            JSONArray arrayNew = new JSONArray();
-            for (Object element : revisionsArray) {
-                labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
-                JSONObject obj = (JSONObject) element;
-                String value = (String) obj.get("value");
-                if (value.contains("revision/")) {
-                    arrayNew.add(value.split("revision/")[1]);
-                } else {
+            // change dc:contrubutor
+            JSONArray contributorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:contributor"));
+            if (contributorArray != null && !contributorArray.isEmpty()) {
+                labelObject.remove(rdf.getPrefixItem("dc:contributor"));
+                JSONArray arrayNew = new JSONArray();
+                for (Object element : contributorArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
                     arrayNew.add(value);
                 }
+                labelObject.put(rdf.getPrefixItem("contributors"), arrayNew);
             }
-            if (fields == null || fields.contains("revisionIDs")) {
-                labelObject.put(rdf.getPrefixItem("revisionIDs"), arrayNew);
+            // change dc:identifier
+            JSONArray identifierArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:identifier"));
+            if (identifierArray != null && !identifierArray.isEmpty()) {
+                for (Object element : identifierArray) {
+                    labelObject.remove(rdf.getPrefixItem("dc:identifier"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    labelObject.put(rdf.getPrefixItem("id"), value);
+                }
             }
+            // change dct:license
+            JSONArray licenseArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dct:license"));
+            if (licenseArray != null && !licenseArray.isEmpty()) {
+                for (Object element : licenseArray) {
+                    labelObject.remove(rdf.getPrefixItem("dct:license"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("license")) {
+                        labelObject.put(rdf.getPrefixItem("license"), value);
+                    }
+                }
+            }
+            // get thumbnail
+            JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
+            String thumbnail = "";
+            if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
+                for (Object element : preferredLabelArray) {
+                    labelObject.remove(rdf.getPrefixItem("ls:preferredLabel"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    thumbnail = value + "@" + lang;
+                }
+            }
+            // change skos:prefLabel
+            JSONArray prefLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:prefLabel"));
+            if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:prefLabel"));
+                for (Object element : prefLabelArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    JSONObject objTmp = new JSONObject();
+                    objTmp.put("value", value);
+                    objTmp.put("lang", lang);
+                    if (thumbnail.equals(value + "@" + lang)) {
+                        objTmp.put("isThumbnail", true);
+                    } else {
+                        objTmp.put("isThumbnail", false);
+                    }
+                    arrayNew.add(objTmp);
+                }
+                labelObject.put(rdf.getPrefixItem("prefLabels"), arrayNew);
+            }
+            // change skos:altLabel
+            JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
+            if (altLabelArray != null && !altLabelArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
+                for (Object element : altLabelArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    JSONObject objTmp = new JSONObject();
+                    objTmp.put("value", value);
+                    objTmp.put("lang", lang);
+                    arrayNew.add(objTmp);
+                }
+                labelObject.put(rdf.getPrefixItem("altLabels"), arrayNew);
+            }
+            // change skos:scopeNote
+            JSONArray scopeNoteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:scopeNote"));
+            if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
+                labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
+                JSONObject objTmp = new JSONObject();
+                for (Object element : scopeNoteArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    String lang = (String) obj.get("lang");
+                    objTmp.put("value", value);
+                    objTmp.put("lang", lang);
+                }
+                if (fields == null || fields.contains("scopeNote")) {
+                    labelObject.put(rdf.getPrefixItem("scopeNote"), objTmp);
+                }
+            }
+            // change ls:hasStatusType
+            JSONArray statusTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasStatusType"));
+            if (statusTypeArray != null && !statusTypeArray.isEmpty()) {
+                for (Object element : statusTypeArray) {
+                    labelObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("Active")) {
+                        value = "active";
+                    } else if (value.contains("Deprecated")) {
+                        value = "deprecated";
+                    } else {
+                        value = "deleted";
+                    }
+                    if (fields == null || fields.contains("statusType")) {
+                        labelObject.put(rdf.getPrefixItem("statusType"), value);
+                    }
+                }
+            }
+            // change ls:context
+            JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasContext"));
+            if (contextArray != null && !contextArray.isEmpty()) {
+                for (Object element : contextArray) {
+                    labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("context")) {
+                        labelObject.put(rdf.getPrefixItem("context"), value);
+                    }
+                }
+            }
+            // change skos:related
+            JSONArray relatedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:related"));
+            if (relatedArray != null && !relatedArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:related"));
+                for (Object element : relatedArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
+                    arrayNew.add(value);
+                }
+                if (fields == null || fields.contains("related")) {
+                    labelObject.put(rdf.getPrefixItem("related"), arrayNew);
+                }
+            }
+            // change skos:broader
+            JSONArray broaderArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broader"));
+            if (broaderArray != null && !broaderArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:broader"));
+                for (Object element : broaderArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
+                    arrayNew.add(value);
+                }
+                if (fields == null || fields.contains("broader")) {
+                    labelObject.put(rdf.getPrefixItem("broader"), arrayNew);
+                }
+            }
+            // change skos:narrower
+            JSONArray narrowerArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrower"));
+            if (narrowerArray != null && !narrowerArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:narrower"));
+                for (Object element : narrowerArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    value = value.replace(rdf.getPrefixItem("ls_lab:"), "");
+                    arrayNew.add(value);
+                }
+                if (fields == null || fields.contains("narrower")) {
+                    labelObject.put(rdf.getPrefixItem("narrower"), arrayNew);
+                }
+            }
+            // change skos:closeMatch
+            JSONArray closeMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:closeMatch"));
+            if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:closeMatch"));
+                for (Object element : closeMatchArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    // get retcat info
+                    boolean match = false;
+                    for (RetcatItem item : retcatlist) {
+                        if (value.contains(item.getPrefix())) {
+                            match = true;
+                            tmpObject.put("type", item.getType());
+                        }
+                    }
+                    if (!match) {
+                        tmpObject.put("type", "wayback");
+                    }
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("closeMatch")) {
+                    labelObject.put(rdf.getPrefixItem("closeMatch"), arrayNew);
+                }
+            }
+            // change skos:exactMatch
+            JSONArray exactMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:exactMatch"));
+            if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:exactMatch"));
+                for (Object element : exactMatchArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    // get retcat info
+                    boolean match = false;
+                    for (RetcatItem item : retcatlist) {
+                        if (value.contains(item.getPrefix())) {
+                            match = true;
+                            tmpObject.put("type", item.getType());
+                        }
+                    }
+                    if (!match) {
+                        tmpObject.put("type", "wayback");
+                    }
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("exactMatch")) {
+                    labelObject.put(rdf.getPrefixItem("exactMatch"), arrayNew);
+                }
+            }
+            // change skos:relatedMatch
+            JSONArray relatedMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:relatedMatch"));
+            if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:relatedMatch"));
+                for (Object element : relatedMatchArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    // get retcat info
+                    boolean match = false;
+                    for (RetcatItem item : retcatlist) {
+                        if (value.contains(item.getPrefix())) {
+                            match = true;
+                            tmpObject.put("type", item.getType());
+                        }
+                    }
+                    if (!match) {
+                        tmpObject.put("type", "wayback");
+                    }
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("relatedMatch")) {
+                    labelObject.put(rdf.getPrefixItem("relatedMatch"), arrayNew);
+                }
+            }
+            // change skos:narrowMatch
+            JSONArray narrowMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrowMatch"));
+            if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:narrowMatch"));
+                for (Object element : narrowMatchArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    // get retcat info
+                    boolean match = false;
+                    for (RetcatItem item : retcatlist) {
+                        if (value.contains(item.getPrefix())) {
+                            match = true;
+                            tmpObject.put("type", item.getType());
+                        }
+                    }
+                    if (!match) {
+                        tmpObject.put("type", "wayback");
+                    }
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("altLabel")) {
+                    labelObject.put(rdf.getPrefixItem("narrowMatch"), arrayNew);
+                }
+            }
+            // change skos:broadMatch
+            JSONArray broadMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broadMatch"));
+            if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("skos:broadMatch"));
+                for (Object element : broadMatchArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    // get retcat info
+                    boolean match = false;
+                    for (RetcatItem item : retcatlist) {
+                        if (value.contains(item.getPrefix())) {
+                            match = true;
+                            tmpObject.put("type", item.getType());
+                        }
+                    }
+                    if (!match) {
+                        tmpObject.put("type", "wayback");
+                    }
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("broadMatch")) {
+                    labelObject.put(rdf.getPrefixItem("broadMatch"), arrayNew);
+                }
+            }
+            // change rdfs:seeAlso
+            JSONArray seeAlsoArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:seeAlso"));
+            if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                labelObject.remove(rdf.getPrefixItem("rdfs:seeAlso"));
+                for (Object element : seeAlsoArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("url", value);
+                    tmpObject.put("type", "wayback");
+                    arrayNew.add(tmpObject);
+                }
+                if (fields == null || fields.contains("seeAlso")) {
+                    labelObject.put(rdf.getPrefixItem("seeAlso"), arrayNew);
+                }
+            }
+            // change dc:created
+            JSONArray createdArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:created"));
+            if (createdArray != null && !createdArray.isEmpty()) {
+                for (Object element : createdArray) {
+                    labelObject.remove(rdf.getPrefixItem("dc:created"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("created")) {
+                        labelObject.put(rdf.getPrefixItem("created"), value);
+                    }
+                }
+            }
+            // change dc:modified
+            JSONArray modifiedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:modified"));
+            if (modifiedArray != null && !modifiedArray.isEmpty()) {
+                labelObject.remove(rdf.getPrefixItem("dc:modified"));
+                JSONArray arrayModify = new JSONArray();
+                for (Object element : modifiedArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    arrayModify.add(value);
+                }
+                if (fields == null || fields.contains("modifications")) {
+                    labelObject.put(rdf.getPrefixItem("modifications"), arrayModify);
+                }
+            }
+            // change skos:changeNote
+            JSONArray revisionsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:changeNote"));
+            if (revisionsArray != null && !revisionsArray.isEmpty()) {
+                JSONArray arrayNew = new JSONArray();
+                for (Object element : revisionsArray) {
+                    labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("revision/")) {
+                        arrayNew.add(value.split("revision/")[1]);
+                    } else {
+                        arrayNew.add(value);
+                    }
+                }
+                if (fields == null || fields.contains("revisionIDs")) {
+                    labelObject.put(rdf.getPrefixItem("revisionIDs"), arrayNew);
+                }
+            }
+            // delete items
+            labelObject.remove(rdf.getPrefixItem("dct:creator"));
+            labelObject.remove(rdf.getPrefixItem("dct:contributor"));
+            labelObject.remove(rdf.getPrefixItem("rdf:type"));
+            labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
+            labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
+        } catch (Exception e) {
+            throw new RdfException(e.toString());
         }
-        // delete items
-        labelObject.remove(rdf.getPrefixItem("dct:creator"));
-        labelObject.remove(rdf.getPrefixItem("dct:contributor"));
-        labelObject.remove(rdf.getPrefixItem("rdf:type"));
-        labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
-        labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
         // return
         return labelObject;
     }
