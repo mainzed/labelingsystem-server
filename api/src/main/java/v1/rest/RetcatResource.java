@@ -144,17 +144,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatListByVocabulary(@PathParam("vocabulary") String vocabulary) {
         try {
-            // get vocab name
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            String query = rdf.getPREFIXSPARQL();
-            query += "SELECT ?vocab WHERE { ?v a ls:Vocabulary. ?v dc:identifier ?id. ?v dc:title ?vocab. FILTER(?id=\"" + vocabulary + "\")}";
-            List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            List<String> vocabname = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "vocab");
-            String vocabretcat = vocabname.get(0).split("@")[0];
-            vocabretcat = vocabretcat.substring(1, vocabretcat.length() - 1);
             // get retcat items
             String newRetcatString = SQlite.getRetcatByVocabulary(vocabulary);
-            newRetcatString += "," + vocabretcat;
             String[] retcatItems = newRetcatString.split(",");
             // output json
             JSONArray outArray = new JSONArray();
@@ -176,6 +167,12 @@ public class RetcatResource {
                     }
                 }
             }
+            // add own vocabulary
+            JSONObject tmpRETCAT = new JSONObject();
+            tmpRETCAT.put("name", "this." + vocabulary);
+            tmpRETCAT.put("descripion", "this vocabulary");
+            outArray.add(tmpRETCAT);
+            // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -223,6 +220,11 @@ public class RetcatResource {
                     }
                 }
             }
+            // add own vocabulary
+            JSONObject tmpRETCAT = new JSONObject();
+            tmpRETCAT.put("name", "this." + vocabulary);
+            tmpRETCAT.put("descripion", "this vocabulary");
+            outArray.add(tmpRETCAT);
             // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -230,7 +232,7 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
-    
+
     @PUT
     @Path("/vocabulary/{vocabulary}")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -271,6 +273,11 @@ public class RetcatResource {
                     }
                 }
             }
+            // add own vocabulary
+            JSONObject tmpRETCAT = new JSONObject();
+            tmpRETCAT.put("name", "this." + vocabulary);
+            tmpRETCAT.put("descripion", "this vocabulary");
+            outArray.add(tmpRETCAT);
             // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
