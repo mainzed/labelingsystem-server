@@ -1,6 +1,6 @@
 package v1.rest;
 
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import exceptions.Logging;
 import v1.utils.config.ConfigProperties;
 import java.io.IOException;
@@ -155,7 +155,7 @@ public class SparqlResource {
         @Override
         public void write(OutputStream output) throws IOException, WebApplicationException {
             try {
-                RDF4J_20M3.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam("repository"),
+                RDF4J_20.SPARQLqueryOutputFileOS(ConfigProperties.getPropertyParam("repository"),
                         ConfigProperties.getPropertyParam("ts_server"), QUERY, FORMAT, output);
             } catch (Exception e) {
             }

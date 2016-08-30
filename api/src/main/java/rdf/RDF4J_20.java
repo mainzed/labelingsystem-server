@@ -37,7 +37,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.eclipse.rdf4j.repository.http.HTTPRepository;
 import org.eclipse.rdf4j.rio.RDFFormat;
 
-public class RDF4J_20M3 {
+public class RDF4J_20 {
 
     public static List<BindingSet> SPARQLquery(String repositoryID, String rdf4jServer, String queryString) throws RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException {
         List<BindingSet> BindingList = new ArrayList();

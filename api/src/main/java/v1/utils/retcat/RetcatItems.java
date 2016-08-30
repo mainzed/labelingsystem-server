@@ -3,7 +3,7 @@ package v1.utils.retcat;
 import rdf.RDF;
 import exceptions.ResourceNotAvailableException;
 import exceptions.SesameSparqlException;
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import v1.utils.config.ConfigProperties;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,11 +25,11 @@ public class RetcatItems {
 		/*RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String prefixes = rdf.getPREFIXSPARQL();
 		String query = prefixes + "SELECT * WHERE { ?s a ls:Vocabulary. ?s ls:hasReleaseType ls:Public. ?s dc:title ?title. ?s dc:identifier ?id. }";
-		List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		List<String> uris = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-		List<String> titles = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "title");
-		List<String> descriptions = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "description");
-		List<String> ids = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "id");
+		List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		List<String> uris = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+		List<String> titles = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "title");
+		List<String> descriptions = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "description");
+		List<String> ids = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "id");
 		if (!result.isEmpty()) {
 			for (int i = 0; i < uris.size(); i++) {
 				retcatList.add(new RetcatItem(titles.get(i).split("@")[0].replace("\"", ""), descriptions.get(i).split("@")[0].replace("\"", ""), "/v1/retcat/query/labelingsystem/" + ids.get(i), "/v1/retcat/label/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "div","high"));

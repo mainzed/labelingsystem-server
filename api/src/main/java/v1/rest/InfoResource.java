@@ -4,7 +4,7 @@ import exceptions.SesameSparqlException;
 import exceptions.SparqlParseException;
 import exceptions.SparqlQueryException;
 import rdf.RDF;
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import v1.utils.config.ConfigProperties;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -38,12 +38,12 @@ public class InfoResource {
 		// vocabs
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?v) AS ?vcount) WHERE { ?v a ls:Vocabulary. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_v = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "vcount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_v = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "vcount");
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?v) AS ?vcount) WHERE { ?v a ls:Vocabulary. ?v ls:hasReleaseType ls:Public. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_vp = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "vcount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_vp = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "vcount");
 		JSONObject oVocabs = new JSONObject();
 		oVocabs.put("count", Integer.parseInt(count_v.iterator().next()));
 		oVocabs.put("public", Integer.parseInt(count_vp.iterator().next()));
@@ -51,12 +51,12 @@ public class InfoResource {
 		// labels
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?l) AS ?lcount) WHERE { ?l a ls:Label. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_l = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "lcount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_l = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "lcount");
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?l) AS ?lcount) WHERE { ?l a ls:Label. ?l skos:inScheme ?v. ?v ls:hasReleaseType ls:Public. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_lp = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "lcount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_lp = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "lcount");
 		JSONObject oLabels = new JSONObject();
 		oLabels.put("count", Integer.parseInt(count_l.iterator().next()));
 		oLabels.put("public", Integer.parseInt(count_lp.iterator().next()));
@@ -64,20 +64,20 @@ public class InfoResource {
 		// triples
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(?s) AS ?scount) WHERE { ?s ?p ?o. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_s = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "scount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_s = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "scount");
 		outObject.put("triples", Integer.parseInt(count_s.iterator().next()));
 		// agents
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?a) AS ?acount) WHERE { ?a a ls:Agent. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_a = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "acount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_a = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "acount");
 		outObject.put("agents", Integer.parseInt(count_a.iterator().next()));
 		// revisions
 		query = rdf.getPREFIXSPARQL();
 		query += "SELECT (COUNT(DISTINCT ?r) AS ?rcount) WHERE { ?r a ls:Revision. }";
-		result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-		HashSet<String> count_r = RDF4J_20M3.getValuesFromBindingSet_UNIQUESET(result, "rcount");
+		result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+		HashSet<String> count_r = RDF4J_20.getValuesFromBindingSet_UNIQUESET(result, "rcount");
 		outObject.put("revisions", Integer.parseInt(count_r.iterator().next()));
 		return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();
 

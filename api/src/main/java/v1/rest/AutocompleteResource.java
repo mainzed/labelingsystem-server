@@ -3,7 +3,7 @@ package v1.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import rdf.RDF;
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import exceptions.AutocompleteLengthException;
 import exceptions.Logging;
 import v1.utils.config.ConfigProperties;
@@ -43,9 +43,9 @@ public class AutocompleteResource {
                         + "} "
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
                 JSONArray jsonarray_suggestions = new JSONArray(); 
                 for (int i=0; i<suggestion_uri.size(); i++) {
@@ -94,9 +94,9 @@ public class AutocompleteResource {
                         + "ORDER BY ASC(?acquery)"
                         + "LIMIT " + suggestions;
 
-                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject(); 
                 JSONArray jsonarray_suggestions = new JSONArray(); 
                 for (int i=0; i<suggestion_uri.size(); i++) {
@@ -137,9 +137,9 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();
                 JSONArray jsonarray_suggestions = new JSONArray();
                 for (int i = 0; i < suggestion_uri.size(); i++) {
@@ -180,9 +180,9 @@ public class AutocompleteResource {
                 query += "} "
                         + "ORDER BY ASC(?acquery) "
                         + "LIMIT " + suggestions;
-                List<BindingSet> result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> suggestion_uri = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "s");
-                List<String> suggestion_string = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
+                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+                List<String> suggestion_uri = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
+                List<String> suggestion_string = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "acquery");
                 JSONObject jsonobj_query = new JSONObject();
                 JSONArray jsonarray_suggestions = new JSONArray();
                 for (int i = 0; i < suggestion_uri.size(); i++) {

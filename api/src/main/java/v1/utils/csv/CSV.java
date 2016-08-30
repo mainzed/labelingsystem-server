@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 //import de.i3mainz.ls.Config.Config;
 import rdf.RDF;
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import exceptions.ConfigException;
 import exceptions.CsvExistanceException;
 import exceptions.CsvLabelImportException;
@@ -413,9 +413,9 @@ public class CSV implements Runnable {
 					+ "?v dc:identifier ?identifier. "
 					+ "FILTER (?identifier=\"$identifier\") }";
 			query = query.replace("$identifier", voc);
-			List<BindingSet> voc_result = RDF4J_20M3.SPARQLquery(ConfigProperties.getPropertyParam("repository"),
+			List<BindingSet> voc_result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"),
 					ConfigProperties.getPropertyParam("ts_server"), query);
-			List<String> voc_true = RDF4J_20M3.getValuesFromBindingSet_ORDEREDLIST(voc_result, "v");
+			List<String> voc_true = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(voc_result, "v");
 			return voc_true.size() > 0;
 		} catch (RepositoryException e) {
 			throw new CsvExistanceException();
@@ -924,7 +924,7 @@ public class CSV implements Runnable {
 				}
 				pw.close();
 				if (!validator) {
-					RDF4J_20M3.SPARQLupdate(ConfigProperties.getPropertyParam("repository"),
+					RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"),
 							ConfigProperties.getPropertyParam("ts_server"), "LOAD <" + ImportcsvResource.FILELINK + ">");
 				}
 			}

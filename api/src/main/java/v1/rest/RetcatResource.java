@@ -4,7 +4,7 @@ import exceptions.Logging;
 import exceptions.ResourceNotAvailableException;
 import exceptions.WaybacklinkException;
 import rdf.RDF;
-import rdf.RDF4J_20M3;
+import rdf.RDF4J_20;
 import v1.utils.config.ConfigProperties;
 import v1.utils.retcat.RetcatItems;
 import v1.utils.db.SQlite;
