@@ -328,7 +328,14 @@ public class Transformer {
             vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
             vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
         } catch (Exception e) {
-            throw new TransformRdfToApiJsonException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new TransformRdfToApiJsonException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         // return
         return vocabularyObject;
@@ -387,7 +394,14 @@ public class Transformer {
             revisionObject.remove(rdf.getPrefixItem("dct:creator"));
             revisionObject.remove(rdf.getPrefixItem("dct:type"));
         } catch (Exception e) {
-            throw new TransformRdfToApiJsonException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new TransformRdfToApiJsonException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         // return
         return revisionObject;
@@ -629,7 +643,14 @@ public class Transformer {
             agentObject.remove(rdf.getPrefixItem("geo:lat"));
             agentObject.remove(rdf.getPrefixItem("geo:lon"));
         } catch (Exception e) {
-            throw new TransformRdfToApiJsonException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new TransformRdfToApiJsonException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         // return
         return agentObject;
@@ -1372,7 +1393,14 @@ public class Transformer {
             labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
             labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
         } catch (Exception e) {
-            throw new TransformRdfToApiJsonException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new TransformRdfToApiJsonException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         // return
         return labelObject;
@@ -1425,7 +1453,14 @@ public class Transformer {
                 }
             }
         } catch (Exception e) {
-            throw new RevisionTypeException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new RevisionTypeException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         return revisionTypes.substring(0, revisionTypes.length() - 1);
     }
@@ -1461,7 +1496,7 @@ public class Transformer {
             JSONObject newScopeNote = (JSONObject) newObject.get("scopeNote");
             String newScopeNoteValue = "";
             String newScopeNoteLang = "";
-            if (oldScopeNote != null) {
+            if (newScopeNote != null) {
                 newScopeNoteValue = (String) newScopeNote.get("value");
                 newScopeNoteLang = (String) newScopeNote.get("lang");
             }
@@ -1632,7 +1667,14 @@ public class Transformer {
                 revisionTypes += "LinkingRevision,";
             }
         } catch (Exception e) {
-            throw new RevisionTypeException(e.toString());
+            int errorLine = -1;
+            for (StackTraceElement element : e.getStackTrace()) {
+                errorLine = element.getLineNumber();
+                if (element.getClassName().equals(Transformer.class.getName())) {
+                    break;
+                }
+            }
+            throw new RevisionTypeException(e.toString() + " in line " + String.valueOf(errorLine));
         }
         // all revision types
         return revisionTypes.substring(0, revisionTypes.length() - 1);

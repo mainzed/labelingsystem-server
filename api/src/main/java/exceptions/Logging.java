@@ -78,7 +78,7 @@ public class Logging {
         jsonobj_error_data.put("internalMessage", exception.toString());
         jsonobj_error_data.put("userMessage", userMessage);
         jsonobj_error_data.put("code", code);
-        jsonobj_error_data.put("more info", jsonarray_element);
+        jsonobj_error_data.put("developerInfo", jsonarray_element);
         // OUTPUT AS pretty print JSON 
         return gson.toJson(jsonobj_error);
     }
