@@ -144,26 +144,28 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatListByVocabulary(@PathParam("vocabulary") String vocabulary) {
         try {
-            // get retcat items
-            String newRetcatString = SQlite.getRetcatByVocabulary(vocabulary);
-            String[] retcatItems = newRetcatString.split(",");
             // output json
             JSONArray outArray = new JSONArray();
-            // set data
-            for (String vocItem : retcatItems) {
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getName().equals(vocItem)) {
-                        JSONObject tmpRETCAT = new JSONObject();
-                        tmpRETCAT.put("name", item.getName());
-                        tmpRETCAT.put("descripion", item.getDescription());
-                        tmpRETCAT.put("queryURL", item.getQueryURL());
-                        tmpRETCAT.put("labelURL", item.getLabelURL());
-                        tmpRETCAT.put("prefix", item.getPrefix());
-                        tmpRETCAT.put("group", item.getGroup());
-                        tmpRETCAT.put("type", item.getType());
-                        tmpRETCAT.put("language", item.getLanguage());
-                        tmpRETCAT.put("quality", item.getQuality());
-                        outArray.add(tmpRETCAT);
+            // get retcat items
+            String newRetcatString = SQlite.getRetcatByVocabulary(vocabulary);
+            if (newRetcatString != null) {
+                String[] retcatItems = newRetcatString.split(",");
+                // set data
+                for (String vocItem : retcatItems) {
+                    for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+                        if (item.getName().equals(vocItem)) {
+                            JSONObject tmpRETCAT = new JSONObject();
+                            tmpRETCAT.put("name", item.getName());
+                            tmpRETCAT.put("descripion", item.getDescription());
+                            tmpRETCAT.put("queryURL", item.getQueryURL());
+                            tmpRETCAT.put("labelURL", item.getLabelURL());
+                            tmpRETCAT.put("prefix", item.getPrefix());
+                            tmpRETCAT.put("group", item.getGroup());
+                            tmpRETCAT.put("type", item.getType());
+                            tmpRETCAT.put("language", item.getLanguage());
+                            tmpRETCAT.put("quality", item.getQuality());
+                            outArray.add(tmpRETCAT);
+                        }
                     }
                 }
             }
