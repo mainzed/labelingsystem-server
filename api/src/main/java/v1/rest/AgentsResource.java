@@ -187,8 +187,8 @@ public class AgentsResource {
 			}
 		} catch (Exception e) {
 			if (e.toString().contains("ResourceNotAvailableException")) {
-				return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "v1.rest.AgentsResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
+				JSONArray outArray = new JSONArray();
+				return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AgentsResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
