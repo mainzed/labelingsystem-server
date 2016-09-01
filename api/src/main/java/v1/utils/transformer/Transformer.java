@@ -9,6 +9,7 @@ import exceptions.TransformRdfToApiJsonException;
 import exceptions.UniqueIdentifierException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -293,13 +294,18 @@ public class Transformer {
             if (modifiedArray != null && !modifiedArray.isEmpty()) {
                 vocabularyObject.remove(rdf.getPrefixItem("dc:modified"));
                 JSONArray arrayModify = new JSONArray();
+                List<String> listModify = new ArrayList();
                 for (Object element : modifiedArray) {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     arrayModify.add(value);
+                    listModify.add(value);
                 }
                 if (fields == null || fields.contains("modifications")) {
                     vocabularyObject.put(rdf.getPrefixItem("modifications"), arrayModify);
+                    // set last modified
+                    Collections.sort(listModify);
+                    vocabularyObject.put("lastModified", listModify.get(listModify.size()-1));
                 }
             }
             // change skos:changeNote
@@ -1359,13 +1365,18 @@ public class Transformer {
             if (modifiedArray != null && !modifiedArray.isEmpty()) {
                 labelObject.remove(rdf.getPrefixItem("dc:modified"));
                 JSONArray arrayModify = new JSONArray();
+                List<String> listModify = new ArrayList();
                 for (Object element : modifiedArray) {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     arrayModify.add(value);
+                    listModify.add(value);
                 }
                 if (fields == null || fields.contains("modifications")) {
                     labelObject.put(rdf.getPrefixItem("modifications"), arrayModify);
+                    // set last modified
+                    Collections.sort(listModify);
+                    labelObject.put("lastModified", listModify.get(listModify.size()-1));
                 }
             }
             // change skos:changeNote
