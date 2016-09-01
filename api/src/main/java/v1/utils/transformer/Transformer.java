@@ -251,6 +251,7 @@ public class Transformer {
                     String value = (String) obj.get("value");
                     if (fields == null || fields.contains("created")) {
                         vocabularyObject.put(rdf.getPrefixItem("created"), value);
+                        vocabularyObject.put("lastModified", value);
                     }
                 }
             }
@@ -305,6 +306,7 @@ public class Transformer {
                     vocabularyObject.put(rdf.getPrefixItem("modifications"), arrayModify);
                     // set last modified
                     Collections.sort(listModify);
+                    vocabularyObject.remove("lastModified");
                     vocabularyObject.put("lastModified", listModify.get(listModify.size()-1));
                 }
             }
@@ -1357,6 +1359,7 @@ public class Transformer {
                     String value = (String) obj.get("value");
                     if (fields == null || fields.contains("created")) {
                         labelObject.put(rdf.getPrefixItem("created"), value);
+                        labelObject.put("lastModified", value);
                     }
                 }
             }
@@ -1376,6 +1379,7 @@ public class Transformer {
                     labelObject.put(rdf.getPrefixItem("modifications"), arrayModify);
                     // set last modified
                     Collections.sort(listModify);
+                    labelObject.remove("lastModified");
                     labelObject.put("lastModified", listModify.get(listModify.size()-1));
                 }
             }
