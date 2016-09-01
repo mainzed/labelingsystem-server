@@ -339,7 +339,7 @@ public class RetcatResource {
     @GET
     @Path("/query/heritagedata/historicengland")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsHE(@QueryParam("query") String searchword) {
+    public Response getQueryResultsHE(@QueryParam("query") String searchword) {
         try {
             String url = "http://heritagedata.org/live/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -477,7 +477,7 @@ public class RetcatResource {
     @GET
     @Path("/query/heritagedata/rcahms")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsRCAHMS(@QueryParam("query") String searchword) {
+    public Response getQueryResultsRCAHMS(@QueryParam("query") String searchword) {
         try {
             String url = "http://heritagedata.org/live/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -615,7 +615,7 @@ public class RetcatResource {
     @GET
     @Path("/query/heritagedata/rcahmw")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsRCAHMW(@QueryParam("query") String searchword) {
+    public Response getQueryResultsRCAHMW(@QueryParam("query") String searchword) {
         try {
             String url = "http://heritagedata.org/live/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
@@ -757,7 +757,7 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/aat")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsAAT(@QueryParam("query") String searchword) {
+    public Response getQueryResultsAAT(@QueryParam("query") String searchword) {
         try {
             String lang = "en"; // language for scopeNote
             String url = "http://vocab.getty.edu/sparql";
@@ -895,7 +895,7 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/tgn")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsTGN(@QueryParam("query") String searchword) {
+    public Response getQueryResultsTGN(@QueryParam("query") String searchword) {
         try {
             String url = "http://vocab.getty.edu/sparql";
             String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
@@ -1031,7 +1031,7 @@ public class RetcatResource {
     @GET
     @Path("/query/getty/ulan")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsULAN(@QueryParam("query") String searchword) {
+    public Response getQueryResultsULAN(@QueryParam("query") String searchword) {
         try {
             String lang = "en"; // language for scopeNote
             String url = "http://vocab.getty.edu/sparql";
@@ -1168,7 +1168,7 @@ public class RetcatResource {
     @GET
     @Path("/query/dbpedia")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsDBPEDIA(@QueryParam("query") String searchword) {
+    public Response getQueryResultsDBPEDIA(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryString=" + searchword + "&MaxHits=" + LIMIT;
@@ -1226,7 +1226,7 @@ public class RetcatResource {
     @GET
     @Path("/query/geonames")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsGEONAMES(@QueryParam("query") String searchword) {
+    public Response getQueryResultsGEONAMES(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://api.geonames.org/searchJSON?q=" + searchword + "&maxRows=" + LIMIT + "&username=" + ConfigProperties.getPropertyParam("geonames");
@@ -1286,7 +1286,7 @@ public class RetcatResource {
     @GET
     @Path("/query/pelagiospleiadesplaces")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsPELAGIOS(@QueryParam("query") String searchword) {
+    public Response getQueryResultsPELAGIOS(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://pelagios.org/peripleo/search?query=" + searchword + "&types=place&limit=" + LIMIT;
@@ -1347,7 +1347,7 @@ public class RetcatResource {
     @GET
     @Path("/query/chronontology")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsCHRONONTOLOGY(@QueryParam("query") String searchword) {
+    public Response getQueryResultsCHRONONTOLOGY(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://chronontology.dainst.org/data/period?q=" + searchword + "&limit=" + LIMIT;
@@ -1464,7 +1464,7 @@ public class RetcatResource {
     @GET
     @Path("/query/labelingsystem")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsLabelingSystemAll(@QueryParam("query") String searchword) {
+    public Response getQueryResultsLabelingSystemAll(@QueryParam("query") String searchword) {
         try {
             String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
@@ -1604,7 +1604,7 @@ public class RetcatResource {
     @GET
     @Path("/query/labelingsystem/{vocabulary}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
+    public Response getQueryResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
         try {
             String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
@@ -1744,7 +1744,7 @@ public class RetcatResource {
     @GET
     @Path("/query/skosmos/finto")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsSKOSMOS_FINTO(@QueryParam("query") String searchword) {
+    public Response getQueryResultsSKOSMOS_FINTO(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://finto.fi/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=allars%20koko%20ponduskategorier%20ysa%20yso%20juho%20jupo%20keko%20okm-tieteenala%20liito%20mero%20puho%20tsr%20afo%20kassu%20mesh%20tero%20maotao%20musa%20muso%20valo%20kauno%20kito%20kto&limit=" + LIMIT;
@@ -1823,7 +1823,7 @@ public class RetcatResource {
     @GET
     @Path("/query/skosmos/unesco")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsSKOSMOS_UNESCO(@QueryParam("query") String searchword) {
+    public Response getQueryResultsSKOSMOS_UNESCO(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://vocabularies.unesco.org/browser/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=thesaurus&limit=" + LIMIT;
@@ -1932,7 +1932,7 @@ public class RetcatResource {
     @GET
     @Path("/query/skosmos/fao")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getResultsSKOSMOS_FAO(@QueryParam("query") String searchword) {
+    public Response getQueryResultsSKOSMOS_FAO(@QueryParam("query") String searchword) {
         try {
             searchword = GeneralFunctions.encodeURIComponent(searchword);
             String url_string = "http://oek1.fao.org/skosmos/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&limit=" + LIMIT;
@@ -2039,14 +2039,23 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/getty")
+    @Path("/info/getty")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelGetty(@QueryParam("url") String url) {
+    public Response geInfoGetty(@QueryParam("url") String url) {
         try {
             String sparqlendpoint = "http://vocab.getty.edu/sparql";
-            String sparql = "SELECT ?prefLabel { "
+            String sparql = "SELECT * { "
                     + "<" + url + "> gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    + " }";
+                    + "<" + url + "> skos:inScheme ?scheme. "
+                    + "?scheme rdfs:label ?schemeTitle. ";
+            if (url.contains("aat") || url.contains("ulan")) {
+                sparql += "OPTIONAL {<" + url + "> skos:scopeNote [dct:language gvp_lang:" + "en" + "; rdf:value ?scopeNote]} . ";
+            } else if (url.contains("tgn")) {
+                sparql += "OPTIONAL {<" + url + "> gvp:parentString ?scopeNote . } ";
+            }
+            sparql += "OPTIONAL {<" + url + "> gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . ";
+            sparql += "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred <" + url + "> . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . ";
+            sparql += " }";
             URL obj = new URL(sparqlendpoint);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("POST");
@@ -2079,6 +2088,65 @@ public class RetcatResource {
                 jsonOut.put("label", labelValue);
                 jsonOut.put("lang", labelLang);
             }
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
+                String descValue = "";
+                if (scopeNote != null) {
+                    descValue = (String) scopeNote.get("value");
+                }
+                jsonOut.put("description", descValue);
+            }
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
+                String descValue = (String) scopeNote.get("value");
+                jsonOut.put("scheme", descValue);
+            }
+            HashMap<String, String> hmBroader = new HashMap();
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
+                JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
+                if (bpObj != null) {
+                    String bp = (String) bpObj.get("value");
+                    String bpt = (String) bptObj.get("value");
+                    hmBroader.put(bpt, bp);
+                }
+            }
+            JSONArray tmpArrayBroader = new JSONArray();
+            Iterator itB = hmBroader.entrySet().iterator();
+            while (itB.hasNext()) {
+                Map.Entry pair = (Map.Entry) itB.next();
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("label", pair.getKey());
+                tmpObject.put("uri", pair.getValue());
+                tmpArrayBroader.add(tmpObject);
+                itB.remove();
+            }
+            jsonOut.put("broaderTerms", tmpArrayBroader);
+            HashMap<String, String> hmNarrower = new HashMap();
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
+                JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
+                if (npObj != null) {
+                    String np = (String) npObj.get("value");
+                    String npt = (String) nptObj.get("value");
+                    hmNarrower.put(npt, np);
+                }
+            }
+            JSONArray tmpArrayNarrower = new JSONArray();
+            Iterator itN = hmNarrower.entrySet().iterator();
+            while (itN.hasNext()) {
+                Map.Entry pair = (Map.Entry) itN.next();
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("label", pair.getKey());
+                tmpObject.put("uri", pair.getValue());
+                tmpArrayNarrower.add(tmpObject);
+                itN.remove();
+            }
+            jsonOut.put("narrowerTerms", tmpArrayNarrower);
             // get retcat info
             String type = "getty";
             String quality = "";
@@ -2092,6 +2160,7 @@ public class RetcatResource {
             jsonOut.put("type", type);
             jsonOut.put("quality", quality);
             jsonOut.put("group", group);
+            jsonOut.put("uri", url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2100,9 +2169,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/heritagedata")
+    @Path("/info/heritagedata")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelHeritageData(@QueryParam("url") String url) {
+    public Response geInfoHeritageData(@QueryParam("url") String url) {
         try {
             String sparqlendpoint = "http://heritagedata.org/live/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>"
@@ -2162,9 +2231,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/labelingsystem")
+    @Path("/info/labelingsystem")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelLabelingSystem(@QueryParam("url") String url) {
+    public Response geInfoLabelingSystem(@QueryParam("url") String url) {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
@@ -2240,9 +2309,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/html")
+    @Path("/info/html")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelExtern(@QueryParam("url") String url, @QueryParam("type") String type) {
+    public Response geInfoExtern(@QueryParam("url") String url, @QueryParam("type") String type) {
         try {
             url = GeneralFunctions.encodeURIUmlaut(url);
             Document doc = Jsoup.connect(url).get();
@@ -2269,9 +2338,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/geonames")
+    @Path("/info/geonames")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelGeoNames(@QueryParam("url") String url) {
+    public Response geInfoGeoNames(@QueryParam("url") String url) {
         try {
             url = url.replace("http://sws.geonames.org/", "");
             url = "http://api.geonames.org/get?geonameId=" + url + "&username=" + ConfigProperties.getPropertyParam("geonames");
@@ -2321,9 +2390,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/pelagiospleiadesplaces")
+    @Path("/info/pelagiospleiadesplaces")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelPelagios(@QueryParam("url") String url) {
+    public Response geInfoPelagios(@QueryParam("url") String url) {
         try {
             url = GeneralFunctions.encodeURIComponent(url);
             url = "http://pelagios.org/peripleo/places/" + url;
@@ -2366,9 +2435,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/chronontology")
+    @Path("/info/chronontology")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelChronontology(@QueryParam("url") String url) {
+    public Response geInfoChronontology(@QueryParam("url") String url) {
         try {
             url = url.replace("/period", "/data/period");
             // query for json
@@ -2411,9 +2480,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/skosmos/finto")
+    @Path("/info/skosmos/finto")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelSkosmosFinto(@QueryParam("url") String url) {
+    public Response geInfoSkosmosFinto(@QueryParam("url") String url) {
         try {
             // query for json
             String vocab = url.split("/")[4];
@@ -2457,9 +2526,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/skosmos/fao")
+    @Path("/info/skosmos/fao")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelSkosmosFao(@QueryParam("url") String url) {
+    public Response geInfoSkosmosFao(@QueryParam("url") String url) {
         try {
             // query for json
             url = GeneralFunctions.encodeURIComponent(url);
@@ -2502,9 +2571,9 @@ public class RetcatResource {
     }
 
     @GET
-    @Path("/label/skosmos/unesco")
+    @Path("/info/skosmos/unesco")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response geLabelSkosmosUnesco(@QueryParam("url") String url) {
+    public Response geInfoSkosmosUnesco(@QueryParam("url") String url) {
         try {
             // query for json
             url = GeneralFunctions.encodeURIComponent(url);

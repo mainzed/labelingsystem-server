@@ -120,6 +120,7 @@ public class Transformer {
             vocabularyObject.remove(rdf.getPrefixItem("creator"));
             vocabularyObject.remove(rdf.getPrefixItem("created"));
             vocabularyObject.remove(rdf.getPrefixItem("modifications"));
+            vocabularyObject.remove(rdf.getPrefixItem("lastModified"));
             vocabularyObject.remove(rdf.getPrefixItem("license"));
             vocabularyObject.remove(rdf.getPrefixItem("id"));
             vocabularyObject.remove("revisionIDs");
@@ -978,6 +979,7 @@ public class Transformer {
             labelObject.remove(rdf.getPrefixItem("seeAlso"));
             labelObject.remove(rdf.getPrefixItem("created"));
             labelObject.remove(rdf.getPrefixItem("modifications"));
+            labelObject.remove(rdf.getPrefixItem("lastModified"));
             labelObject.remove(rdf.getPrefixItem("revisionIDs"));
             // add object
             rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
