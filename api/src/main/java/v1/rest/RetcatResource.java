@@ -2175,8 +2175,13 @@ public class RetcatResource {
         try {
             String sparqlendpoint = "http://heritagedata.org/live/sparql";
             String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>"
-                    + "SELECT ?prefLabel WHERE { "
+                    + "SELECT * WHERE { "
                     + "<" + url + "> skos:prefLabel ?prefLabel. "
+                    + "<" + url + "> skos:inScheme ?scheme . "
+                    + "?scheme rdfs:label ?schemeTitle . "
+                    + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
+                    + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
+                    + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
                     + " }";
             URL obj = new URL(sparqlendpoint);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -2210,6 +2215,65 @@ public class RetcatResource {
                 jsonOut.put("label", labelValue);
                 jsonOut.put("lang", labelLang);
             }
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
+                String descValue = "";
+                if (scopeNote != null) {
+                    descValue = (String) scopeNote.get("value");
+                }
+                jsonOut.put("description", descValue);
+            }
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
+                String descValue = (String) scopeNote.get("value");
+                jsonOut.put("scheme", descValue);
+            }
+            HashMap<String, String> hmBroader = new HashMap();
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
+                JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
+                if (bpObj != null) {
+                    String bp = (String) bpObj.get("value");
+                    String bpt = (String) bptObj.get("value");
+                    hmBroader.put(bpt, bp);
+                }
+            }
+            JSONArray tmpArrayBroader = new JSONArray();
+            Iterator itB = hmBroader.entrySet().iterator();
+            while (itB.hasNext()) {
+                Map.Entry pair = (Map.Entry) itB.next();
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("label", pair.getKey());
+                tmpObject.put("uri", pair.getValue());
+                tmpArrayBroader.add(tmpObject);
+                itB.remove();
+            }
+            jsonOut.put("broaderTerms", tmpArrayBroader);
+            HashMap<String, String> hmNarrower = new HashMap();
+            for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
+                JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
+                if (npObj != null) {
+                    String np = (String) npObj.get("value");
+                    String npt = (String) nptObj.get("value");
+                    hmNarrower.put(npt, np);
+                }
+            }
+            JSONArray tmpArrayNarrower = new JSONArray();
+            Iterator itN = hmNarrower.entrySet().iterator();
+            while (itN.hasNext()) {
+                Map.Entry pair = (Map.Entry) itN.next();
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("label", pair.getKey());
+                tmpObject.put("uri", pair.getValue());
+                tmpArrayNarrower.add(tmpObject);
+                itN.remove();
+            }
+            jsonOut.put("narrowerTerms", tmpArrayNarrower);
             // get retcat info
             String type = "heritagedata";
             String quality = "";
@@ -2223,6 +2287,7 @@ public class RetcatResource {
             jsonOut.put("type", type);
             jsonOut.put("quality", quality);
             jsonOut.put("group", group);
+            jsonOut.put("uri", url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2237,10 +2302,15 @@ public class RetcatResource {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>"
+            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT * { "
-                    + "OPTIONAL { <" + url + "> ls:preferredLabel ?prefLabel. } "
+                    + "<" + url + "> ls:preferredLabel ?prefLabel. "
                     + "<" + url + "> ls:hasStatusType ?statusType. "
+                    + "<" + url + "> skos:inScheme ?scheme . "
+                    + "?scheme dc:title ?schemeTitle . "
+                    + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
+                    + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm. } "
+                    + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm . } "
                     + " }";
             URL obj = new URL(sparqlendpoint);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -2286,6 +2356,65 @@ public class RetcatResource {
                     jsonOut.put("type", "ls");
                     jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"), ""));
                 }
+                for (Object element : bindingsArray) {
+                    JSONObject tmpElement = (JSONObject) element;
+                    JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
+                    String descValue = "";
+                    if (scopeNote != null) {
+                        descValue = (String) scopeNote.get("value");
+                    }
+                    jsonOut.put("description", descValue);
+                }
+                for (Object element : bindingsArray) {
+                    JSONObject tmpElement = (JSONObject) element;
+                    JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
+                    String descValue = (String) scopeNote.get("value");
+                    jsonOut.put("scheme", descValue);
+                }
+                HashMap<String, String> hmBroader = new HashMap();
+                for (Object element : bindingsArray) {
+                    JSONObject tmpElement = (JSONObject) element;
+                    JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
+                    JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
+                    if (bpObj != null) {
+                        String bp = (String) bpObj.get("value");
+                        String bpt = (String) bptObj.get("value");
+                        hmBroader.put(bpt, bp);
+                    }
+                }
+                JSONArray tmpArrayBroader = new JSONArray();
+                Iterator itB = hmBroader.entrySet().iterator();
+                while (itB.hasNext()) {
+                    Map.Entry pair = (Map.Entry) itB.next();
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("label", pair.getKey());
+                    tmpObject.put("uri", pair.getValue());
+                    tmpArrayBroader.add(tmpObject);
+                    itB.remove();
+                }
+                jsonOut.put("broaderTerms", tmpArrayBroader);
+                HashMap<String, String> hmNarrower = new HashMap();
+                for (Object element : bindingsArray) {
+                    JSONObject tmpElement = (JSONObject) element;
+                    JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
+                    JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
+                    if (npObj != null) {
+                        String np = (String) npObj.get("value");
+                        String npt = (String) nptObj.get("value");
+                        hmNarrower.put(npt, np);
+                    }
+                }
+                JSONArray tmpArrayNarrower = new JSONArray();
+                Iterator itN = hmNarrower.entrySet().iterator();
+                while (itN.hasNext()) {
+                    Map.Entry pair = (Map.Entry) itN.next();
+                    JSONObject tmpObject = new JSONObject();
+                    tmpObject.put("label", pair.getKey());
+                    tmpObject.put("uri", pair.getValue());
+                    tmpArrayNarrower.add(tmpObject);
+                    itN.remove();
+                }
+                jsonOut.put("narrowerTerms", tmpArrayNarrower);
                 // get retcat info
                 String type = "ls";
                 String quality = "";
@@ -2298,6 +2427,7 @@ public class RetcatResource {
                 }
                 jsonOut.put("quality", quality);
                 jsonOut.put("group", group);
+                jsonOut.put("uri", url);
             } else {
                 throw new ResourceNotAvailableException();
             }
