@@ -39,11 +39,22 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import v1.utils.retcat.RetcatItem;
+import v1.utils.retcat.Retcat_ChronOntology;
+import v1.utils.retcat.Retcat_Dbpedia;
+import v1.utils.retcat.Retcat_Fao;
+import v1.utils.retcat.Retcat_Finto;
+import v1.utils.retcat.Retcat_GeoNames;
+import v1.utils.retcat.Retcat_Getty;
+import v1.utils.retcat.Retcat_HTML;
+import v1.utils.retcat.Retcat_HeritageData;
+import v1.utils.retcat.Retcat_LabelingSystem;
+import v1.utils.retcat.Retcat_Pleiades;
+import v1.utils.retcat.Retcat_Unesco;
 
 @Path("/retcat")
 public class RetcatResource {
 
-    private final int LIMIT = 20;
+    private static final int LIMIT = 20;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -54,7 +65,7 @@ public class RetcatResource {
             for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
                 JSONObject tmpRETCAT = new JSONObject();
                 tmpRETCAT.put("name", item.getName());
-                tmpRETCAT.put("descripion", item.getDescription());
+                tmpRETCAT.put("description", item.getDescription());
                 tmpRETCAT.put("queryURL", item.getQueryURL());
                 tmpRETCAT.put("labelURL", item.getLabelURL());
                 tmpRETCAT.put("prefix", item.getPrefix());
@@ -81,7 +92,7 @@ public class RetcatResource {
                 if (item.getName().equals(retcat)) {
                     JSONObject tmpRETCAT = new JSONObject();
                     tmpRETCAT.put("name", item.getName());
-                    tmpRETCAT.put("descripion", item.getDescription());
+                    tmpRETCAT.put("description", item.getDescription());
                     tmpRETCAT.put("queryURL", item.getQueryURL());
                     tmpRETCAT.put("labelURL", item.getLabelURL());
                     tmpRETCAT.put("prefix", item.getPrefix());
@@ -156,7 +167,7 @@ public class RetcatResource {
                         if (item.getName().equals(vocItem)) {
                             JSONObject tmpRETCAT = new JSONObject();
                             tmpRETCAT.put("name", item.getName());
-                            tmpRETCAT.put("descripion", item.getDescription());
+                            tmpRETCAT.put("description", item.getDescription());
                             tmpRETCAT.put("queryURL", item.getQueryURL());
                             tmpRETCAT.put("labelURL", item.getLabelURL());
                             tmpRETCAT.put("prefix", item.getPrefix());
@@ -172,7 +183,7 @@ public class RetcatResource {
             // add own vocabulary
             JSONObject tmpRETCAT = new JSONObject();
             tmpRETCAT.put("name", "this." + vocabulary);
-            tmpRETCAT.put("descripion", "this vocabulary");
+            tmpRETCAT.put("description", "this vocabulary");
             outArray.add(tmpRETCAT);
             // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -210,7 +221,7 @@ public class RetcatResource {
                     if (item.getName().equals(vocItem)) {
                         JSONObject tmpRETCAT = new JSONObject();
                         tmpRETCAT.put("name", item.getName());
-                        tmpRETCAT.put("descripion", item.getDescription());
+                        tmpRETCAT.put("description", item.getDescription());
                         tmpRETCAT.put("queryURL", item.getQueryURL());
                         tmpRETCAT.put("labelURL", item.getLabelURL());
                         tmpRETCAT.put("prefix", item.getPrefix());
@@ -225,7 +236,7 @@ public class RetcatResource {
             // add own vocabulary
             JSONObject tmpRETCAT = new JSONObject();
             tmpRETCAT.put("name", "this." + vocabulary);
-            tmpRETCAT.put("descripion", "this vocabulary");
+            tmpRETCAT.put("description", "this vocabulary");
             outArray.add(tmpRETCAT);
             // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -263,7 +274,7 @@ public class RetcatResource {
                     if (item.getName().equals(vocItem)) {
                         JSONObject tmpRETCAT = new JSONObject();
                         tmpRETCAT.put("name", item.getName());
-                        tmpRETCAT.put("descripion", item.getDescription());
+                        tmpRETCAT.put("description", item.getDescription());
                         tmpRETCAT.put("queryURL", item.getQueryURL());
                         tmpRETCAT.put("labelURL", item.getLabelURL());
                         tmpRETCAT.put("prefix", item.getPrefix());
@@ -278,7 +289,7 @@ public class RetcatResource {
             // add own vocabulary
             JSONObject tmpRETCAT = new JSONObject();
             tmpRETCAT.put("name", "this." + vocabulary);
-            tmpRETCAT.put("descripion", "this vocabulary");
+            tmpRETCAT.put("description", "this vocabulary");
             outArray.add(tmpRETCAT);
             // output
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
@@ -341,131 +352,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsHE(@QueryParam("query") String searchword) {
         try {
-            String url = "http://heritagedata.org/live/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-                    + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?Subject skos:prefLabel ?prefLabel . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/mda_obj> || ?scheme=<http://purl.org/heritagedata/schemes/eh_period> || ?scheme=<http://purl.org/heritagedata/schemes/agl_et> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmt2> || ?scheme=<http://purl.org/heritagedata/schemes/560> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tbm> || ?scheme=<http://purl.org/heritagedata/schemes/eh_com> || ?scheme=<http://purl.org/heritagedata/schemes/eh_evd> || ?scheme=<http://purl.org/heritagedata/schemes/eh_tmc>) "
-                    + "}";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryHE(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "heritagedata";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -479,131 +367,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsRCAHMS(@QueryParam("query") String searchword) {
         try {
-            String url = "http://heritagedata.org/live/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-                    + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?Subject skos:prefLabel ?prefLabel . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/2> || ?scheme=<http://purl.org/heritagedata/schemes/3> || ?scheme=<http://purl.org/heritagedata/schemes/1>) "
-                    + "}";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMS(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "heritagedata";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -617,135 +382,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsRCAHMW(@QueryParam("query") String searchword) {
         try {
-            String url = "http://heritagedata.org/live/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-                    + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?Subject skos:prefLabel ?prefLabel . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                    //+ "FILTER(LANGMATCHES(LANG(?prefLabel), \"en\")) "
-                    //+ "FILTER(LANGMATCHES(LANG(?scopeNote), \"en\")) "
-                    //+ "FILTER(LANGMATCHES(LANG(?BroaderPreferredTerm), \"en\")) "
-                    //+ "FILTER(LANGMATCHES(LANG(?NarrowerPreferredTerm), \"en\")) "
-                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/11> || ?scheme=<http://purl.org/heritagedata/schemes/10> || ?scheme=<http://purl.org/heritagedata/schemes/12> || ?scheme=<http://purl.org/heritagedata/schemes/17> || ?scheme=<http://purl.org/heritagedata/schemes/19> || ?scheme=<http://purl.org/heritagedata/schemes/14> || ?scheme=<http://purl.org/heritagedata/schemes/15> || ?scheme=<http://purl.org/heritagedata/schemes/18> || ?scheme=<http://purl.org/heritagedata/schemes/20> || ?scheme=<http://purl.org/heritagedata/schemes/13> || ?scheme=<http://purl.org/heritagedata/schemes/21> || ?scheme=<http://purl.org/heritagedata/schemes/22>) "
-                    + "}";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMW(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "heritagedata";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -759,131 +397,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsAAT(@QueryParam("query") String searchword) {
         try {
-            String lang = "en"; // language for scopeNote
-            String url = "http://vocab.getty.edu/sparql";
-            String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle { "
-                    + "?Subject a skos:Concept. "
-                    + "?Subject luc:term '" + searchword + "' . "
-                    + "?Subject skos:inScheme aat: . "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    + "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
-                    + "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
-                    + "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-                    + " } ORDER BY ASC(LCASE(STR(?Term)))";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryAAT(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "getty";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -897,129 +412,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsTGN(@QueryParam("query") String searchword) {
         try {
-            String url = "http://vocab.getty.edu/sparql";
-            String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
-                    + "?Subject a skos:Concept. "
-                    + "?Subject luc:term '" + searchword + "' . "
-                    + "?Subject skos:inScheme tgn: . "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    + "OPTIONAL {?Subject gvp:parentString ?scopeNote . } "
-                    + "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
-                    + "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-                    + " } ORDER BY ASC(LCASE(STR(?Term)))";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryTGN(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                //String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    //String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    //String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    //String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "getty";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1033,130 +427,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsULAN(@QueryParam("query") String searchword) {
         try {
-            String lang = "en"; // language for scopeNote
-            String url = "http://vocab.getty.edu/sparql";
-            String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
-                    + "?Subject a skos:Concept. "
-                    + "?Subject luc:term '" + searchword + "' . "
-                    + "?Subject skos:inScheme ulan: . "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "?Subject gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    + "OPTIONAL {?Subject skos:scopeNote [dct:language gvp_lang:" + lang + "; rdf:value ?scopeNote]} . "
-                    + "OPTIONAL {?Subject gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . "
-                    + "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred ?Subject . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . "
-                    + " } ORDER BY ASC(LCASE(STR(?Term)))";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryULAN(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                //String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    //String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    //String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    //String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "getty";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1170,51 +442,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsDBPEDIA(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryString=" + searchword + "&MaxHits=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept", "application/json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+           Map<String, SuggestionItem> autosuggests = Retcat_Dbpedia.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                String uriValue = (String) tmpElement.get("uri");
-                autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                String labelValue = (String) tmpElement.get("label");
-                tmpAutosuggest.setLabel(labelValue);
-                String descriptionValue = (String) tmpElement.get("description");
-                if (descriptionValue != null) {
-                    tmpAutosuggest.setDescription(descriptionValue);
-                }
-                tmpAutosuggest.setSchemeTitle("DBpedia");
-                // get retcat info
-                String type = "dbpedia";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1228,53 +457,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsGEONAMES(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://api.geonames.org/searchJSON?q=" + searchword + "&maxRows=" + LIMIT + "&username=" + ConfigProperties.getPropertyParam("geonames");
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestProperty("Accept", "application/json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_GeoNames.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("geonames");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                Long uriValue = (Long) tmpElement.get("geonameId");
-                String uri = "http://sws.geonames.org/" + uriValue;
-                autosuggests.put(uri, new SuggestionItem(uri));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uri);
-                String labelValue = (String) tmpElement.get("name");
-                tmpAutosuggest.setLabel(labelValue);
-                String adminName1 = (String) tmpElement.get("adminName1");
-                String countryName = (String) tmpElement.get("countryName");
-                String lat = (String) tmpElement.get("lat");
-                String lon = (String) tmpElement.get("lng");
-                tmpAutosuggest.setDescription(adminName1 + ", " + countryName + " [" + lat + " " + lon + "]");
-                tmpAutosuggest.setSchemeTitle("GeoNames");
-                // get retcat info
-                String type = "geonames";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1288,54 +472,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsPELAGIOS(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://pelagios.org/peripleo/search?query=" + searchword + "&types=place&limit=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            //conn.setRequestProperty("Accept", "application/json");
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
-            JSONObject jsonOut = new JSONObject();
+            Map<String, SuggestionItem> autosuggests = Retcat_Pleiades.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("items");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                String uriValue = (String) tmpElement.get("identifier");
-                if (uriValue.contains("pleiades.stoa.org")) {
-                    autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                    SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                    String labelValue = (String) tmpElement.get("title");
-                    tmpAutosuggest.setLabel(labelValue);
-                    String descriptionValue = (String) tmpElement.get("description");
-                    if (descriptionValue != null) {
-                        tmpAutosuggest.setDescription(descriptionValue);
-                    }
-                    tmpAutosuggest.setSchemeTitle("Pleides Places");
-                    // get retcat info
-                    String type = "pleiades";
-                    String quality = "";
-                    String group = "";
-                    for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                        if (item.getType().equals(type)) {
-                            quality = item.getQuality();
-                            group = item.getGroup();
-                        }
-                    }
-                    tmpAutosuggest.setType(type);
-                    tmpAutosuggest.setQuality(quality);
-                    tmpAutosuggest.setGroup(group);
-                }
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1349,110 +487,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsCHRONONTOLOGY(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://chronontology.dainst.org/data/period?q=" + searchword + "&limit=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_ChronOntology.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject resourceObject = (JSONObject) tmpElement.get("resource");
-                String uriValue = (String) resourceObject.get("@id");
-                uriValue = "http://chronontology.dainst.org" + uriValue;
-                autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                String labelValue = resourceObject.get("prefLabel").toString().replace("}", "").split(":")[1].replace("\"", "");
-                tmpAutosuggest.setLabel(labelValue);
-                String descriptionValue = (String) resourceObject.get("description");
-                if (descriptionValue != null) {
-                    tmpAutosuggest.setDescription(descriptionValue);
-                }
-                tmpAutosuggest.setSchemeTitle("ChronOntology");
-                JSONArray isPartOfValue = (JSONArray) resourceObject.get("isPartOf");
-                JSONArray hasPartValue = (JSONArray) resourceObject.get("hasPart");
-                // query for broader
-                if (isPartOfValue != null) {
-                    for (Object broaderItem : isPartOfValue) {
-                        String itemString = broaderItem.toString();
-                        String broaderurl = itemString.replace("/period", "/data/period");
-                        // query for json
-                        URL obj = new URL("http://chronontology.dainst.org" + broaderurl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        StringBuilder broaderResponse = new StringBuilder();
-                        while ((inputLine = in.readLine()) != null) {
-                            broaderResponse.append(inputLine);
-                        }
-                        in.close();
-                        // parse json
-                        JSONObject broaderjsonObject = (JSONObject) new JSONParser().parse(broaderResponse.toString());
-                        JSONObject broaderResourceObject = (JSONObject) broaderjsonObject.get("resource");
-                        String broaderUriValue = (String) broaderResourceObject.get("@id");
-                        broaderUriValue = "http://chronontology.dainst.org" + broaderUriValue;
-                        String broaderLabelValue = broaderResourceObject.get("prefLabel").toString().replace("}", "").split(":")[1].replace("\"", "");
-                        if (!broaderUriValue.equals("")) {
-                            HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                            hstmpBroader.put(broaderUriValue, broaderLabelValue);
-                            tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                        }
-                    }
-                }
-                // query for narrower
-                if (hasPartValue != null) {
-                    for (Object narrowerItem : hasPartValue) {
-                        String itemString = narrowerItem.toString();
-                        String narrowerurl = itemString.replace("/period", "/data/period");
-                        // query for json
-                        URL obj = new URL("http://chronontology.dainst.org" + narrowerurl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        StringBuilder narrowerResponse = new StringBuilder();
-                        while ((inputLine = in.readLine()) != null) {
-                            narrowerResponse.append(inputLine);
-                        }
-                        in.close();
-                        // parse json
-                        JSONObject narrowerjsonObject = (JSONObject) new JSONParser().parse(narrowerResponse.toString());
-                        JSONObject narrowerResourceObject = (JSONObject) narrowerjsonObject.get("resource");
-                        String narrowerUriValue = (String) narrowerResourceObject.get("@id");
-                        narrowerUriValue = "http://chronontology.dainst.org" + narrowerUriValue;
-                        String narrowerLabelValue = narrowerResourceObject.get("prefLabel").toString().replace("}", "").split(":")[1].replace("\"", "");
-                        if (!narrowerUriValue.equals("")) {
-                            HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                            hstmpNarrower.put(narrowerUriValue, narrowerLabelValue);
-                            tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                        }
-                    }
-                }
-                // get retcat info
-                String type = "chronontology";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1466,133 +502,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsLabelingSystemAll(@QueryParam("query") String searchword) {
         try {
-            String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-                    + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?scheme dc:title ?schemeTitle . "
-                    + "?scheme ls:hasReleaseType ls:Public . "
-                    + "?Subject skos:prefLabel ?pl . "
-                    + "?Subject ls:preferredLabel ?prefLabel . "
-                    + "?Subject ls:hasStatusType ls:Active . "
-                    + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "}";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryAll(searchword);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "ls";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1606,133 +517,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
         try {
-            String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-                    + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                    + "?Subject skos:inScheme ?scheme . "
-                    + "?scheme dc:title ?schemeTitle . "
-                    + "?Subject skos:prefLabel ?pl . "
-                    + "?Subject ls:preferredLabel ?prefLabel . "
-                    + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
-                    + "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
-                    + "}";
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
-            JSONObject jsonOut = new JSONObject();
+            Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryVocab(searchword, vocabulary);
             JSONArray outArray = new JSONArray();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            HashSet<String> uris = new HashSet<String>();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                uris.add(subjectValue);
-            }
-            // create list of autosuggest objects
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (String element : uris) {
-                autosuggests.put(element, new SuggestionItem(element));
-            }
-            // fill objects
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                // get Subject
-                JSONObject subject = (JSONObject) tmpElement.get("Subject");
-                String subjectValue = (String) subject.get("value");
-                // for every subject value get object from list and write values in it 
-                SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
-                // get Label
-                JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) labelObject.get("value");
-                String labelLang = (String) labelObject.get("xml:lang");
-                tmpAutosuggest.setLabel(labelValue);
-                tmpAutosuggest.setLanguage(labelLang);
-                // get Scheme
-                JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
-                String schemeValue = (String) schemeObject.get("value");
-                String schemeLang = (String) schemeObject.get("xml:lang");
-                tmpAutosuggest.setSchemeTitle(schemeValue);
-                // get scopeNote
-                JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
-                if (scopeNoteObject != null) {
-                    String scopeNoteValue = (String) scopeNoteObject.get("value");
-                    String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                    tmpAutosuggest.setDescription(scopeNoteValue);
-                }
-                // get broader 
-                String broaderVL = "";
-                String broaderURI = "";
-                JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (broaderObject != null) {
-                    String broaderValue = (String) broaderObject.get("value");
-                    String broaderLang = (String) broaderObject.get("xml:lang");
-                    broaderVL = broaderValue.replace("<", "").replace(">", "");
-                }
-                JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
-                if (broaderURIObject != null) {
-                    broaderURI = (String) broaderURIObject.get("value");
-                }
-                if (!broaderURI.equals("")) {
-                    HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                    hstmpBroader.put(broaderURI, broaderVL);
-                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
-                }
-                // get narrower 
-                String narrowerVL = "";
-                String narrowerURI = "";
-                JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (narrowerObject != null) {
-                    String narrowerValue = (String) narrowerObject.get("value");
-                    String narrowerLang = (String) narrowerObject.get("xml:lang");
-                    narrowerVL = narrowerValue.replace("<", "").replace(">", "");
-                }
-                JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
-                if (narrowerURIObject != null) {
-                    narrowerURI = (String) narrowerURIObject.get("value");
-                }
-                if (!narrowerURI.equals("")) {
-                    HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                    hstmpNarrower.put(narrowerURI, narrowerVL);
-                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
-                }
-                // get retcat info
-                String type = "ls";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1746,72 +532,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsSKOSMOS_FINTO(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://finto.fi/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=allars%20koko%20ponduskategorier%20ysa%20yso%20juho%20jupo%20keko%20okm-tieteenala%20liito%20mero%20puho%20tsr%20afo%20kassu%20mesh%20tero%20maotao%20musa%20muso%20valo%20kauno%20kito%20kto&limit=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Finto.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                String uriValue = (String) tmpElement.get("uri");
-                autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                String labelValue = (String) tmpElement.get("prefLabel");
-                tmpAutosuggest.setLabel(labelValue);
-                String vocabValue = (String) tmpElement.get("vocab");
-                tmpAutosuggest.setSchemeTitle(vocabValue);
-                JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
-                JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
-                tmpAutosuggest.setLanguage("en");
-                // query for broader
-                if (boraderArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        String labelValueTmp = (String) tmpObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, labelValueTmp);
-                        tmpAutosuggest.setBroaderTerm(hstmp);
-                    }
-                }
-                // query for narrower
-                if (narrowerArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        String labelValueTmp = (String) tmpObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, labelValueTmp);
-                        tmpAutosuggest.setNarrowerTerm(hstmp);
-                    }
-                }
-                // get retcat info
-                String type = "finto";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1825,102 +547,8 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsSKOSMOS_UNESCO(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://vocabularies.unesco.org/browser/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&vocab=thesaurus&limit=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Unesco.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                String uriValue = (String) tmpElement.get("uri");
-                autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                String labelValue = (String) tmpElement.get("prefLabel");
-                tmpAutosuggest.setLabel(labelValue);
-                String vocabValue = (String) tmpElement.get("vocab");
-                tmpAutosuggest.setSchemeTitle(vocabValue);
-                JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
-                JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
-                tmpAutosuggest.setLanguage("en");
-                // query for broader
-                if (boraderArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        //query for label
-                        String broaderUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
-                        broaderUrl = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + broaderUrl;
-                        URL obj = new URL(broaderUrl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader broaderIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        String broaderInputLine;
-                        StringBuilder broaderResponse = new StringBuilder();
-                        while ((broaderInputLine = broaderIn.readLine()) != null) {
-                            broaderResponse.append(broaderInputLine);
-                        }
-                        broaderIn.close();
-                        // parse json
-                        JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(broaderResponse.toString());
-                        String broaderLabelValue = (String) broaderJsonObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, broaderLabelValue);
-                        tmpAutosuggest.setBroaderTerm(hstmp);
-                    }
-                }
-                // query for narrower
-                if (narrowerArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        //query for label
-                        String narrowerUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
-                        narrowerUrl = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + narrowerUrl;
-                        URL obj = new URL(narrowerUrl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader narrowerIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        String narrowerInputLine;
-                        StringBuilder narrowerResponse = new StringBuilder();
-                        while ((narrowerInputLine = narrowerIn.readLine()) != null) {
-                            narrowerResponse.append(narrowerInputLine);
-                        }
-                        narrowerIn.close();
-                        // parse json
-                        JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(narrowerResponse.toString());
-                        String narrowerLabelValue = (String) broaderJsonObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, narrowerLabelValue);
-                        tmpAutosuggest.setNarrowerTerm(hstmp);
-                    }
-                }
-                // get retcat info
-                String type = "unesco";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -1934,102 +562,23 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getQueryResultsSKOSMOS_FAO(@QueryParam("query") String searchword) {
         try {
-            searchword = GeneralFunctions.encodeURIComponent(searchword);
-            String url_string = "http://oek1.fao.org/skosmos/rest/v1/search?query=*" + searchword + "*&lang=en&type=skos:Concept&fields=narrower%20broader&limit=" + LIMIT;
-            URL url = new URL(url_string);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = br.readLine()) != null) {
-                response.append(inputLine);
-            }
-            br.close();
-            // init output
+            Map<String, SuggestionItem> autosuggests = Retcat_Fao.query(searchword);
             JSONArray outArray = new JSONArray();
-            // fill objects
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONArray resultsArray = (JSONArray) jsonObject.get("results");
-            Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-            for (Object element : resultsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                String uriValue = (String) tmpElement.get("uri");
-                autosuggests.put(uriValue, new SuggestionItem(uriValue));
-                SuggestionItem tmpAutosuggest = autosuggests.get(uriValue);
-                String labelValue = (String) tmpElement.get("prefLabel");
-                tmpAutosuggest.setLabel(labelValue);
-                String vocabValue = (String) tmpElement.get("vocab");
-                tmpAutosuggest.setSchemeTitle(vocabValue);
-                JSONArray boraderArray = (JSONArray) tmpElement.get("broader");
-                JSONArray narrowerArray = (JSONArray) tmpElement.get("narrower");
-                tmpAutosuggest.setLanguage("en");
-                // query for broader
-                if (boraderArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        //query for label
-                        String broaderUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
-                        broaderUrl = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + broaderUrl;
-                        URL obj = new URL(broaderUrl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader broaderIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        String broaderInputLine;
-                        StringBuilder broaderResponse = new StringBuilder();
-                        while ((broaderInputLine = broaderIn.readLine()) != null) {
-                            broaderResponse.append(broaderInputLine);
-                        }
-                        broaderIn.close();
-                        // parse json
-                        JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(broaderResponse.toString());
-                        String broaderLabelValue = (String) broaderJsonObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, broaderLabelValue);
-                        tmpAutosuggest.setBroaderTerm(hstmp);
-                    }
-                }
-                // query for narrower
-                if (narrowerArray != null) {
-                    for (Object item : boraderArray) {
-                        JSONObject tmpObject = (JSONObject) item;
-                        HashMap<String, String> hstmp = new HashMap();
-                        String uriValueTmp = (String) tmpObject.get("uri");
-                        //query for label
-                        String narrowerUrl = GeneralFunctions.encodeURIComponent(uriValueTmp);
-                        narrowerUrl = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + narrowerUrl;
-                        URL obj = new URL(narrowerUrl);
-                        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-                        con.setRequestMethod("GET");
-                        BufferedReader narrowerIn = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-                        String narrowerInputLine;
-                        StringBuilder narrowerResponse = new StringBuilder();
-                        while ((narrowerInputLine = narrowerIn.readLine()) != null) {
-                            narrowerResponse.append(narrowerInputLine);
-                        }
-                        narrowerIn.close();
-                        // parse json
-                        JSONObject broaderJsonObject = (JSONObject) new JSONParser().parse(narrowerResponse.toString());
-                        String narrowerLabelValue = (String) broaderJsonObject.get("prefLabel");
-                        hstmp.put(uriValueTmp, narrowerLabelValue);
-                        tmpAutosuggest.setNarrowerTerm(hstmp);
-                    }
-                }
-                // get retcat info
-                String type = "fao";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                tmpAutosuggest.setType(type);
-                tmpAutosuggest.setQuality(quality);
-                tmpAutosuggest.setGroup(group);
-            }
-            // fill output json
+            outArray = fillOutputJSONforQuery(autosuggests);
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+    
+    @GET
+    @Path("/query/html")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getQueryResultsExtern(@QueryParam("query") String url) {
+        try {
+            Map<String, SuggestionItem> autosuggests = Retcat_HTML.query(url);
+            JSONArray outArray = new JSONArray();
             outArray = fillOutputJSONforQuery(autosuggests);
             return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
@@ -2043,124 +592,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoGetty(@QueryParam("url") String url) {
         try {
-            String sparqlendpoint = "http://vocab.getty.edu/sparql";
-            String sparql = "SELECT * { "
-                    + "<" + url + "> gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
-                    + "<" + url + "> skos:inScheme ?scheme. "
-                    + "?scheme rdfs:label ?schemeTitle. ";
-            if (url.contains("aat") || url.contains("ulan")) {
-                sparql += "OPTIONAL {<" + url + "> skos:scopeNote [dct:language gvp_lang:" + "en" + "; rdf:value ?scopeNote]} . ";
-            } else if (url.contains("tgn")) {
-                sparql += "OPTIONAL {<" + url + "> gvp:parentString ?scopeNote . } ";
-            }
-            sparql += "OPTIONAL {<" + url + "> gvp:broaderPreferred ?BroaderPreferred . ?BroaderPreferred gvp:prefLabelGVP [xl:literalForm ?BroaderPreferredTerm].} . ";
-            sparql += "OPTIONAL {?NarrowerPreferred gvp:broaderPreferred <" + url + "> . ?NarrowerPreferred gvp:prefLabelGVP [xl:literalForm ?NarrowerPreferredTerm].} . ";
-            sparql += " }";
-            URL obj = new URL(sparqlendpoint);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
-            JSONObject jsonOut = new JSONObject();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) prefLabel.get("value");
-                String labelLang = (String) prefLabel.get("xml:lang");
-                jsonOut.put("label", labelValue);
-                jsonOut.put("lang", labelLang);
-            }
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
-                String descValue = "";
-                if (scopeNote != null) {
-                    descValue = (String) scopeNote.get("value");
-                }
-                jsonOut.put("description", descValue);
-            }
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
-                String descValue = (String) scopeNote.get("value");
-                jsonOut.put("scheme", descValue);
-            }
-            HashMap<String, String> hmBroader = new HashMap();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
-                JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (bpObj != null) {
-                    String bp = (String) bpObj.get("value");
-                    String bpt = (String) bptObj.get("value");
-                    hmBroader.put(bpt, bp);
-                }
-            }
-            JSONArray tmpArrayBroader = new JSONArray();
-            Iterator itB = hmBroader.entrySet().iterator();
-            while (itB.hasNext()) {
-                Map.Entry pair = (Map.Entry) itB.next();
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("label", pair.getKey());
-                tmpObject.put("uri", pair.getValue());
-                tmpArrayBroader.add(tmpObject);
-                itB.remove();
-            }
-            jsonOut.put("broaderTerms", tmpArrayBroader);
-            HashMap<String, String> hmNarrower = new HashMap();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
-                JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (npObj != null) {
-                    String np = (String) npObj.get("value");
-                    String npt = (String) nptObj.get("value");
-                    hmNarrower.put(npt, np);
-                }
-            }
-            JSONArray tmpArrayNarrower = new JSONArray();
-            Iterator itN = hmNarrower.entrySet().iterator();
-            while (itN.hasNext()) {
-                Map.Entry pair = (Map.Entry) itN.next();
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("label", pair.getKey());
-                tmpObject.put("uri", pair.getValue());
-                tmpArrayNarrower.add(tmpObject);
-                itN.remove();
-            }
-            jsonOut.put("narrowerTerms", tmpArrayNarrower);
-            // get retcat info
-            String type = "getty";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
-            jsonOut.put("uri", url);
+            JSONObject jsonOut = Retcat_Getty.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2173,121 +605,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoHeritageData(@QueryParam("url") String url) {
         try {
-            String sparqlendpoint = "http://heritagedata.org/live/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>"
-                    + "SELECT * WHERE { "
-                    + "<" + url + "> skos:prefLabel ?prefLabel. "
-                    + "<" + url + "> skos:inScheme ?scheme . "
-                    + "?scheme rdfs:label ?schemeTitle . "
-                    + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
-                    + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                    + " }";
-            URL obj = new URL(sparqlendpoint);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
-            JSONObject jsonOut = new JSONObject();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
-                String labelValue = (String) prefLabel.get("value");
-                String labelLang = (String) prefLabel.get("xml:lang");
-                jsonOut.put("label", labelValue);
-                jsonOut.put("lang", labelLang);
-            }
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
-                String descValue = "";
-                if (scopeNote != null) {
-                    descValue = (String) scopeNote.get("value");
-                }
-                jsonOut.put("description", descValue);
-            }
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
-                String descValue = (String) scopeNote.get("value");
-                jsonOut.put("scheme", descValue);
-            }
-            HashMap<String, String> hmBroader = new HashMap();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
-                JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                if (bpObj != null) {
-                    String bp = (String) bpObj.get("value");
-                    String bpt = (String) bptObj.get("value");
-                    hmBroader.put(bpt, bp);
-                }
-            }
-            JSONArray tmpArrayBroader = new JSONArray();
-            Iterator itB = hmBroader.entrySet().iterator();
-            while (itB.hasNext()) {
-                Map.Entry pair = (Map.Entry) itB.next();
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("label", pair.getKey());
-                tmpObject.put("uri", pair.getValue());
-                tmpArrayBroader.add(tmpObject);
-                itB.remove();
-            }
-            jsonOut.put("broaderTerms", tmpArrayBroader);
-            HashMap<String, String> hmNarrower = new HashMap();
-            for (Object element : bindingsArray) {
-                JSONObject tmpElement = (JSONObject) element;
-                JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
-                JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                if (npObj != null) {
-                    String np = (String) npObj.get("value");
-                    String npt = (String) nptObj.get("value");
-                    hmNarrower.put(npt, np);
-                }
-            }
-            JSONArray tmpArrayNarrower = new JSONArray();
-            Iterator itN = hmNarrower.entrySet().iterator();
-            while (itN.hasNext()) {
-                Map.Entry pair = (Map.Entry) itN.next();
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("label", pair.getKey());
-                tmpObject.put("uri", pair.getValue());
-                tmpArrayNarrower.add(tmpObject);
-                itN.remove();
-            }
-            jsonOut.put("narrowerTerms", tmpArrayNarrower);
-            // get retcat info
-            String type = "heritagedata";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
-            jsonOut.put("uri", url);
+            JSONObject jsonOut = Retcat_HeritageData.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2300,137 +618,20 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoLabelingSystem(@QueryParam("url") String url) {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-                    + "SELECT * { "
-                    + "<" + url + "> ls:preferredLabel ?prefLabel. "
-                    + "<" + url + "> ls:hasStatusType ?statusType. "
-                    + "<" + url + "> skos:inScheme ?scheme . "
-                    + "?scheme dc:title ?schemeTitle . "
-                    + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
-                    + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm. } "
-                    + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm . } "
-                    + " }";
-            URL obj = new URL(sparqlendpoint);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("Accept", "application/sparql-results+json");
-            String urlParameters = "query=" + sparql;
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // init output
-            JSONObject jsonOut = new JSONObject();
-            // parse SPARQL results json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-            JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-            // create unique list of ids
-            if (!bindingsArray.isEmpty()) {
-                for (Object element : bindingsArray) {
-                    JSONObject tmpElement = (JSONObject) element;
-                    JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
-                    String labelValue = "";
-                    String labelLang = "";
-                    String stValue = "";
-                    if (prefLabel != null) {
-                        labelValue = (String) prefLabel.get("value");
-                        labelLang = (String) prefLabel.get("xml:lang");
-                        jsonOut.put("label", labelValue);
-                        jsonOut.put("lang", labelLang);
-                    } else {
-                        jsonOut.put("label", "");
-                    }
-                    JSONObject statusType = (JSONObject) tmpElement.get("statusType");
-                    stValue = (String) statusType.get("value");
-                    jsonOut.put("type", "ls");
-                    jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"), ""));
-                }
-                for (Object element : bindingsArray) {
-                    JSONObject tmpElement = (JSONObject) element;
-                    JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
-                    String descValue = "";
-                    if (scopeNote != null) {
-                        descValue = (String) scopeNote.get("value");
-                    }
-                    jsonOut.put("description", descValue);
-                }
-                for (Object element : bindingsArray) {
-                    JSONObject tmpElement = (JSONObject) element;
-                    JSONObject scopeNote = (JSONObject) tmpElement.get("schemeTitle");
-                    String descValue = (String) scopeNote.get("value");
-                    jsonOut.put("scheme", descValue);
-                }
-                HashMap<String, String> hmBroader = new HashMap();
-                for (Object element : bindingsArray) {
-                    JSONObject tmpElement = (JSONObject) element;
-                    JSONObject bpObj = (JSONObject) tmpElement.get("BroaderPreferred");
-                    JSONObject bptObj = (JSONObject) tmpElement.get("BroaderPreferredTerm");
-                    if (bpObj != null) {
-                        String bp = (String) bpObj.get("value");
-                        String bpt = (String) bptObj.get("value");
-                        hmBroader.put(bpt, bp);
-                    }
-                }
-                JSONArray tmpArrayBroader = new JSONArray();
-                Iterator itB = hmBroader.entrySet().iterator();
-                while (itB.hasNext()) {
-                    Map.Entry pair = (Map.Entry) itB.next();
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("label", pair.getKey());
-                    tmpObject.put("uri", pair.getValue());
-                    tmpArrayBroader.add(tmpObject);
-                    itB.remove();
-                }
-                jsonOut.put("broaderTerms", tmpArrayBroader);
-                HashMap<String, String> hmNarrower = new HashMap();
-                for (Object element : bindingsArray) {
-                    JSONObject tmpElement = (JSONObject) element;
-                    JSONObject npObj = (JSONObject) tmpElement.get("NarrowerPreferred");
-                    JSONObject nptObj = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
-                    if (npObj != null) {
-                        String np = (String) npObj.get("value");
-                        String npt = (String) nptObj.get("value");
-                        hmNarrower.put(npt, np);
-                    }
-                }
-                JSONArray tmpArrayNarrower = new JSONArray();
-                Iterator itN = hmNarrower.entrySet().iterator();
-                while (itN.hasNext()) {
-                    Map.Entry pair = (Map.Entry) itN.next();
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("label", pair.getKey());
-                    tmpObject.put("uri", pair.getValue());
-                    tmpArrayNarrower.add(tmpObject);
-                    itN.remove();
-                }
-                jsonOut.put("narrowerTerms", tmpArrayNarrower);
-                // get retcat info
-                String type = "ls";
-                String quality = "";
-                String group = "";
-                for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                    if (item.getType().equals(type)) {
-                        quality = item.getQuality();
-                        group = item.getGroup();
-                    }
-                }
-                jsonOut.put("quality", quality);
-                jsonOut.put("group", group);
-                jsonOut.put("uri", url);
-            } else {
-                throw new ResourceNotAvailableException();
-            }
+            JSONObject jsonOut = Retcat_LabelingSystem.info(url);
+            return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+    
+    @GET
+    @Path("/info/dbpedia")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response geInfoDBpedia(@QueryParam("url") String url) {
+        try {
+            JSONObject jsonOut = Retcat_Dbpedia.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2443,23 +644,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoExtern(@QueryParam("url") String url, @QueryParam("type") String type) {
         try {
-            url = GeneralFunctions.encodeURIUmlaut(url);
-            Document doc = Jsoup.connect(url).get();
-            Elements titleTag = doc.select("title");
-            JSONObject jsonOut = new JSONObject();
-            String out = titleTag.text();
-            if (url.startsWith("http://dbpedia.org/resource/")) {
-                out = out.replace("About: ", "");
-            }
-            jsonOut.put("label", out);
-            jsonOut.put("lang", "");
-            if (type != null) {
-                jsonOut.put("type", type);
-            } else {
-                jsonOut.put("type", "wayback");
-            }
-            jsonOut.put("quality", "low");
-            jsonOut.put("group", "wayback");
+            JSONObject jsonOut = Retcat_HTML.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2472,46 +657,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoGeoNames(@QueryParam("url") String url) {
         try {
-            url = url.replace("http://sws.geonames.org/", "");
-            url = "http://api.geonames.org/get?geonameId=" + url + "&username=" + ConfigProperties.getPropertyParam("geonames");
-            // query for xml
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("POST");
-            String urlParameters = "";
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse xml
-            int startTagName = response.indexOf("<name>");
-            int endTagName = response.indexOf("</name>");
-            String name = response.substring(startTagName, endTagName).replace("<name>", "");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", name);
-            jsonOut.put("lang", "");
-            // get retcat info
-            String type = "geonames";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_GeoNames.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2524,39 +670,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoPelagios(@QueryParam("url") String url) {
         try {
-            url = GeneralFunctions.encodeURIComponent(url);
-            url = "http://pelagios.org/peripleo/places/" + url;
-            // query for json
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            String title = (String) jsonObject.get("title");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", title);
-            jsonOut.put("lang", "");
-            // get retcat info
-            String type = "pleiades";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_Pleiades.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2569,39 +683,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoChronontology(@QueryParam("url") String url) {
         try {
-            url = url.replace("/period", "/data/period");
-            // query for json
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            JSONObject resourceObject = (JSONObject) jsonObject.get("resource");
-            String labelValue = resourceObject.get("prefLabel").toString().replace("}", "").split(":")[1].replace("\"", "");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", labelValue);
-            jsonOut.put("lang", "");
-            // get retcat info
-            String type = "chronontology";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_ChronOntology.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2614,40 +696,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoSkosmosFinto(@QueryParam("url") String url) {
         try {
-            // query for json
-            String vocab = url.split("/")[4];
-            url = GeneralFunctions.encodeURIComponent(url);
-            url = "http://api.finto.fi/rest/v1/" + vocab + "/label?lang=en&uri=" + url;
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            String labelValue = (String) jsonObject.get("prefLabel");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", labelValue);
-            jsonOut.put("lang", "");
-            // get retcat info
-            String type = "finto";
-            String quality = "";
-            String group = "en";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_Finto.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2660,39 +709,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoSkosmosFao(@QueryParam("url") String url) {
         try {
-            // query for json
-            url = GeneralFunctions.encodeURIComponent(url);
-            url = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + url;
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            String labelValue = (String) jsonObject.get("prefLabel");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", labelValue);
-            jsonOut.put("lang", "");
-            // get retcat info
-            String type = "fao";
-            String quality = "en";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_Fao.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2705,39 +722,7 @@ public class RetcatResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response geInfoSkosmosUnesco(@QueryParam("url") String url) {
         try {
-            // query for json
-            url = GeneralFunctions.encodeURIComponent(url);
-            url = "http://vocabularies.unesco.org/browser/rest/v1/thesaurus/label?lang=en&uri=" + url;
-            URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-            // parse json
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-            String labelValue = (String) jsonObject.get("prefLabel");
-            // output
-            JSONObject jsonOut = new JSONObject();
-            jsonOut.put("label", labelValue);
-            jsonOut.put("lang", "en");
-            // get retcat info
-            String type = "fao";
-            String quality = "";
-            String group = "";
-            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-                if (item.getType().equals(type)) {
-                    quality = item.getQuality();
-                    group = item.getGroup();
-                }
-            }
-            jsonOut.put("type", type);
-            jsonOut.put("quality", quality);
-            jsonOut.put("group", group);
+            JSONObject jsonOut = Retcat_Unesco.info(url);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -2816,6 +801,10 @@ public class RetcatResource {
             }
         }
         return outArray;
+    }
+
+    public static int getLimit() {
+        return LIMIT;
     }
 
 }

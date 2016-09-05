@@ -27,26 +27,28 @@ public class ResourceQueryResource {
     public Response redirectToRetcat(@QueryParam("retcat") String retcat, @QueryParam("query") String query) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
         List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
         boolean match = false;
-        //ckeck if own vocab
-        if (retcat.contains("this.")) {
-            String vocab = retcat.split("this.")[1];
-            query = GeneralFunctions.encodeURIComponent(query);
-            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/labelingsystem/" + vocab + "?query=" + query);
-            return Response.temporaryRedirect(targetURIForRedirection).build();
-        }
-        // look for other endpoints
-        for (RetcatItem item : retcatlist) {
-            if (retcat.contains(item.getName())) {
+        if (retcat != null) {
+            //ckeck if own vocab
+            if (retcat.contains("this.")) {
+                String vocab = retcat.split("this.")[1];
                 query = GeneralFunctions.encodeURIComponent(query);
-                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getQueryURL() + "?query=" + query);
+                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/labelingsystem/" + vocab + "?query=" + query);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
+            }
+            // look for other endpoints
+            for (RetcatItem item : retcatlist) {
+                if (retcat.contains(item.getName())) {
+                    query = GeneralFunctions.encodeURIComponent(query);
+                    URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getQueryURL() + "?query=" + query);
+                    return Response.temporaryRedirect(targetURIForRedirection).build();
+                }
             }
         }
         if (!match) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        } else {
-            return Response.ok().build();
+            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/html" + "?url=" + query);
+            return Response.temporaryRedirect(targetURIForRedirection).build();
         }
+        return Response.ok().build();
     }
 
 }

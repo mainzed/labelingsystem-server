@@ -78,7 +78,7 @@ public class RetcatItems {
         // DBPEDIA
         retcatList.add(new RetcatItem("DBpedia",
                 "DBpedia is a project aiming to extract structured content from the information created as part of the Wikipedia project. ",
-                "/v1/retcat/query/dbpedia", "/v1/retcat/info/html", "//dbpedia.org/resource", "additional information", "dbpedia", "de", "low"));
+                "/v1/retcat/query/dbpedia", "/v1/retcat/info/dbpedia", "//dbpedia.org/resource", "additional information", "dbpedia", "de", "low"));
         // GEONAMES
         retcatList.add(new RetcatItem("GeoNames",
                 "GeoNames is a geographical database available and accessible through various web services, under a Creative Commons attribution license.",
