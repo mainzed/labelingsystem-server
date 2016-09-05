@@ -1478,7 +1478,7 @@ public class RetcatResource {
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
+                    + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "}";
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -1616,7 +1616,7 @@ public class RetcatResource {
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                     + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
                     + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
-                    + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
+                    + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                     + "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                     + "}";
             URL obj = new URL(url);
