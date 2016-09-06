@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
+import v1.utils.config.ConfigProperties;
 
 @Path("/")
 public class RestResource {
@@ -21,6 +22,7 @@ public class RestResource {
             outObject.put("title", "Labeling System API Version 1.0");
             outObject.put("version", "1.0");
             outObject.put("wiki", "https://github.com/labelingsystem/server/wiki");
+            outObject.put("info", ConfigProperties.getPropertyParam("api") + "/v1/info");
             // get last modified data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
