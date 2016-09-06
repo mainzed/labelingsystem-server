@@ -95,12 +95,23 @@ public class Retcat_Dbpedia {
                 lang = (String) tmpObj.get("lang");
             }
         }
+        if (name.equals("")) {
+            JSONObject tmpObj = (JSONObject) nameArray.get(0);
+            name = (String) tmpObj.get("value");
+            lang = (String) tmpObj.get("lang");
+        }
         JSONArray abstractArray = (JSONArray) thisValue.get("http://dbpedia.org/ontology/abstract");
         String desc = "";
-        for (Object element : abstractArray) {
-            JSONObject tmpObj = (JSONObject) element;
-            String langTmp = (String) tmpObj.get("lang");
-            if (langTmp.equals("en")) {
+        if (abstractArray != null) {
+            for (Object element : abstractArray) {
+                JSONObject tmpObj = (JSONObject) element;
+                String langTmp = (String) tmpObj.get("lang");
+                if (langTmp.equals("en")) {
+                    desc = (String) tmpObj.get("value");
+                }
+            }
+            if (desc.equals("")) {
+                JSONObject tmpObj = (JSONObject) abstractArray.get(0);
                 desc = (String) tmpObj.get("value");
             }
         }
