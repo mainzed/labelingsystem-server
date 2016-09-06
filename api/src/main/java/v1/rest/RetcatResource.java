@@ -785,7 +785,7 @@ public class RetcatResource {
                         }
                     }
                 }
-                suggestionObject.put("narrrwerTerms", narrowerArrayNew);
+                suggestionObject.put("narrowerTerms", narrowerArrayNew);
                 // add information to output array
                 outArray.add(suggestionObject);
                 i++;
