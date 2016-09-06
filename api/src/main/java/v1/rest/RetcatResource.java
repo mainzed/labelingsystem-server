@@ -767,25 +767,25 @@ public class RetcatResource {
                     }
                 }
                 suggestionObject.put("broaderTerms", broaderArrayNew);
-                // narrrower
-                Set narrrowerTerms = tmpAS.getNarrowerTerms();
-                JSONArray narrrowerArrayNew = new JSONArray();
-                if (narrrowerTerms.size() > 0) {
-                    for (Object element : narrrowerTerms) {
+                // narrower
+                Set narrowerTerms = tmpAS.getNarrowerTerms();
+                JSONArray narrowerArrayNew = new JSONArray();
+                if (narrowerTerms.size() > 0) {
+                    for (Object element : narrowerTerms) {
                         Map hm = (Map) element;
                         Iterator entries = hm.entrySet().iterator();
                         while (entries.hasNext()) {
                             Map.Entry thisEntry = (Map.Entry) entries.next();
                             String key = (String) thisEntry.getKey();
                             String value = (String) thisEntry.getValue();
-                            JSONObject narrrowerObjectTmp = new JSONObject();
-                            narrrowerObjectTmp.put("uri", key);
-                            narrrowerObjectTmp.put("label", value);
-                            narrrowerArrayNew.add(narrrowerObjectTmp);
+                            JSONObject narrowerObjectTmp = new JSONObject();
+                            narrowerObjectTmp.put("uri", key);
+                            narrowerObjectTmp.put("label", value);
+                            narrowerArrayNew.add(narrowerObjectTmp);
                         }
                     }
                 }
-                suggestionObject.put("narrrowerTerms", narrrowerArrayNew);
+                suggestionObject.put("narrrwerTerms", narrowerArrayNew);
                 // add information to output array
                 outArray.add(suggestionObject);
                 i++;
