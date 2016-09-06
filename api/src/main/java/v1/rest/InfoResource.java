@@ -35,7 +35,7 @@ public class InfoResource {
             // get last modified data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            outObject.put("last modified", sdf.format(file.lastModified()));
+            outObject.put("last build", sdf.format(file.lastModified()));
             // get label data
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = "";

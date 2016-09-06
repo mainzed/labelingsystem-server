@@ -18,13 +18,13 @@ public class RestResource {
     public Response getAPIpage() {
         try {
             JSONObject outObject = new JSONObject();
-            outObject.put("name", "Labeling System API Version 1.0");
+            outObject.put("title", "Labeling System API Version 1.0");
             outObject.put("version", "1.0");
-            outObject.put("documentation", "https://github.com/labelingsystem/server");
+            outObject.put("wiki", "https://github.com/labelingsystem/server/wiki");
             // get last modified data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            outObject.put("last modified", sdf.format(file.lastModified()));
+            outObject.put("last build", sdf.format(file.lastModified()));
             return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RestResource"))
