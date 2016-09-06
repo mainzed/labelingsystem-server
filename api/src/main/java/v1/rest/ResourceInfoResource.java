@@ -23,17 +23,17 @@ public class ResourceInfoResource {
 
     @GET
     @Produces("application/json;charset=UTF-8")
-    public Response redirectToRetcat(@QueryParam("url") String url) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+    public Response redirectToRetcat(@QueryParam("uri") String uri) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
         List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
         boolean match = false;
         for (RetcatItem item : retcatlist) {
-            if (url.contains(item.getPrefix())) {
-                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getLabelURL() + "?url=" + url + "&type=" + item.getType());
+            if (uri.contains(item.getPrefix())) {
+                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + item.getLabelURL() + "?uri=" + uri + "&type=" + item.getType());
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             }
         }
         if (!match) {
-            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/info/html" + "?url=" + url);
+            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/info/html" + "?url=" + uri);
             return Response.temporaryRedirect(targetURIForRedirection).build();
         }
         return Response.ok().build();

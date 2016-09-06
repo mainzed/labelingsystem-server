@@ -324,13 +324,13 @@ public class RetcatResource {
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
             JSONObject resultsObject = (JSONObject) jsonObject.get("archived_snapshots");
             JSONObject resultsObject2 = (JSONObject) resultsObject.get("closest");
-            String wburl = null;
+            String wburi = null;
             try {
-                wburl = (String) resultsObject2.get("url");
+                wburi = (String) resultsObject2.get("url");
             } catch (Exception e) {
                 throw new WaybacklinkException("no wayback url available");
             }
-            jsonOut.put("url", wburl);
+            jsonOut.put("uri", wburi);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -371,9 +371,9 @@ public class RetcatResource {
     @GET
     @Path("/info/labelingsystem")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoLabelingSystem(@QueryParam("url") String url) {
+    public Response getInfoLabelingSystem(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_LabelingSystem.info(url);
+            JSONObject jsonOut = Retcat_LabelingSystem.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -429,9 +429,9 @@ public class RetcatResource {
     @GET
     @Path("/info/getty")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoGetty(@QueryParam("url") String url) {
+    public Response getInfoGetty(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Getty.info(url);
+            JSONObject jsonOut = Retcat_Getty.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -487,9 +487,9 @@ public class RetcatResource {
     @GET
     @Path("/info/heritagedata")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoHeritageData(@QueryParam("url") String url) {
+    public Response getInfoHeritageData(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_HeritageData.info(url);
+            JSONObject jsonOut = Retcat_HeritageData.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -515,9 +515,9 @@ public class RetcatResource {
     @GET
     @Path("/info/chronontology")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoChronontology(@QueryParam("url") String url) {
+    public Response getInfoChronontology(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_ChronOntology.info(url);
+            JSONObject jsonOut = Retcat_ChronOntology.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -543,9 +543,9 @@ public class RetcatResource {
     @GET
     @Path("/info/pelagiospleiadesplaces")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoPelagios(@QueryParam("url") String url) {
+    public Response getInfoPelagios(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Pleiades.info(url);
+            JSONObject jsonOut = Retcat_Pleiades.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -556,9 +556,9 @@ public class RetcatResource {
     @GET
     @Path("/info/skosmos/finto")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoSkosmosFinto(@QueryParam("url") String url) {
+    public Response getInfoSkosmosFinto(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Finto.info(url);
+            JSONObject jsonOut = Retcat_Finto.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -599,9 +599,9 @@ public class RetcatResource {
     @GET
     @Path("/info/skosmos/fao")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoSkosmosFao(@QueryParam("url") String url) {
+    public Response getInfoSkosmosFao(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Fao.info(url);
+            JSONObject jsonOut = Retcat_Fao.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -627,9 +627,9 @@ public class RetcatResource {
     @GET
     @Path("/info/skosmos/unesco")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoSkosmosUnesco(@QueryParam("url") String url) {
+    public Response getInfoSkosmosUnesco(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Unesco.info(url);
+            JSONObject jsonOut = Retcat_Unesco.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -655,9 +655,9 @@ public class RetcatResource {
     @GET
     @Path("/info/dbpedia")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoDBpedia(@QueryParam("url") String url) {
+    public Response getInfoDBpedia(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_Dbpedia.info(url);
+            JSONObject jsonOut = Retcat_Dbpedia.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -683,9 +683,9 @@ public class RetcatResource {
     @GET
     @Path("/info/geonames")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getInfoGeoNames(@QueryParam("url") String url) {
+    public Response getInfoGeoNames(@QueryParam("uri") String uri) {
         try {
-            JSONObject jsonOut = Retcat_GeoNames.info(url);
+            JSONObject jsonOut = Retcat_GeoNames.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
