@@ -10,9 +10,9 @@ RESTful API for Labeling System applications
 
 RESTful API to provide cool URIs for Labeling System items
 
-###guitest
+###db
 
-just a small test (will be deleted)
+SQlite database for auth and retcat functions
 
 ##Wiki
 
