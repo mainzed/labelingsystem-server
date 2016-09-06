@@ -45,7 +45,7 @@ public class Retcat_HTML {
         jsonOut.put("type", "wayback");
         jsonOut.put("quality", "low");
         jsonOut.put("group", "wayback");
-        jsonOut.put("url", outputUrl);
+        jsonOut.put("uri", outputUrl);
         JSONArray broader = new JSONArray();
         JSONArray narrower = new JSONArray();
         jsonOut.put("broaderTerms", broader);

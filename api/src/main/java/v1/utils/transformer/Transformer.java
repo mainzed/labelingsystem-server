@@ -856,7 +856,7 @@ public class Transformer {
             if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
                 for (Object element : closeMatchArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    closeMatchStringList.add((String) tmpjson.get("url"));
+                    closeMatchStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("closeMatch");
                 JSONArray arrayNew = new JSONArray();
@@ -874,7 +874,7 @@ public class Transformer {
             if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
                 for (Object element : exactMatchArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    exactMatchStringList.add((String) tmpjson.get("url"));
+                    exactMatchStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("exactMatch");
                 JSONArray arrayNew = new JSONArray();
@@ -892,7 +892,7 @@ public class Transformer {
             if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
                 for (Object element : relatedMatchArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    relatedMatchStringList.add((String) tmpjson.get("url"));
+                    relatedMatchStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("relatedMatch");
                 JSONArray arrayNew = new JSONArray();
@@ -910,7 +910,7 @@ public class Transformer {
             if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
                 for (Object element : narrowMatchArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    narrowMatchStringList.add((String) tmpjson.get("url"));
+                    narrowMatchStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("narrowMatch");
                 JSONArray arrayNew = new JSONArray();
@@ -928,7 +928,7 @@ public class Transformer {
             if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
                 for (Object element : broadMatchArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    broadMatchStringList.add((String) tmpjson.get("url"));
+                    broadMatchStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("broadMatch");
                 JSONArray arrayNew = new JSONArray();
@@ -946,7 +946,7 @@ public class Transformer {
             if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
                 for (Object element : seeAlsoArray) {
                     JSONObject tmpjson = (JSONObject) element;
-                    seeAlsoStringList.add((String) tmpjson.get("url"));
+                    seeAlsoStringList.add((String) tmpjson.get("uri"));
                 }
                 labelObject.remove("seeAlso");
                 JSONArray arrayNew = new JSONArray();
@@ -1209,7 +1209,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     // get retcat info
                     boolean match = false;
                     for (RetcatItem item : retcatlist) {
@@ -1236,7 +1236,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     // get retcat info
                     boolean match = false;
                     for (RetcatItem item : retcatlist) {
@@ -1263,7 +1263,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     // get retcat info
                     boolean match = false;
                     for (RetcatItem item : retcatlist) {
@@ -1290,7 +1290,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     // get retcat info
                     boolean match = false;
                     for (RetcatItem item : retcatlist) {
@@ -1317,7 +1317,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     // get retcat info
                     boolean match = false;
                     for (RetcatItem item : retcatlist) {
@@ -1344,7 +1344,7 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("url", value);
+                    tmpObject.put("uri", value);
                     tmpObject.put("type", "wayback");
                     arrayNew.add(tmpObject);
                 }
