@@ -917,7 +917,6 @@ public class LabelsResource {
 		triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
 		triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
 		triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-		triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
 		triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
@@ -946,7 +945,6 @@ public class LabelsResource {
 			triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
 			triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
 			triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-			triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
 			triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
 			triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
 			triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
@@ -971,7 +969,6 @@ public class LabelsResource {
 		triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
 		triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
 		triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-		triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
 		triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
@@ -995,7 +992,6 @@ public class LabelsResource {
 		triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
 		triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
 		triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-		triples += "ls_rev" + ":" + revID + " a prov:Modify . ";
 		triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
 		triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";

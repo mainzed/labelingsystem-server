@@ -357,12 +357,6 @@ public class CSV implements Runnable {
 			TRIPLE_LIST.add(label);
 			label = "";
 			label += "<" + rdf.getPrefixItem("ls_rev:" + revisionid) + "> ";
-			label += "<" + rdf.getPrefixItem("rdf:type") + "> ";
-			label += "<" + rdf.getPrefixItem("prov:Modify") + "> ";
-			label += ". ";
-			TRIPLE_LIST.add(label);
-			label = "";
-			label += "<" + rdf.getPrefixItem("ls_rev:" + revisionid) + "> ";
 			label += "<" + rdf.getPrefixItem("dc:identifier") + "> ";
 			label += "\"" + revisionid + "\" ";
 			label += ". ";
