@@ -142,6 +142,26 @@ public class RetcatResource {
     }
 
     @GET
+    @Path("/info/types")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getRetcatTypes() {
+        try {
+            JSONArray outArray = new JSONArray();
+            HashSet<String> groupList = new HashSet();
+            for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+                groupList.add(item.getType());
+            }
+            for (String item : groupList) {
+                outArray.add(item);
+            }
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    @GET
     @Path("/vocabulary/{vocabulary}")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response getRetcatListByVocabulary(@PathParam("vocabulary") String vocabulary) {
