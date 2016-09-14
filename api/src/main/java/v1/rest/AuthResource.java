@@ -4,12 +4,15 @@ import exceptions.Logging;
 import v1.utils.crypt.Crypt;
 import v1.utils.db.SQlite;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
+import v1.utils.uuid.UniqueIdentifier;
 
 @Path("/auth")
 public class AuthResource {
@@ -20,14 +23,16 @@ public class AuthResource {
 	public Response loginUser(@FormParam("user") String user, @FormParam("pwd") String pwd) {
 		JSONObject jsonOut = new JSONObject();
 		try {
+			String secretToken = UniqueIdentifier.getUUID();
 			String role = SQlite.getUserInfoAndCheckPassword(user, pwd);
-			boolean login = SQlite.setLogin(user, role);
+			boolean login = SQlite.setLogin(user + ";" + secretToken, role);
 			if (login) {
-				String status[] = SQlite.getLoginStatus(user);
+				String status[] = SQlite.getLoginStatus(user + ";" + secretToken);
 				jsonOut.put("verified", true);
 				jsonOut.put("user", user);
 				jsonOut.put("role", status[0]);
 				jsonOut.put("date", status[1]);
+				jsonOut.put("token", secretToken);
 			}
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
@@ -41,13 +46,13 @@ public class AuthResource {
 		}
 	}
 
-	@POST
+	@GET
 	@Path("/status")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response statusUser(@FormParam("user") String user) {
+	public Response statusUser(@QueryParam("user") String user, @QueryParam("token") String token) {
 		JSONObject jsonOut = new JSONObject();
 		try {
-			String status[] = SQlite.getLoginStatus(user);
+			String status[] = SQlite.getLoginStatus(user + ";" + token);
 			if (status[0] != null) {
 				jsonOut.put("verified", true);
 				jsonOut.put("user", user);
