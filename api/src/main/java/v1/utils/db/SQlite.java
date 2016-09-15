@@ -10,15 +10,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.UUID;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class SQlite {
 
 	private static final String DBDRIVER = "org.sqlite.JDBC";
 
-	/**
-	 * ******
-	 * USERS * *******
-	 */
+	// USERS
 	public static String getUserInfoAndCheckPassword(String user, String password) throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
 		String ret = null;
 		String db_password = "";
@@ -103,61 +102,33 @@ public class SQlite {
 		}
 	}
 
-	/**
-	 * ********
-	 * RETCATS * ********
-	 */
-	public static boolean insertRetcatString(String vocabulary, String retcatString) throws ClassNotFoundException, IOException {
-		boolean ret = false;
+	public static JSONArray getUsersInfo() throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
+		JSONArray users = new JSONArray();
 		Class.forName(DBDRIVER);
 		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
 			try (Statement stmt = c.createStatement()) {
-				String sql = "INSERT INTO retcat (vocabulary,retcat) VALUES ('" + vocabulary + "','" + retcatString + "')";
-				stmt.executeUpdate(sql);
-			}
-			ret = true;
-		} catch (Exception e) {
-			throw new NullPointerException(e.toString());
-		} finally {
-			return ret;
-		}
-	}
-
-	public static boolean deleteRetcatEntry(String vocabulary) throws ClassNotFoundException, IOException {
-		boolean ret = false;
-		Class.forName(DBDRIVER);
-		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
-			try (Statement stmt = c.createStatement()) {
-				String sql = "DELETE FROM retcat WHERE vocabulary = '" + vocabulary + "'";
-				stmt.executeUpdate(sql);
-			}
-			ret = true;
-		} catch (Exception e) {
-			throw new NullPointerException(e.toString());
-		} finally {
-			return ret;
-		}
-	}
-
-	public static String getRetcatByVocabulary(String vocabulary) throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
-		String ret = null;
-		Class.forName(DBDRIVER);
-		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
-			try (Statement stmt = c.createStatement()) {
-				String sql = "SELECT retcat FROM retcat WHERE vocabulary = '" + vocabulary + "'";
+				String sql = "SELECT * FROM users";
 				try (ResultSet rs = stmt.executeQuery(sql)) {
 					while (rs.next()) {
-						ret = rs.getString("retcat");
+						JSONObject userObject = new JSONObject();
+						userObject.put("username", rs.getString("user_name"));
+						userObject.put("role", rs.getString("role"));
+						if (rs.getString("activation_token").equals("-1")) {
+							userObject.put("status", "active");
+						} else {
+							userObject.put("status", "inactive");
+						}
+						users.add(userObject);
 					}
 				}
 			}
+			return users;
 		} catch (Exception e) {
-			throw new NullPointerException(e.toString());
+			throw new AccessDeniedException(e.toString());
 		}
-		return ret;
 	}
 
-	// LOGIN //
+	// LOGIN
 	public static boolean setLogin(String user, String role) throws ClassNotFoundException, IOException, NoSuchAlgorithmException {
 		boolean ret = false;
 		Calendar cal = Calendar.getInstance();
@@ -212,6 +183,57 @@ public class SQlite {
 		} finally {
 			return ret;
 		}
+	}
+
+	// RETCAT
+	public static boolean insertRetcatString(String vocabulary, String retcatString) throws ClassNotFoundException, IOException {
+		boolean ret = false;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "INSERT INTO retcat (vocabulary,retcat) VALUES ('" + vocabulary + "','" + retcatString + "')";
+				stmt.executeUpdate(sql);
+			}
+			ret = true;
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		} finally {
+			return ret;
+		}
+	}
+
+	public static boolean deleteRetcatEntry(String vocabulary) throws ClassNotFoundException, IOException {
+		boolean ret = false;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "DELETE FROM retcat WHERE vocabulary = '" + vocabulary + "'";
+				stmt.executeUpdate(sql);
+			}
+			ret = true;
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		} finally {
+			return ret;
+		}
+	}
+
+	public static String getRetcatByVocabulary(String vocabulary) throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
+		String ret = null;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "SELECT retcat FROM retcat WHERE vocabulary = '" + vocabulary + "'";
+				try (ResultSet rs = stmt.executeQuery(sql)) {
+					while (rs.next()) {
+						ret = rs.getString("retcat");
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		}
+		return ret;
 	}
 
 }

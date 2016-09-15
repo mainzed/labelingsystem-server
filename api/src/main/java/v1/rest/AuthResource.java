@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import v1.utils.uuid.UniqueIdentifier;
 
@@ -94,8 +95,7 @@ public class AuthResource {
 		try {
 			Boolean res = SQlite.insertUser(user, pwd);
 			JSONObject jsonOut = new JSONObject();
-			jsonOut.put("status", res);
-			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+			return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -109,8 +109,7 @@ public class AuthResource {
 		try {
 			Boolean res = SQlite.deactivateUser(user);
 			JSONObject jsonOut = new JSONObject();
-			jsonOut.put("status", res);
-			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+			return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -124,8 +123,7 @@ public class AuthResource {
 		try {
 			Boolean res = SQlite.activateUser(user);
 			JSONObject jsonOut = new JSONObject();
-			jsonOut.put("status", res);
-			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+			return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -142,6 +140,19 @@ public class AuthResource {
 			JSONObject jsonOut = new JSONObject();
 			jsonOut.put("hash", hash);
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+
+	@GET
+	@Path("/users")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getUserList(@QueryParam("user") String user) {
+		try {
+			JSONArray users = SQlite.getUsersInfo();
+			return Response.ok(users).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
