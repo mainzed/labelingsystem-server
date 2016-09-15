@@ -18,6 +18,7 @@ import v1.utils.generalfuncs.GeneralFunctions;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -513,6 +514,25 @@ public class AgentsResource {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AgentsResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
 			}
+		}
+	}
+
+	@GET
+	@Path("/info/groups")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getGroups() {
+		try {
+			String groups = ConfigProperties.getPropertyParam("groups");
+			String[] groupsArray = groups.split(";");
+			Arrays.sort(groupsArray);
+			JSONArray outArray = new JSONArray();
+			for (String item : groupsArray) {
+				outArray.add(item);
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AgentsResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
 
