@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -18,6 +19,7 @@ import org.json.simple.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
+import rdf.RDF4J_20;
 import v1.utils.retcat.RetcatItem;
 
 public class Transformer {
@@ -125,6 +127,7 @@ public class Transformer {
 			vocabularyObject.remove(rdf.getPrefixItem("id"));
 			vocabularyObject.remove("revisionIDs");
 			vocabularyObject.remove("statusType");
+			vocabularyObject.remove("statistics");
 			// add object
 			rdfObject.put(rdf.getPrefixItem("ls_voc" + ":" + id), vocabularyObject);
 			return rdfObject.toJSONString();
@@ -336,6 +339,49 @@ public class Transformer {
 			vocabularyObject.remove(rdf.getPrefixItem("rdf:type"));
 			vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
 			vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
+			// statstics
+			String query = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT (COUNT(DISTINCT ?l) AS ?labels) (COUNT(?b) AS ?broader) (COUNT(?n) AS ?narrower) (COUNT(?r) AS ?related) (COUNT(?bm) AS ?broadMatch) (COUNT(?nm) AS ?narrowMatch) (COUNT(?rm) AS ?relatedMatch) (COUNT(?cm) AS ?closeMatch) (COUNT(?em) AS ?exactMatch) ?id ?title WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?v dc:title ?title . OPTIONAL{?l skos:broader ?b.} OPTIONAL{?l skos:narrower ?n.} OPTIONAL{?l skos:related ?n.} OPTIONAL{?l skos:broadMatch ?bm.} OPTIONAL{?l skos:narrowMatch ?nm.} OPTIONAL{?l skos:relatedMatch ?rm.} OPTIONAL{?l skos:closeMatch ?cm.} OPTIONAL{?l skos:exactMatch ?em.}  FILTER (?id = \"" + id + "\")} GROUP BY ?id ?v ?title";
+			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+			List<String> labels = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "labels");
+			List<String> broader = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "broader");
+			List<String> narrower = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "narrower");
+			List<String> related = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "related");
+			List<String> broadMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "broadMatch");
+			List<String> narrowMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "narrowMatch");
+			List<String> relatedMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "relatedMatch");
+			List<String> closeMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "closeMatch");
+			List<String> exactMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "exactMatch");
+			JSONObject statstics = new JSONObject();
+			statstics.put("labelCount", Integer.parseInt(labels.toArray()[0].toString()));
+			int internalLinks = 0;
+			if (broader.toArray()[0] != null) {
+				internalLinks += Integer.parseInt(broader.toArray()[0].toString());
+			}
+			if (narrower.toArray()[0] != null) {
+				internalLinks += Integer.parseInt(narrower.toArray()[0].toString());
+			}
+			if (related.toArray()[0] != null) {
+				internalLinks += Integer.parseInt(related.toArray()[0].toString());
+			}
+			int externalLinks = 0;
+			if (broadMatch.toArray()[0] != null) {
+				externalLinks += Integer.parseInt(broadMatch.toArray()[0].toString());
+			}
+			if (narrowMatch.toArray()[0] != null) {
+				externalLinks += Integer.parseInt(narrowMatch.toArray()[0].toString());
+			}
+			if (relatedMatch.toArray()[0] != null) {
+				externalLinks += Integer.parseInt(relatedMatch.toArray()[0].toString());
+			}
+			if (closeMatch.toArray()[0] != null) {
+				externalLinks += Integer.parseInt(closeMatch.toArray()[0].toString());
+			}
+			if (exactMatch.toArray()[0] != null) {
+				externalLinks += Integer.parseInt(exactMatch.toArray()[0].toString());
+			}
+			statstics.put("externalLinks", externalLinks);
+			statstics.put("internalLinks", internalLinks);
+			vocabularyObject.put(rdf.getPrefixItem("statistics"), statstics);
 		} catch (Exception e) {
 			int errorLine = -1;
 			for (StackTraceElement element : e.getStackTrace()) {
