@@ -546,11 +546,10 @@ public class AgentsResource {
 			String item = "ls_age";
 			// parse name
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-			String itemID = (String) jsonObject.get("name");
-			String groupID = (String) jsonObject.get("group");
+			String itemID = (String) jsonObject.get("id");
 			// create triples
 			json = Transformer.agent_POST(json, itemID);
-			String triples = createAgentSPARQLUPDATE(item, itemID, groupID);
+			String triples = createAgentSPARQLUPDATE(item, itemID);
 			// input triples
 			RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
@@ -675,15 +674,13 @@ public class AgentsResource {
 		}
 	}
 
-	private static String createAgentSPARQLUPDATE(String item, String itemid, String groupid) throws ConfigException, IOException, UniqueIdentifierException {
+	private static String createAgentSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String prefixes = rdf.getPREFIXSPARQL();
 		String triples = prefixes + "INSERT DATA { ";
 		triples += item + ":" + itemid + " a ls:Agent . ";
 		triples += item + ":" + itemid + " a foaf:Agent . ";
 		triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
-		triples += item + ":" + itemid + " foaf:accountName \"" + itemid + "\"" + " . ";
-		triples += item + ":" + itemid + " ls:inGroup \"" + groupid + "\"" + " . ";
 		triples += " }";
 		return triples;
 	}
@@ -697,7 +694,7 @@ public class AgentsResource {
 				+ "?agent ?p ?o. "
 				+ "?agent dc:identifier ?identifier. "
 				+ "FILTER (?identifier=\"$identifier\") "
-				+ "FILTER (?p IN (foaf:mbox,foaf:firstName,foaf:lastName,foaf:homepage,foaf:img,geo:lat,geo:lon)) "
+				+ "FILTER (?p IN (foaf:mbox,foaf:firstName,foaf:lastName,foaf:homepage,foaf:img,geo:lat,geo:lon,foaf:title,dct:publisher,dct:isPartOf)) "
 				+ "}";
 		update = update.replace("$identifier", id);
 		return update;

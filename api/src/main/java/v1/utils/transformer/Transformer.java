@@ -478,16 +478,16 @@ public class Transformer {
 		if (flushArray != null && !flushArray.isEmpty()) {
 			return agentObject.toJSONString();
 		} else {
-			// change email
-			String emailString = (String) agentObject.get("email");
-			if (emailString != null && !emailString.isEmpty()) {
-				agentObject.remove("email");
-				JSONArray emailArrayNew = new JSONArray();
-				JSONObject emailObject = new JSONObject();
-				emailObject.put("type", "uri");
-				emailObject.put("value", emailString);
-				emailArrayNew.add(emailObject);
-				agentObject.put(rdf.getPrefixItem("foaf:mbox"), emailArrayNew);
+			// change title
+			String titleString = (String) agentObject.get("title");
+			if (titleString != null && !titleString.isEmpty()) {
+				agentObject.remove("title");
+				JSONArray titleArrayNew = new JSONArray();
+				JSONObject titleObject = new JSONObject();
+				titleObject.put("type", "literal");
+				titleObject.put("value", titleString);
+				titleArrayNew.add(titleObject);
+				agentObject.put(rdf.getPrefixItem("foaf:title"), titleArrayNew);
 			}
 			// change firstName
 			String firstNameString = (String) agentObject.get("firstName");
@@ -510,6 +510,39 @@ public class Transformer {
 				lastNameObject.put("value", lastNameString);
 				lastNameArrayNew.add(lastNameObject);
 				agentObject.put(rdf.getPrefixItem("foaf:lastName"), lastNameArrayNew);
+			}
+			// change orcid
+			String orcidString = (String) agentObject.get("orcid");
+			if (orcidString != null && !orcidString.isEmpty()) {
+				agentObject.remove("orcid");
+				JSONArray orcidArrayNew = new JSONArray();
+				JSONObject orcidObject = new JSONObject();
+				orcidObject.put("type", "literal");
+				orcidObject.put("value", orcidString);
+				orcidArrayNew.add(orcidObject);
+				agentObject.put(rdf.getPrefixItem("dct:publisher"), orcidArrayNew);
+			}
+			// change affiliation
+			String affiliationString = (String) agentObject.get("affiliation");
+			if (affiliationString != null && !affiliationString.isEmpty()) {
+				agentObject.remove("affiliation");
+				JSONArray affiliationArrayNew = new JSONArray();
+				JSONObject affiliationObject = new JSONObject();
+				affiliationObject.put("type", "literal");
+				affiliationObject.put("value", affiliationString);
+				affiliationArrayNew.add(affiliationObject);
+				agentObject.put(rdf.getPrefixItem("dct:isPartOf"), affiliationArrayNew);
+			}
+			// change email
+			String emailString = (String) agentObject.get("email");
+			if (emailString != null && !emailString.isEmpty()) {
+				agentObject.remove("email");
+				JSONArray emailArrayNew = new JSONArray();
+				JSONObject emailObject = new JSONObject();
+				emailObject.put("type", "uri");
+				emailObject.put("value", emailString);
+				emailArrayNew.add(emailObject);
+				agentObject.put(rdf.getPrefixItem("foaf:mbox"), emailArrayNew);
 			}
 			// change homepage
 			String homepageString = (String) agentObject.get("homepage");
@@ -557,16 +590,17 @@ public class Transformer {
 			}
 			// delete items
 			agentObject.remove(rdf.getPrefixItem("id"));
-			agentObject.remove(rdf.getPrefixItem("group"));
 			agentObject.remove(rdf.getPrefixItem("name"));
 			agentObject.remove(rdf.getPrefixItem("email"));
 			agentObject.remove(rdf.getPrefixItem("firstName"));
 			agentObject.remove(rdf.getPrefixItem("lastName"));
-			// delete optional items
 			agentObject.remove(rdf.getPrefixItem("homepage"));
 			agentObject.remove(rdf.getPrefixItem("img"));
 			agentObject.remove(rdf.getPrefixItem("lat"));
 			agentObject.remove(rdf.getPrefixItem("lon"));
+			agentObject.remove(rdf.getPrefixItem("title"));
+			agentObject.remove(rdf.getPrefixItem("affiliation"));
+			agentObject.remove(rdf.getPrefixItem("orcid"));
 			// add object
 			rdfObject.put(rdf.getPrefixItem("ls_age" + ":" + id), agentObject);
 			return rdfObject.toJSONString();
@@ -593,34 +627,14 @@ public class Transformer {
 					agentObject.put(rdf.getPrefixItem("id"), value);
 				}
 			}
-			// change ls:inGroup
-			JSONArray groupArray = (JSONArray) agentObject.get(rdf.getPrefixItem("ls:inGroup"));
-			if (groupArray != null && !groupArray.isEmpty()) {
-				for (Object element : groupArray) {
-					agentObject.remove(rdf.getPrefixItem("ls:inGroup"));
+			// change foaf:title
+			JSONArray titleArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:title"));
+			if (titleArray != null && !titleArray.isEmpty()) {
+				for (Object element : titleArray) {
+					agentObject.remove(rdf.getPrefixItem("foaf:title"));
 					JSONObject obj = (JSONObject) element;
 					String value = (String) obj.get("value");
-					agentObject.put(rdf.getPrefixItem("group"), value);
-				}
-			}
-			// change foaf:accountName
-			JSONArray accountNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:accountName"));
-			if (accountNameArray != null && !accountNameArray.isEmpty()) {
-				for (Object element : accountNameArray) {
-					agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
-					JSONObject obj = (JSONObject) element;
-					String value = (String) obj.get("value");
-					agentObject.put(rdf.getPrefixItem("name"), value);
-				}
-			}
-			// change foaf:mbox
-			JSONArray mboxArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:mbox"));
-			if (mboxArray != null && !mboxArray.isEmpty()) {
-				for (Object element : mboxArray) {
-					agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
-					JSONObject obj = (JSONObject) element;
-					String value = (String) obj.get("value");
-					agentObject.put(rdf.getPrefixItem("email"), value);
+					agentObject.put(rdf.getPrefixItem("title"), value);
 				}
 			}
 			// change foaf:firstName
@@ -633,7 +647,7 @@ public class Transformer {
 					agentObject.put(rdf.getPrefixItem("firstName"), value);
 				}
 			}
-			// change foaf:firstName
+			// change foaf:lastName
 			JSONArray lastNameArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:lastName"));
 			if (lastNameArray != null && !lastNameArray.isEmpty()) {
 				for (Object element : lastNameArray) {
@@ -641,6 +655,36 @@ public class Transformer {
 					JSONObject obj = (JSONObject) element;
 					String value = (String) obj.get("value");
 					agentObject.put(rdf.getPrefixItem("lastName"), value);
+				}
+			}
+			// change dct:publisher
+			JSONArray publisherArray = (JSONArray) agentObject.get(rdf.getPrefixItem("dct:publisher"));
+			if (publisherArray != null && !publisherArray.isEmpty()) {
+				for (Object element : publisherArray) {
+					agentObject.remove(rdf.getPrefixItem("dct:publisher"));
+					JSONObject obj = (JSONObject) element;
+					String value = (String) obj.get("value");
+					agentObject.put(rdf.getPrefixItem("orcid"), value);
+				}
+			}
+			// change dct:isPartOf
+			JSONArray partOfArray = (JSONArray) agentObject.get(rdf.getPrefixItem("dct:isPartOf"));
+			if (partOfArray != null && !partOfArray.isEmpty()) {
+				for (Object element : partOfArray) {
+					agentObject.remove(rdf.getPrefixItem("dct:isPartOf"));
+					JSONObject obj = (JSONObject) element;
+					String value = (String) obj.get("value");
+					agentObject.put(rdf.getPrefixItem("affiliation"), value);
+				}
+			}
+			// change foaf:mbox
+			JSONArray mboxArray = (JSONArray) agentObject.get(rdf.getPrefixItem("foaf:mbox"));
+			if (mboxArray != null && !mboxArray.isEmpty()) {
+				for (Object element : mboxArray) {
+					agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
+					JSONObject obj = (JSONObject) element;
+					String value = (String) obj.get("value");
+					agentObject.put(rdf.getPrefixItem("email"), value);
 				}
 			}
 			// change foaf:homepage
@@ -689,8 +733,13 @@ public class Transformer {
 			agentObject.remove(rdf.getPrefixItem("rdf:type"));
 			agentObject.remove(rdf.getPrefixItem("ls:sameAs"));
 			agentObject.remove(rdf.getPrefixItem("dc:identifier"));
-			agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
 			agentObject.remove(rdf.getPrefixItem("foaf:mbox"));
+			agentObject.remove(rdf.getPrefixItem("foaf:title"));
+			agentObject.remove(rdf.getPrefixItem("dct:isPartOf"));
+			agentObject.remove(rdf.getPrefixItem("dct:publisher"));
+			agentObject.remove(rdf.getPrefixItem("dct:publisher"));
+			agentObject.remove(rdf.getPrefixItem("foaf:accountName"));
+			agentObject.remove(rdf.getPrefixItem("ls:inGroup"));
 			agentObject.remove(rdf.getPrefixItem("foaf:firstName"));
 			agentObject.remove(rdf.getPrefixItem("foaf:lastName"));
 			agentObject.remove(rdf.getPrefixItem("foaf:homepage"));
