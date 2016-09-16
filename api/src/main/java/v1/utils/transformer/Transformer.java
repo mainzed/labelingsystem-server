@@ -796,6 +796,21 @@ public class Transformer {
 				}
 				labelObject.put(rdf.getPrefixItem("skos:prefLabel"), arrayNew);
 			}
+			// change releasetype
+			String releaseString = (String) labelObject.get("releaseType");
+			if (releaseString != null && !releaseString.isEmpty()) {
+				labelObject.remove("releaseType");
+				JSONArray releaseArrayNew = new JSONArray();
+				JSONObject releaseObject = new JSONObject();
+				releaseObject.put("type", "uri");
+				if (releaseString.equals("draft")) {
+					releaseObject.put("value", rdf.getPrefixItem("ls:Draft"));
+				} else {
+					releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
+				}
+				releaseArrayNew.add(releaseObject);
+				labelObject.put(rdf.getPrefixItem("ls:hasReleaseType"), releaseArrayNew);
+			}
 			// change vocabID
 			String vocabArray = (String) labelObject.get("vocabID");
 			if (vocabArray != null && !vocabArray.isEmpty()) {
@@ -1076,6 +1091,7 @@ public class Transformer {
 			labelObject.remove(rdf.getPrefixItem("modifications"));
 			labelObject.remove(rdf.getPrefixItem("lastModified"));
 			labelObject.remove(rdf.getPrefixItem("revisionIDs"));
+			labelObject.remove(rdf.getPrefixItem("releaseType"));
 			// add object
 			rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
 			return rdfObject.toJSONString();
@@ -1235,6 +1251,23 @@ public class Transformer {
 					}
 					if (fields == null || fields.contains("statusType")) {
 						labelObject.put(rdf.getPrefixItem("statusType"), value);
+					}
+				}
+			}
+			// change ls:hasReleaseType
+			JSONArray releaseTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
+			if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
+				for (Object element : releaseTypeArray) {
+					labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
+					JSONObject obj = (JSONObject) element;
+					String value = (String) obj.get("value");
+					if (value.contains("Draft")) {
+						value = "draft";
+					} else {
+						value = "public";
+					}
+					if (fields == null || fields.contains("releaseType")) {
+						labelObject.put(rdf.getPrefixItem("releaseType"), value);
 					}
 				}
 			}
@@ -1504,6 +1537,7 @@ public class Transformer {
 			labelObject.remove(rdf.getPrefixItem("rdf:type"));
 			labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
 			labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
+			labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
 		} catch (Exception e) {
 			int errorLine = -1;
 			for (StackTraceElement element : e.getStackTrace()) {

@@ -961,7 +961,7 @@ public class VocabsResource {
         return update;
     }
 
-    private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
+    /*private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
         List<String> deleteList = new ArrayList<String>();
@@ -1018,7 +1018,7 @@ public class VocabsResource {
         update += ")) }";
         update = update.replace("$identifier", id);
         return update;
-    }
+    }*/
 
     private static String deleteVocabularySPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));

@@ -517,25 +517,6 @@ public class AgentsResource {
 		}
 	}
 
-	@GET
-	@Path("/info/groups")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getGroups() {
-		try {
-			String groups = ConfigProperties.getPropertyParam("groups");
-			String[] groupsArray = groups.split(";");
-			Arrays.sort(groupsArray);
-			JSONArray outArray = new JSONArray();
-			for (String item : groupsArray) {
-				outArray.add(item);
-			}
-			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AgentsResource"))
-					.header("Content-Type", "application/json;charset=UTF-8").build();
-		}
-	}
-
 	@POST
 	@Path("/")
 	@Consumes(MediaType.APPLICATION_JSON)

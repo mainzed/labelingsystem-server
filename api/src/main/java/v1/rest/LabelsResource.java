@@ -73,6 +73,8 @@ public class LabelsResource {
 			@QueryParam("limit") String limit,
 			@QueryParam("creator") String creator,
 			@QueryParam("contributor") String contributor,
+			@QueryParam("statusType") String statusType,
+            @QueryParam("releaseType") String releaseType,
 			@QueryParam("prefLabel") String prefLabel,
 			@QueryParam("vocab") String vocab,
 			@QueryParam("context") String context,
@@ -95,6 +97,9 @@ public class LabelsResource {
 					+ "OPTIONAL { ?s ls:hasContext ?context . } " // because of filtering
 					+ "OPTIONAL { ?s ls:hasStatusType ?statusType . } "; // because of filtering
 			// FILTERING
+			if (draft == null) {
+                //query += "?s ls:hasReleaseType ls:Public . ";
+            }
 			if (deprecated == null) {
 				query += "?s ls:hasStatusType ls:Active . ";
 			}
@@ -1014,7 +1019,7 @@ public class LabelsResource {
 				+ "OPTIONAL { ?resource skos:broader ?label . } "
 				+ "OPTIONAL { ?resource skos:narrower ?label . } "
 				+ "FILTER (?identifier=\"$identifier\") "
-				+ "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,skos:inScheme)) "
+				+ "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasReleaseType, ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,skos:inScheme)) "
 				+ "}";
 		update = update.replace("$identifier", id);
 		return update;
