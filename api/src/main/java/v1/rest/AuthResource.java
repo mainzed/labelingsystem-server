@@ -1,6 +1,12 @@
 package v1.rest;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import exceptions.Logging;
+import exceptions.ResourceNotAvailableException;
+import java.util.List;
 import v1.utils.crypt.Crypt;
 import v1.utils.db.SQlite;
 import javax.ws.rs.FormParam;
@@ -11,8 +17,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import rdf.RDF;
+import rdf.RDF4J_20;
+import v1.utils.config.ConfigProperties;
+import v1.utils.generalfuncs.GeneralFunctions;
+import v1.utils.transformer.Transformer;
 import v1.utils.uuid.UniqueIdentifier;
 
 @Path("/auth")
@@ -23,17 +36,35 @@ public class AuthResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response loginUser(@FormParam("user") String user, @FormParam("pwd") String pwd) {
 		JSONObject jsonOut = new JSONObject();
+		JSONObject jsonStatus = new JSONObject();
+		JSONObject jsonUser = new JSONObject();
 		try {
 			String secretToken = UniqueIdentifier.getUUID();
 			String role = SQlite.getUserInfoAndCheckPassword(user, pwd);
 			boolean login = SQlite.setLogin(user + ";" + secretToken, role);
 			if (login) {
 				String status[] = SQlite.getLoginStatus(user + ";" + secretToken);
-				jsonOut.put("verified", true);
-				jsonOut.put("user", user);
-				jsonOut.put("role", status[0]);
-				jsonOut.put("date", status[1]);
-				jsonOut.put("token", secretToken);
+				jsonStatus.put("verified", true);
+				jsonStatus.put("user", user);
+				jsonStatus.put("role", status[0]);
+				jsonStatus.put("date", status[1]);
+				jsonStatus.put("token", secretToken);
+				jsonOut.put("status", jsonStatus);
+				// get agent object
+				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				String item = "ls_age";
+				String query = GeneralFunctions.getAllElementsForItemID(item, user);
+				List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+				List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+				List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+				if (result.size() > 0) {
+					for (int i = 0; i < predicates.size(); i++) {
+						rdf.setModelTriple(item + ":" + user, predicates.get(i), objects.get(i));
+					}
+					String jsonObject = Transformer.agent_GET(rdf.getModel("RDF/JSON"), user).toJSONString();
+					jsonUser = (JSONObject) new JSONParser().parse(jsonObject);
+					jsonOut.put("user", jsonUser);
+				}
 			}
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
@@ -52,13 +83,31 @@ public class AuthResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response statusUser(@QueryParam("user") String user, @QueryParam("token") String token) {
 		JSONObject jsonOut = new JSONObject();
+		JSONObject jsonStatus = new JSONObject();
+		JSONObject jsonUser = new JSONObject();
 		try {
 			String status[] = SQlite.getLoginStatus(user + ";" + token);
 			if (status[0] != null) {
-				jsonOut.put("verified", true);
-				jsonOut.put("user", user);
-				jsonOut.put("role", status[0]);
-				jsonOut.put("date", status[1]);
+				jsonStatus.put("verified", true);
+				jsonStatus.put("user", user);
+				jsonStatus.put("role", status[0]);
+				jsonStatus.put("date", status[1]);
+				jsonOut.put("status", jsonStatus);
+				// get agent object
+				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				String item = "ls_age";
+				String query = GeneralFunctions.getAllElementsForItemID(item, user);
+				List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+				List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
+				List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
+				if (result.size() > 0) {
+					for (int i = 0; i < predicates.size(); i++) {
+						rdf.setModelTriple(item + ":" + user, predicates.get(i), objects.get(i));
+					}
+					String jsonObject = Transformer.agent_GET(rdf.getModel("RDF/JSON"), user).toJSONString();
+					jsonUser = (JSONObject) new JSONParser().parse(jsonObject);
+					jsonOut.put("user", jsonUser);
+				}
 			} else {
 				jsonOut.put("verified", false);
 				jsonOut.put("user", user);
