@@ -235,5 +235,56 @@ public class SQlite {
 		}
 		return ret;
 	}
+	
+	// RETCAT LIST
+	public static boolean insertRetcatStringForList(String vocabulary, String vocabID) throws ClassNotFoundException, IOException {
+		boolean ret = false;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "INSERT INTO retcatlist (vocabulary,list) VALUES ('" + vocabulary + "','" + vocabID + "')";
+				stmt.executeUpdate(sql);
+			}
+			ret = true;
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		} finally {
+			return ret;
+		}
+	}
+
+	public static boolean deleteRetcatEntryForList(String vocabulary) throws ClassNotFoundException, IOException {
+		boolean ret = false;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "DELETE FROM retcatlist WHERE vocabulary = '" + vocabulary + "'";
+				stmt.executeUpdate(sql);
+			}
+			ret = true;
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		} finally {
+			return ret;
+		}
+	}
+
+	public static String getRetcatByVocabularyForList(String vocabulary) throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
+		String ret = null;
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "SELECT list FROM retcatlist WHERE vocabulary = '" + vocabulary + "'";
+				try (ResultSet rs = stmt.executeQuery(sql)) {
+					while (rs.next()) {
+						ret = rs.getString("list");
+					}
+				}
+			}
+		} catch (Exception e) {
+			throw new NullPointerException(e.toString());
+		}
+		return ret;
+	}
 
 }
