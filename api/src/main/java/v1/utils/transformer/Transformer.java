@@ -339,8 +339,8 @@ public class Transformer {
 			vocabularyObject.remove(rdf.getPrefixItem("rdf:type"));
 			vocabularyObject.remove(rdf.getPrefixItem("skos:changeNote"));
 			vocabularyObject.remove(rdf.getPrefixItem("ls:sameAs"));
-			// statstics
-			String query = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT (COUNT(DISTINCT ?l) AS ?labels) (COUNT(?b) AS ?broader) (COUNT(?n) AS ?narrower) (COUNT(?r) AS ?related) (COUNT(?bm) AS ?broadMatch) (COUNT(?nm) AS ?narrowMatch) (COUNT(?rm) AS ?relatedMatch) (COUNT(?cm) AS ?closeMatch) (COUNT(?em) AS ?exactMatch) ?id ?title WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?v dc:title ?title . OPTIONAL{?l skos:broader ?b.} OPTIONAL{?l skos:narrower ?n.} OPTIONAL{?l skos:related ?n.} OPTIONAL{?l skos:broadMatch ?bm.} OPTIONAL{?l skos:narrowMatch ?nm.} OPTIONAL{?l skos:relatedMatch ?rm.} OPTIONAL{?l skos:closeMatch ?cm.} OPTIONAL{?l skos:exactMatch ?em.}  FILTER (?id = \"" + id + "\")} GROUP BY ?id ?v ?title";
+			// statistics
+			String query = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT (COUNT(DISTINCT ?l) AS ?labels) (COUNT(?b) AS ?broader) (COUNT(?n) AS ?narrower) (COUNT(?r) AS ?related) (COUNT(?bm) AS ?broadMatch) (COUNT(?nm) AS ?narrowMatch) (COUNT(?rm) AS ?relatedMatch) (COUNT(?cm) AS ?closeMatch) (COUNT(?em) AS ?exactMatch) ?id ?title WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?v dc:title ?title . OPTIONAL{?l skos:broader ?b.} OPTIONAL{?l skos:narrower ?n.} OPTIONAL{?l skos:related ?r.} OPTIONAL{?l skos:broadMatch ?bm.} OPTIONAL{?l skos:narrowMatch ?nm.} OPTIONAL{?l skos:relatedMatch ?rm.} OPTIONAL{?l skos:closeMatch ?cm.} OPTIONAL{?l skos:exactMatch ?em.}  FILTER (?id = \"" + id + "\")} GROUP BY ?id ?v ?title";
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> labels = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "labels");
 			List<String> broader = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "broader");
@@ -351,8 +351,9 @@ public class Transformer {
 			List<String> relatedMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "relatedMatch");
 			List<String> closeMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "closeMatch");
 			List<String> exactMatch = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "exactMatch");
-			JSONObject statstics = new JSONObject();
-			statstics.put("labelCount", Integer.parseInt(labels.toArray()[0].toString()));
+			JSONObject statistics = new JSONObject();
+			int labelCount = Integer.parseInt(labels.toArray()[0].toString());
+			statistics.put("labelCount", labelCount);
 			int internalLinks = 0;
 			if (broader.toArray()[0] != null) {
 				internalLinks += Integer.parseInt(broader.toArray()[0].toString());
@@ -379,9 +380,14 @@ public class Transformer {
 			if (exactMatch.toArray()[0] != null) {
 				externalLinks += Integer.parseInt(exactMatch.toArray()[0].toString());
 			}
-			statstics.put("externalLinks", externalLinks);
-			statstics.put("internalLinks", internalLinks);
-			vocabularyObject.put(rdf.getPrefixItem("statistics"), statstics);
+			statistics.put("externalLinks", externalLinks);
+			statistics.put("internalLinks", internalLinks);
+			query = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT (COUNT(DISTINCT ?l) AS ?publiclabels) WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?l ls:hasReleaseType ls:Draft . FILTER (?id = \"" + id + "\") }";
+			result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+			labels = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "publiclabels");
+			statistics.put("publicLabels", Integer.parseInt(labels.toArray()[0].toString()));
+			statistics.put("draftLabels", labelCount - Integer.parseInt(labels.toArray()[0].toString()));
+			vocabularyObject.put(rdf.getPrefixItem("statistics"), statistics);
 		} catch (Exception e) {
 			int errorLine = -1;
 			for (StackTraceElement element : e.getStackTrace()) {
@@ -1816,6 +1822,14 @@ public class Transformer {
 			}
 			if (oldSeeAlsoCount != newSeeAlsoCount) {
 				revisionTypesList.add("LinkingRevision");
+			}
+			// releaseType [mendatory]
+			String oldReleaseType = (String) oldObject.get("releaseType");
+			String newReleaseType = (String) newObject.get("releaseType");
+			if (newReleaseType != null) {
+				if (!oldReleaseType.equals(newReleaseType)) {
+					revisionTypesList.add("SystemRevision");
+				}
 			}
 		} catch (Exception e) {
 			int errorLine = -1;
