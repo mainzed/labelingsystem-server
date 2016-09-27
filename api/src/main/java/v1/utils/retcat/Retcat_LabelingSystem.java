@@ -34,11 +34,11 @@ public class Retcat_LabelingSystem {
                 + "?scheme dc:title ?schemeTitle . "
                 + "?scheme ls:hasReleaseType ls:Public . "
                 + "?Subject skos:prefLabel ?pl . "
-                + "?Subject ls:preferredLabel ?prefLabel . "
+                + "?Subject ls:thumbnail ?prefLabel . "
                 + "?Subject ls:hasStatusType ls:Active . "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
-                + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
+                + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
+                + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
                 + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                 + "}";
         URL obj = new URL(url);
@@ -164,10 +164,10 @@ public class Retcat_LabelingSystem {
                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
                 + "?Subject skos:prefLabel ?pl . "
-                + "?Subject ls:preferredLabel ?prefLabel . "
+                + "?Subject ls:thumbnail ?prefLabel . "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-                + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
-                + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} "
+                + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
+                + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
                 + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                 + "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                 + "}";
@@ -292,13 +292,13 @@ public class Retcat_LabelingSystem {
         String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
         String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                 + "SELECT * { "
-                + "<" + url + "> ls:preferredLabel ?prefLabel. "
+                + "<" + url + "> ls:thumbnail ?prefLabel. "
                 + "<" + url + "> ls:hasStatusType ?statusType. "
                 + "<" + url + "> skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
                 + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
-                + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm. } "
-                + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm . } "
+                + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm. } "
+                + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm . } "
                 + " }";
         URL obj = new URL(sparqlendpoint);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();

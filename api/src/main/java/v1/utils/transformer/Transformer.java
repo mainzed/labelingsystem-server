@@ -103,40 +103,18 @@ public class Transformer {
             releaseArrayNew.add(releaseObject);
             vocabularyObject.put(rdf.getPrefixItem("ls:hasReleaseType"), releaseArrayNew);
         }
-        // change theme
-        /*List<String> themeStringList = new ArrayList<String>();
-        JSONArray themeArray = (JSONArray) vocabularyObject.get("theme");
-        if (themeArray != null && !themeArray.isEmpty()) {
-            for (Object element : themeArray) {
-                themeStringList.add((String) element);
-            }
-            vocabularyObject.remove("theme");
-            JSONArray themeArrayNew = new JSONArray();
-            for (String element : themeStringList) {
-                JSONObject themeObject = new JSONObject();
-                themeObject.put("type", "uri");
-                themeObject.put("value", element);
-                themeArrayNew.add(themeObject);
-            }
-            vocabularyObject.put(rdf.getPrefixItem("dcat:theme"), themeArrayNew);
-        }*/
         // delete items
-        vocabularyObject.remove(rdf.getPrefixItem("id"));
-        vocabularyObject.remove(rdf.getPrefixItem("creator"));
-        vocabularyObject.remove(rdf.getPrefixItem("contributors"));
-        vocabularyObject.remove(rdf.getPrefixItem("title"));
-        vocabularyObject.remove(rdf.getPrefixItem("description"));
-        vocabularyObject.remove(rdf.getPrefixItem("created"));
-        vocabularyObject.remove(rdf.getPrefixItem("license"));
-        vocabularyObject.remove(rdf.getPrefixItem("modifications"));
-        vocabularyObject.remove(rdf.getPrefixItem("lastModified"));
-        vocabularyObject.remove(rdf.getPrefixItem("releaseType"));
+        vocabularyObject.remove("id");
+        vocabularyObject.remove("creator");
+        vocabularyObject.remove("contributors");
+        vocabularyObject.remove("title");
+        vocabularyObject.remove("description");
+        vocabularyObject.remove("created");
+        vocabularyObject.remove("license");
+        vocabularyObject.remove("modifications");
+        vocabularyObject.remove("lastModified");
+        vocabularyObject.remove("releaseType");
         vocabularyObject.remove("statistics");
-        // deposits
-        vocabularyObject.remove(rdf.getPrefixItem("theme"));
-        vocabularyObject.remove(rdf.getPrefixItem("topConcept"));
-        vocabularyObject.remove("revisionIDs");
-        vocabularyObject.remove("statusType");
         // add object
         rdfObject.put(rdf.getPrefixItem("ls_voc" + ":" + id), vocabularyObject);
         return rdfObject.toJSONString();
@@ -517,19 +495,12 @@ public class Transformer {
             agentObject.put(rdf.getPrefixItem("dct:isPartOf"), affiliationArrayNew);
         }
         // delete items
-        agentObject.remove(rdf.getPrefixItem("id"));
-        agentObject.remove(rdf.getPrefixItem("title"));
-        agentObject.remove(rdf.getPrefixItem("firstName"));
-        agentObject.remove(rdf.getPrefixItem("lastName"));
-        agentObject.remove(rdf.getPrefixItem("affiliation"));
-        agentObject.remove(rdf.getPrefixItem("orcid"));
-        // deposits
-        agentObject.remove(rdf.getPrefixItem("name"));
-        agentObject.remove(rdf.getPrefixItem("email"));
-        agentObject.remove(rdf.getPrefixItem("homepage"));
-        agentObject.remove(rdf.getPrefixItem("img"));
-        agentObject.remove(rdf.getPrefixItem("lat"));
-        agentObject.remove(rdf.getPrefixItem("lon"));
+        agentObject.remove("id");
+        agentObject.remove("title");
+        agentObject.remove("firstName");
+        agentObject.remove("lastName");
+        agentObject.remove("affiliation");
+        agentObject.remove("orcid");
         // add object
         rdfObject.put(rdf.getPrefixItem("ls_age" + ":" + id), agentObject);
         return rdfObject.toJSONString();
@@ -642,336 +613,318 @@ public class Transformer {
         // parse json
         JSONObject rdfObject = new JSONObject();
         JSONObject labelObject = (JSONObject) new JSONParser().parse(json);
-        // for patch
-        JSONArray flushArray = (JSONArray) labelObject.get("flush");
-        if (flushArray != null && !flushArray.isEmpty()) {
-            return labelObject.toJSONString();
-        } else {
-            // change prefLabel
-            JSONArray prefLabelArray = (JSONArray) labelObject.get("prefLabels");
-            if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
-                labelObject.remove("prefLabels");
-                JSONArray arrayNew = new JSONArray();
-                for (Object element : prefLabelArray) {
-                    JSONObject thisObject = (JSONObject) element;
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "literal");
-                    tmpObject.put("value", thisObject.get("value"));
-                    tmpObject.put("lang", thisObject.get("lang"));
-                    arrayNew.add(tmpObject);
-                    Boolean thumbnail = (Boolean) thisObject.get("isThumbnail");
-                    if (thumbnail) {
-                        JSONArray tmpArray = new JSONArray();
-                        JSONObject tmpObject2 = new JSONObject();
-                        tmpObject2.put("type", "literal");
-                        tmpObject2.put("value", thisObject.get("value"));
-                        tmpObject2.put("lang", thisObject.get("lang"));
-                        tmpArray.add(tmpObject2);
-                        labelObject.put(rdf.getPrefixItem("ls:preferredLabel"), tmpArray);
-                    }
-                }
-                labelObject.put(rdf.getPrefixItem("skos:prefLabel"), arrayNew);
+        // change contributors
+        List<String> contributorStringList = new ArrayList<String>();
+        JSONArray contributorArray = (JSONArray) labelObject.get("contributors");
+        if (contributorArray != null && !contributorArray.isEmpty()) {
+            for (Object element : contributorArray) {
+                contributorStringList.add((String) element);
             }
-            // change releasetype
-            String releaseString = (String) labelObject.get("releaseType");
-            if (releaseString != null && !releaseString.isEmpty()) {
-                labelObject.remove("releaseType");
-                JSONArray releaseArrayNew = new JSONArray();
-                JSONObject releaseObject = new JSONObject();
-                releaseObject.put("type", "uri");
-                if (releaseString.equals("draft")) {
-                    releaseObject.put("value", rdf.getPrefixItem("ls:Draft"));
-                } else {
-                    releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
-                }
-                releaseArrayNew.add(releaseObject);
-                labelObject.put(rdf.getPrefixItem("ls:hasReleaseType"), releaseArrayNew);
+            labelObject.remove("contributors");
+            JSONArray arrayNew = new JSONArray();
+            JSONArray arrayNew2 = new JSONArray();
+            for (String element : contributorStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "literal");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+                JSONObject tmpObject2 = new JSONObject();
+                tmpObject2.put("type", "uri");
+                tmpObject2.put("value", rdf.getPrefixItem("ls_age:" + element));
+                arrayNew2.add(tmpObject2);
             }
-            // change vocabID
-            String vocabArray = (String) labelObject.get("vocabID");
-            if (vocabArray != null && !vocabArray.isEmpty()) {
-                labelObject.remove("vocabID");
-                JSONArray arrayNew = new JSONArray();
+            labelObject.put(rdf.getPrefixItem("dc:contributor"), arrayNew);
+            labelObject.put(rdf.getPrefixItem("dct:contributor"), arrayNew2);
+        }
+        // change vocabID
+        String vocabArray = (String) labelObject.get("vocabID");
+        if (vocabArray != null && !vocabArray.isEmpty()) {
+            labelObject.remove("vocabID");
+            JSONArray arrayNew = new JSONArray();
+            JSONObject tmpObject = new JSONObject();
+            tmpObject.put("type", "uri");
+            tmpObject.put("value", rdf.getPrefixItem("ls_voc:" + vocabArray));
+            arrayNew.add(tmpObject);
+            labelObject.put(rdf.getPrefixItem("skos:inScheme"), arrayNew);
+        }
+        // change language
+        String language = (String) labelObject.get("language");
+        if (language != null) {
+            labelObject.remove("language");
+            JSONArray languageArrayNew = new JSONArray();
+            JSONObject languageObject = new JSONObject();
+            languageObject.put("type", "literal");
+            languageObject.put("value", language);
+            languageArrayNew.add(languageObject);
+            labelObject.put(rdf.getPrefixItem("dc:language"), languageArrayNew);
+        }
+        // change thumbnail
+        String thumbnail = (String) labelObject.get("thumbnail");
+        JSONArray prefLabelArray = new JSONArray();
+        if (thumbnail != null) {
+            labelObject.remove("thumbnail");
+            JSONObject tmpObject = new JSONObject();
+            tmpObject.put("type", "literal");
+            tmpObject.put("value", thumbnail);
+            tmpObject.put("lang", language);
+            JSONArray arrayNew = new JSONArray();
+            arrayNew.add(tmpObject);
+            labelObject.put(rdf.getPrefixItem("ls:thumbnail"), arrayNew);
+            // add thumbnail to preflabels
+            prefLabelArray.add(tmpObject);
+        }
+        // change prefLabel
+        JSONArray translationsArray = (JSONArray) labelObject.get("translations");
+        if (translationsArray != null && !translationsArray.isEmpty()) {
+            labelObject.remove("translations");
+            for (Object element : translationsArray) {
+                JSONObject thisObject = (JSONObject) element;
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "literal");
+                tmpObject.put("value", thisObject.get("value"));
+                tmpObject.put("lang", thisObject.get("lang"));
+                prefLabelArray.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:prefLabel"), prefLabelArray);
+        }
+        // change description
+        String description = (String) labelObject.get("description");
+        if (description != null) {
+            labelObject.remove("description");
+            JSONObject tmpObject = new JSONObject();
+            tmpObject.put("type", "literal");
+            tmpObject.put("value", description);
+            tmpObject.put("lang", language);
+            JSONArray arrayNew = new JSONArray();
+            arrayNew.add(tmpObject);
+            labelObject.put(rdf.getPrefixItem("skos:scopeNote"), arrayNew);
+        }
+        // change related
+        JSONArray relatedArray = (JSONArray) labelObject.get("related");
+        List<String> relatedStringList = new ArrayList<String>();
+        if (relatedArray != null && !relatedArray.isEmpty()) {
+            for (Object element : relatedArray) {
+                relatedStringList.add((String) element);
+            }
+            labelObject.remove("related");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : relatedStringList) {
                 JSONObject tmpObject = new JSONObject();
                 tmpObject.put("type", "uri");
-                tmpObject.put("value", rdf.getPrefixItem("ls_voc:" + vocabArray));
+                tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
                 arrayNew.add(tmpObject);
-                labelObject.put(rdf.getPrefixItem("skos:inScheme"), arrayNew);
             }
-            // change altLabel
-            JSONArray altLabelArray = (JSONArray) labelObject.get("altLabels");
-            if (altLabelArray != null && !altLabelArray.isEmpty()) {
-                labelObject.remove("altLabels");
-                JSONArray arrayNew = new JSONArray();
-                for (Object element : altLabelArray) {
-                    JSONObject thisObject = (JSONObject) element;
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "literal");
-                    tmpObject.put("value", thisObject.get("value"));
-                    tmpObject.put("lang", thisObject.get("lang"));
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:altLabel"), arrayNew);
-            }
-            // change scopeNote
-            JSONObject scopeNoteArray = (JSONObject) labelObject.get("scopeNote");
-            if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
-                labelObject.remove("scopeNote");
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("type", "literal");
-                tmpObject.put("value", scopeNoteArray.get("value"));
-                tmpObject.put("lang", scopeNoteArray.get("lang"));
-                JSONArray arrayNew = new JSONArray();
-                arrayNew.add(tmpObject);
-                labelObject.put(rdf.getPrefixItem("skos:scopeNote"), arrayNew);
-            }
-            // change context
-            String contextArray = (String) labelObject.get("context");
-            if (contextArray != null && !contextArray.isEmpty()) {
-                labelObject.remove("context");
-                JSONArray arrayNew = new JSONArray();
-                JSONObject tmpObject = new JSONObject();
-                tmpObject.put("type", "literal");
-                tmpObject.put("value", contextArray);
-                arrayNew.add(tmpObject);
-                labelObject.put(rdf.getPrefixItem("ls:hasContext"), arrayNew);
-            }
-            // change contributor
-            List<String> contributorStringList = new ArrayList<String>();
-            JSONArray contributorArray = (JSONArray) labelObject.get("contributors");
-            if (contributorArray != null && !contributorArray.isEmpty()) {
-                for (Object element : contributorArray) {
-                    contributorStringList.add((String) element);
-                }
-                labelObject.remove("contributors");
-                JSONArray arrayNew = new JSONArray();
-                JSONArray arrayNew2 = new JSONArray();
-                for (String element : contributorStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "literal");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                    JSONObject tmpObject2 = new JSONObject();
-                    tmpObject2.put("type", "uri");
-                    tmpObject2.put("value", rdf.getPrefixItem("ls_age:" + element));
-                    arrayNew2.add(tmpObject2);
-                }
-                labelObject.put(rdf.getPrefixItem("dc:contributor"), arrayNew);
-                labelObject.put(rdf.getPrefixItem("dct:contributor"), arrayNew2);
-            }
-            // change related
-            JSONArray relatedArray = (JSONArray) labelObject.get("related");
-            List<String> relatedStringList = new ArrayList<String>();
-            if (relatedArray != null && !relatedArray.isEmpty()) {
-                for (Object element : relatedArray) {
-                    relatedStringList.add((String) element);
-                }
-                labelObject.remove("related");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : relatedStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:related"), arrayNew);
-            }
-            // change broader
-            JSONArray broaderArray = (JSONArray) labelObject.get("broader");
-            List<String> broaderStringList = new ArrayList<String>();
-            if (broaderArray != null && !broaderArray.isEmpty()) {
-                for (Object element : broaderArray) {
-                    if (element.equals("null")) {
-                        broaderStringList.add("http://dummy.net");
-                    } else {
-                        broaderStringList.add((String) element);
-                    }
-                }
-                labelObject.remove("broader");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : broaderStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
-                    arrayNew.add(tmpObject);
-                    // narrower
-                    JSONObject tmpLabelObject = new JSONObject();
-                    JSONArray arrayNew2 = new JSONArray();
-                    JSONObject tmpObject2 = new JSONObject();
-                    tmpObject2.put("type", "uri");
-                    tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
-                    arrayNew2.add(tmpObject2);
-                    tmpLabelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew2);
-                    rdfObject.put(rdf.getPrefixItem("ls_lab:" + element), tmpLabelObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew);
-            }
-            // change narrower
-            JSONArray narrowerArray = (JSONArray) labelObject.get("narrower");
-            List<String> narrowerStringList = new ArrayList<String>();
-            if (narrowerArray != null && !narrowerArray.isEmpty()) {
-                for (Object element : narrowerArray) {
-                    if (element.equals("null")) {
-                        narrowerStringList.add("http://dummy.net");
-                    } else {
-                        narrowerStringList.add((String) element);
-                    }
-                }
-                labelObject.remove("narrower");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : narrowerStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
-                    arrayNew.add(tmpObject);
-                    // broader
-                    JSONObject tmpLabelObject = new JSONObject();
-                    JSONArray arrayNew2 = new JSONArray();
-                    JSONObject tmpObject2 = new JSONObject();
-                    tmpObject2.put("type", "uri");
-                    tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
-                    arrayNew2.add(tmpObject2);
-                    tmpLabelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew2);
-                    rdfObject.put(rdf.getPrefixItem("ls_lab:" + element), tmpLabelObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew);
-            }
-            // change closeMatch
-            JSONArray closeMatchArray = (JSONArray) labelObject.get("closeMatch");
-            List<String> closeMatchStringList = new ArrayList<String>();
-            if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
-                for (Object element : closeMatchArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    closeMatchStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("closeMatch");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : closeMatchStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:closeMatch"), arrayNew);
-            }
-            // change exactMatch
-            JSONArray exactMatchArray = (JSONArray) labelObject.get("exactMatch");
-            List<String> exactMatchStringList = new ArrayList<String>();
-            if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
-                for (Object element : exactMatchArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    exactMatchStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("exactMatch");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : exactMatchStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew);
-            }
-            // change relatedMatch
-            JSONArray relatedMatchArray = (JSONArray) labelObject.get("relatedMatch");
-            List<String> relatedMatchStringList = new ArrayList<String>();
-            if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
-                for (Object element : relatedMatchArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    relatedMatchStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("relatedMatch");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : relatedMatchStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:relatedMatch"), arrayNew);
-            }
-            // change narrowMatch
-            JSONArray narrowMatchArray = (JSONArray) labelObject.get("narrowMatch");
-            List<String> narrowMatchStringList = new ArrayList<String>();
-            if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
-                for (Object element : narrowMatchArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    narrowMatchStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("narrowMatch");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : narrowMatchStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:narrowMatch"), arrayNew);
-            }
-            // change broadMatch
-            JSONArray broadMatchArray = (JSONArray) labelObject.get("broadMatch");
-            List<String> broadMatchStringList = new ArrayList<String>();
-            if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
-                for (Object element : broadMatchArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    broadMatchStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("broadMatch");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : broadMatchStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("skos:broadMatch"), arrayNew);
-            }
-            // change seeAlso
-            JSONArray seeAlsoArray = (JSONArray) labelObject.get("seeAlso");
-            List<String> seeAlsoStringList = new ArrayList<String>();
-            if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
-                for (Object element : seeAlsoArray) {
-                    JSONObject tmpjson = (JSONObject) element;
-                    seeAlsoStringList.add((String) tmpjson.get("uri"));
-                }
-                labelObject.remove("seeAlso");
-                JSONArray arrayNew = new JSONArray();
-                for (String element : seeAlsoStringList) {
-                    JSONObject tmpObject = new JSONObject();
-                    tmpObject.put("type", "uri");
-                    tmpObject.put("value", element);
-                    arrayNew.add(tmpObject);
-                }
-                labelObject.put(rdf.getPrefixItem("rdfs:seeAlso"), arrayNew);
-            }
-            // delete items
-            labelObject.remove(rdf.getPrefixItem("vocabID"));
-            labelObject.remove(rdf.getPrefixItem("creator"));
-            labelObject.remove(rdf.getPrefixItem("contributors"));
-            labelObject.remove(rdf.getPrefixItem("id"));
-            labelObject.remove(rdf.getPrefixItem("license"));
-            labelObject.remove(rdf.getPrefixItem("prefLabels"));
-            labelObject.remove(rdf.getPrefixItem("altLabels"));
-            labelObject.remove(rdf.getPrefixItem("statusType"));
-            labelObject.remove(rdf.getPrefixItem("context"));
-            labelObject.remove(rdf.getPrefixItem("related"));
-            labelObject.remove(rdf.getPrefixItem("broader"));
-            labelObject.remove(rdf.getPrefixItem("narrower"));
-            labelObject.remove(rdf.getPrefixItem("closeMatch"));
-            labelObject.remove(rdf.getPrefixItem("exactMatch"));
-            labelObject.remove(rdf.getPrefixItem("relatedMatch"));
-            labelObject.remove(rdf.getPrefixItem("narrowMatch"));
-            labelObject.remove(rdf.getPrefixItem("broadMatch"));
-            labelObject.remove(rdf.getPrefixItem("seeAlso"));
-            labelObject.remove(rdf.getPrefixItem("created"));
-            labelObject.remove(rdf.getPrefixItem("modifications"));
-            labelObject.remove(rdf.getPrefixItem("lastModified"));
-            labelObject.remove(rdf.getPrefixItem("revisionIDs"));
-            labelObject.remove(rdf.getPrefixItem("releaseType"));
-            // add object
-            rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
-            return rdfObject.toJSONString();
+            labelObject.put(rdf.getPrefixItem("skos:related"), arrayNew);
         }
+        // change broader
+        JSONArray broaderArray = (JSONArray) labelObject.get("broader");
+        List<String> broaderStringList = new ArrayList<String>();
+        if (broaderArray != null && !broaderArray.isEmpty()) {
+            for (Object element : broaderArray) {
+                if (element.equals("null")) {
+                    broaderStringList.add("http://dummy.net");
+                } else {
+                    broaderStringList.add((String) element);
+                }
+            }
+            labelObject.remove("broader");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : broaderStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
+                arrayNew.add(tmpObject);
+                // narrower
+                JSONObject tmpLabelObject = new JSONObject();
+                JSONArray arrayNew2 = new JSONArray();
+                JSONObject tmpObject2 = new JSONObject();
+                tmpObject2.put("type", "uri");
+                tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
+                arrayNew2.add(tmpObject2);
+                tmpLabelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew2);
+                rdfObject.put(rdf.getPrefixItem("ls_lab:" + element), tmpLabelObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew);
+        }
+        // change narrower
+        JSONArray narrowerArray = (JSONArray) labelObject.get("narrower");
+        List<String> narrowerStringList = new ArrayList<String>();
+        if (narrowerArray != null && !narrowerArray.isEmpty()) {
+            for (Object element : narrowerArray) {
+                if (element.equals("null")) {
+                    narrowerStringList.add("http://dummy.net");
+                } else {
+                    narrowerStringList.add((String) element);
+                }
+            }
+            labelObject.remove("narrower");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : narrowerStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", rdf.getPrefixItem("ls_lab:" + element));
+                arrayNew.add(tmpObject);
+                // broader
+                JSONObject tmpLabelObject = new JSONObject();
+                JSONArray arrayNew2 = new JSONArray();
+                JSONObject tmpObject2 = new JSONObject();
+                tmpObject2.put("type", "uri");
+                tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
+                arrayNew2.add(tmpObject2);
+                tmpLabelObject.put(rdf.getPrefixItem("skos:broader"), arrayNew2);
+                rdfObject.put(rdf.getPrefixItem("ls_lab:" + element), tmpLabelObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:narrower"), arrayNew);
+        }
+        // change closeMatch
+        JSONArray closeMatchArray = (JSONArray) labelObject.get("closeMatch");
+        List<String> closeMatchStringList = new ArrayList<String>();
+        if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
+            for (Object element : closeMatchArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                closeMatchStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("closeMatch");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : closeMatchStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:closeMatch"), arrayNew);
+        }
+        // change exactMatch
+        JSONArray exactMatchArray = (JSONArray) labelObject.get("exactMatch");
+        List<String> exactMatchStringList = new ArrayList<String>();
+        if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
+            for (Object element : exactMatchArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                exactMatchStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("exactMatch");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : exactMatchStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew);
+        }
+        // change relatedMatch
+        JSONArray relatedMatchArray = (JSONArray) labelObject.get("relatedMatch");
+        List<String> relatedMatchStringList = new ArrayList<String>();
+        if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
+            for (Object element : relatedMatchArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                relatedMatchStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("relatedMatch");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : relatedMatchStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:relatedMatch"), arrayNew);
+        }
+        // change narrowMatch
+        JSONArray narrowMatchArray = (JSONArray) labelObject.get("narrowMatch");
+        List<String> narrowMatchStringList = new ArrayList<String>();
+        if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
+            for (Object element : narrowMatchArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                narrowMatchStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("narrowMatch");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : narrowMatchStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:narrowMatch"), arrayNew);
+        }
+        // change broadMatch
+        JSONArray broadMatchArray = (JSONArray) labelObject.get("broadMatch");
+        List<String> broadMatchStringList = new ArrayList<String>();
+        if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
+            for (Object element : broadMatchArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                broadMatchStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("broadMatch");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : broadMatchStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("skos:broadMatch"), arrayNew);
+        }
+        // change seeAlso
+        JSONArray seeAlsoArray = (JSONArray) labelObject.get("seeAlso");
+        List<String> seeAlsoStringList = new ArrayList<String>();
+        if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
+            for (Object element : seeAlsoArray) {
+                JSONObject tmpjson = (JSONObject) element;
+                seeAlsoStringList.add((String) tmpjson.get("uri"));
+            }
+            labelObject.remove("seeAlso");
+            JSONArray arrayNew = new JSONArray();
+            for (String element : seeAlsoStringList) {
+                JSONObject tmpObject = new JSONObject();
+                tmpObject.put("type", "uri");
+                tmpObject.put("value", element);
+                arrayNew.add(tmpObject);
+            }
+            labelObject.put(rdf.getPrefixItem("rdfs:seeAlso"), arrayNew);
+        }
+        // change releasetype
+        String releaseString = (String) labelObject.get("releaseType");
+        if (releaseString != null && !releaseString.isEmpty()) {
+            labelObject.remove("releaseType");
+            JSONArray releaseArrayNew = new JSONArray();
+            JSONObject releaseObject = new JSONObject();
+            releaseObject.put("type", "uri");
+            if (releaseString.equals("draft")) {
+                releaseObject.put("value", rdf.getPrefixItem("ls:Draft"));
+            } else {
+                releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
+            }
+            releaseArrayNew.add(releaseObject);
+            labelObject.put(rdf.getPrefixItem("ls:hasReleaseType"), releaseArrayNew);
+        }
+        // delete items
+        labelObject.remove("id");
+        labelObject.remove("creator");
+        labelObject.remove("contributors");
+        labelObject.remove("vocabID");
+        labelObject.remove("translations");
+        labelObject.remove("thumbnail");
+        labelObject.remove("description");
+        labelObject.remove("created");
+        labelObject.remove("license");
+        labelObject.remove("modifications");
+        labelObject.remove("lastModified");
+        labelObject.remove("revisionIDs");
+        labelObject.remove("releaseType");
+        labelObject.remove("related");
+        labelObject.remove("broader");
+        labelObject.remove("narrower");
+        labelObject.remove("closeMatch");
+        labelObject.remove("exactMatch");
+        labelObject.remove("relatedMatch");
+        labelObject.remove("narrowMatch");
+        labelObject.remove("broadMatch");
+        labelObject.remove("seeAlso");
+        // add object
+        rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
+        return rdfObject.toJSONString();
     }
 
     public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
@@ -984,22 +937,14 @@ public class Transformer {
             jsonObject.put("label", jsonObject.remove(rdf.getPrefixItem("ls_lab" + ":" + id)));
             // get items
             labelObject = (JSONObject) jsonObject.get(rdf.getPrefixItem("label"));
-            // change skos:inScheme
-            JSONArray vocabArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:inScheme"));
-            if (vocabArray != null && !vocabArray.isEmpty()) {
-                for (Object element : vocabArray) {
-                    labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
+            // change dc:identifier
+            JSONArray identifierArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:identifier"));
+            if (identifierArray != null && !identifierArray.isEmpty()) {
+                for (Object element : identifierArray) {
+                    labelObject.remove(rdf.getPrefixItem("dc:identifier"));
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
-                    String arrayNew;
-                    if (value.contains("vocabulary/")) {
-                        arrayNew = value.split("vocabulary/")[1];
-                    } else {
-                        arrayNew = value;
-                    }
-                    if (fields == null || fields.contains("vocabID")) {
-                        labelObject.put(rdf.getPrefixItem("vocabID"), arrayNew);
-                    }
+                    labelObject.put(rdf.getPrefixItem("id"), value);
                 }
             }
             // change dc:creator
@@ -1024,38 +969,48 @@ public class Transformer {
                 }
                 labelObject.put(rdf.getPrefixItem("contributors"), arrayNew);
             }
-            // change dc:identifier
-            JSONArray identifierArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:identifier"));
-            if (identifierArray != null && !identifierArray.isEmpty()) {
-                for (Object element : identifierArray) {
-                    labelObject.remove(rdf.getPrefixItem("dc:identifier"));
+            // change skos:inScheme
+            JSONArray vocabArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:inScheme"));
+            if (vocabArray != null && !vocabArray.isEmpty()) {
+                for (Object element : vocabArray) {
+                    labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
-                    labelObject.put(rdf.getPrefixItem("id"), value);
-                }
-            }
-            // change dct:license
-            JSONArray licenseArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dct:license"));
-            if (licenseArray != null && !licenseArray.isEmpty()) {
-                for (Object element : licenseArray) {
-                    labelObject.remove(rdf.getPrefixItem("dct:license"));
-                    JSONObject obj = (JSONObject) element;
-                    String value = (String) obj.get("value");
-                    if (fields == null || fields.contains("license")) {
-                        labelObject.put(rdf.getPrefixItem("license"), value);
+                    String arrayNew;
+                    if (value.contains("vocabulary/")) {
+                        arrayNew = value.split("vocabulary/")[1];
+                    } else {
+                        arrayNew = value;
+                    }
+                    if (fields == null || fields.contains("vocabID")) {
+                        labelObject.put(rdf.getPrefixItem("vocabID"), arrayNew);
                     }
                 }
             }
-            // get thumbnail
-            JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
+            // change ls:thumbnail
+            JSONArray thumbnailArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:thumbnail"));
             String thumbnail = "";
-            if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-                for (Object element : preferredLabelArray) {
-                    labelObject.remove(rdf.getPrefixItem("ls:preferredLabel"));
+            String language = "";
+            if (thumbnailArray != null && !thumbnailArray.isEmpty()) {
+                labelObject.remove(rdf.getPrefixItem("ls:thumbnail"));
+                for (Object element : thumbnailArray) {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     String lang = (String) obj.get("lang");
                     thumbnail = value + "@" + lang;
+                    language = lang;
+                    labelObject.put("thumbnail", value);
+                    labelObject.put("language", lang);
+                }
+            }
+            // change skos:scopeNote
+            JSONArray scopeNoteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:scopeNote"));
+            if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
+                labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
+                for (Object element : scopeNoteArray) {
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    labelObject.put("description", value);
                 }
             }
             // change skos:prefLabel
@@ -1070,94 +1025,26 @@ public class Transformer {
                     JSONObject objTmp = new JSONObject();
                     objTmp.put("value", value);
                     objTmp.put("lang", lang);
-                    if (thumbnail.equals(value + "@" + lang)) {
-                        objTmp.put("isThumbnail", true);
-                    } else {
-                        objTmp.put("isThumbnail", false);
+                    String prefLabel = value + "@" + lang;
+                    if (!thumbnail.equals(prefLabel)) {
+                        arrayNew.add(objTmp);
                     }
-                    arrayNew.add(objTmp);
                 }
-                labelObject.put(rdf.getPrefixItem("prefLabels"), arrayNew);
-            }
-            // change skos:altLabel
-            JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
-            if (altLabelArray != null && !altLabelArray.isEmpty()) {
-                JSONArray arrayNew = new JSONArray();
-                labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
-                for (Object element : altLabelArray) {
-                    JSONObject obj = (JSONObject) element;
-                    String value = (String) obj.get("value");
-                    String lang = (String) obj.get("lang");
-                    JSONObject objTmp = new JSONObject();
-                    objTmp.put("value", value);
-                    objTmp.put("lang", lang);
-                    arrayNew.add(objTmp);
-                }
-                labelObject.put(rdf.getPrefixItem("altLabels"), arrayNew);
-            }
-            // change skos:scopeNote
-            JSONArray scopeNoteArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:scopeNote"));
-            if (scopeNoteArray != null && !scopeNoteArray.isEmpty()) {
-                labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
-                JSONObject objTmp = new JSONObject();
-                for (Object element : scopeNoteArray) {
-                    JSONObject obj = (JSONObject) element;
-                    String value = (String) obj.get("value");
-                    String lang = (String) obj.get("lang");
-                    objTmp.put("value", value);
-                    objTmp.put("lang", lang);
-                }
-                if (fields == null || fields.contains("scopeNote")) {
-                    labelObject.put(rdf.getPrefixItem("scopeNote"), objTmp);
+                if (arrayNew.size() > 0) {
+                    labelObject.put(rdf.getPrefixItem("translations"), arrayNew);
                 }
             }
-            // change ls:hasStatusType
-            JSONArray statusTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasStatusType"));
-            if (statusTypeArray != null && !statusTypeArray.isEmpty()) {
-                for (Object element : statusTypeArray) {
-                    labelObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
+            // change dc:language
+            JSONArray languageArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:language"));
+            if (languageArray != null && !languageArray.isEmpty()) {
+                for (Object element : languageArray) {
+                    labelObject.remove(rdf.getPrefixItem("dc:language"));
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
-                    if (value.contains("Active")) {
-                        value = "active";
-                    } else if (value.contains("Deprecated")) {
-                        value = "deprecated";
-                    } else {
-                        value = "deleted";
-                    }
-                    if (fields == null || fields.contains("statusType")) {
-                        labelObject.put(rdf.getPrefixItem("statusType"), value);
-                    }
+                    labelObject.put("language", value);
                 }
-            }
-            // change ls:hasReleaseType
-            JSONArray releaseTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
-            if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
-                for (Object element : releaseTypeArray) {
-                    labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
-                    JSONObject obj = (JSONObject) element;
-                    String value = (String) obj.get("value");
-                    if (value.contains("Draft")) {
-                        value = "draft";
-                    } else {
-                        value = "public";
-                    }
-                    if (fields == null || fields.contains("releaseType")) {
-                        labelObject.put(rdf.getPrefixItem("releaseType"), value);
-                    }
-                }
-            }
-            // change ls:context
-            JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasContext"));
-            if (contextArray != null && !contextArray.isEmpty()) {
-                for (Object element : contextArray) {
-                    labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
-                    JSONObject obj = (JSONObject) element;
-                    String value = (String) obj.get("value");
-                    if (fields == null || fields.contains("context")) {
-                        labelObject.put(rdf.getPrefixItem("context"), value);
-                    }
-                }
+            } else {
+                labelObject.put("language", language);
             }
             // change skos:related
             JSONArray relatedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:related"));
@@ -1369,6 +1256,18 @@ public class Transformer {
                     }
                 }
             }
+            // change dct:license
+            JSONArray licenseArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dct:license"));
+            if (licenseArray != null && !licenseArray.isEmpty()) {
+                for (Object element : licenseArray) {
+                    labelObject.remove(rdf.getPrefixItem("dct:license"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("license")) {
+                        labelObject.put(rdf.getPrefixItem("license"), value);
+                    }
+                }
+            }
             // change dc:modified
             JSONArray modifiedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:modified"));
             if (modifiedArray != null && !modifiedArray.isEmpty()) {
@@ -1407,13 +1306,53 @@ public class Transformer {
                     labelObject.put(rdf.getPrefixItem("revisionIDs"), arrayNew);
                 }
             }
+            // change ls:hasReleaseType
+            JSONArray releaseTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
+            if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
+                for (Object element : releaseTypeArray) {
+                    labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (value.contains("Draft")) {
+                        value = "draft";
+                    } else {
+                        value = "public";
+                    }
+                    if (fields == null || fields.contains("releaseType")) {
+                        labelObject.put(rdf.getPrefixItem("releaseType"), value);
+                    }
+                }
+            }
             // delete items
-            labelObject.remove(rdf.getPrefixItem("dct:creator"));
-            labelObject.remove(rdf.getPrefixItem("dct:contributor"));
             labelObject.remove(rdf.getPrefixItem("rdf:type"));
-            labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
-            labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
+            labelObject.remove(rdf.getPrefixItem("dc:identifier"));
+            labelObject.remove(rdf.getPrefixItem("dct:creator"));
+            labelObject.remove(rdf.getPrefixItem("dc:creator"));
+            labelObject.remove(rdf.getPrefixItem("dct:contributor"));
+            labelObject.remove(rdf.getPrefixItem("dc:contributor"));
+            labelObject.remove(rdf.getPrefixItem("skos:inScheme"));
+            labelObject.remove(rdf.getPrefixItem("ls:thumbnail"));
+            labelObject.remove(rdf.getPrefixItem("skos:prefLabel"));
+            labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
             labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
+            labelObject.remove(rdf.getPrefixItem("skos:broader"));
+            labelObject.remove(rdf.getPrefixItem("skos:narrower"));
+            labelObject.remove(rdf.getPrefixItem("skos:related"));
+            labelObject.remove(rdf.getPrefixItem("skos:broadMatch"));
+            labelObject.remove(rdf.getPrefixItem("skos:narrowMatch"));
+            labelObject.remove(rdf.getPrefixItem("skos:relatedMatch"));
+            labelObject.remove(rdf.getPrefixItem("skos:closeMatch"));
+            labelObject.remove(rdf.getPrefixItem("skos:exactMatch"));
+            labelObject.remove(rdf.getPrefixItem("rdfs:seeAlso"));
+            labelObject.remove(rdf.getPrefixItem("dc:created"));
+            labelObject.remove(rdf.getPrefixItem("dct:license"));
+            labelObject.remove(rdf.getPrefixItem("dc:modified"));
+            labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
+            // deposits
+            labelObject.remove(rdf.getPrefixItem("ls:sameAs"));
+            labelObject.remove(rdf.getPrefixItem("ls:hasStatusType"));
+            labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
+            labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
         } catch (Exception e) {
             int errorLine = -1;
             for (StackTraceElement element : e.getStackTrace()) {
@@ -1486,86 +1425,14 @@ public class Transformer {
             return revisionTypes.substring(0, revisionTypes.length() - 1);
         }
     }*/
-
     public static String labelDifference(String json_old, String json_new) throws ParseException, RevisionTypeException {
-
-        List<String> revisionTypesList = new ArrayList();
+        List<String> descriptionList = new ArrayList();
         try {
             JSONObject oldObject = (JSONObject) new JSONParser().parse(json_old);
             JSONObject newObject = (JSONObject) new JSONParser().parse(json_new);
-            /*
-        SUPPORTED:
-        prefLabels[{lang,value,isThumbnail}] (DescriptionRevision)
-        altLabels[{lang,value}] (DescriptionRevision)
-        scopeNote{lang,value} (DescriptionRevision)
-        broader[id] (LinkingRevision)
-        narrower[id] (LinkingRevision)
-        related[id] (LinkingRevision)
-        ...
-        TODO:
-        preferredLabel (SystemRevision)
-        context[value] (SystemRevision)
-        contributor[value] (ShareRevision)
-             */
-            // scopeNote [optional]
-            JSONObject oldScopeNote = (JSONObject) oldObject.get("scopeNote");
-            JSONObject newScopeNote = (JSONObject) newObject.get("scopeNote");
-            int oldScopeNoteCount = 0;
-            int newScopeNoteCount = 0;
-            if (oldScopeNote != null) {
-                oldScopeNoteCount = 1;
-            }
-            if (newScopeNote != null) {
-                newScopeNoteCount = 1;
-            }
-            if (oldScopeNoteCount != newScopeNoteCount) {
-                revisionTypesList.add("DescriptionRevision");
-            } else if (newScopeNote != oldScopeNote) {
-                revisionTypesList.add("DescriptionRevision");
-            }
-            // prefLabel [mendatory]
-            JSONArray oldPrefLabel = (JSONArray) oldObject.get("prefLabels");
-            JSONArray newPrefLabel = (JSONArray) newObject.get("prefLabels");
-            int oldPrefLabelCount = 0;
-            int newPrefLabelCount = 0;
-            if (oldPrefLabel != null) {
-                oldPrefLabelCount = oldPrefLabel.size();
-            }
-            if (newPrefLabel != null) {
-                newPrefLabelCount = newPrefLabel.size();
-            }
-            if (oldPrefLabelCount != newPrefLabelCount) {
-                revisionTypesList.add("DescriptionRevision");
-            } else if (oldPrefLabel != null && newPrefLabel != null) {
-                for (Object item : oldPrefLabel) {
-                    if (!newPrefLabel.contains(item)) {
-                        revisionTypesList.add("DescriptionRevision");
-                        break;
-                    }
-                }
-            }
-            // altLabel [optional]
-            JSONArray oldAltLabel = (JSONArray) oldObject.get("altLabels");
-            JSONArray newAltLabel = (JSONArray) newObject.get("altLabels");
-            int oldAltLabelCount = 0;
-            int newAltLabelCount = 0;
-            if (oldAltLabel != null) {
-                oldAltLabelCount = oldAltLabel.size();
-            }
-            if (newAltLabel != null) {
-                newAltLabelCount = newAltLabel.size();
-            }
-            if (oldAltLabelCount != newAltLabelCount) {
-                revisionTypesList.add("DescriptionRevision");
-            } else if (oldAltLabel != null && newAltLabel != null) {
-                for (Object item : oldAltLabel) {
-                    if (!newAltLabel.contains(item)) {
-                        revisionTypesList.add("DescriptionRevision");
-                        break;
-                    }
-                }
-            }
-            // relations
+            // objects
+            JSONArray oldPrefLabel = (JSONArray) oldObject.get("translations");
+            JSONArray newPrefLabel = (JSONArray) newObject.get("translations");
             JSONArray oldBroader = (JSONArray) oldObject.get("broader");
             JSONArray newBroader = (JSONArray) newObject.get("broader");
             JSONArray oldNarrower = (JSONArray) oldObject.get("narrower");
@@ -1584,112 +1451,154 @@ public class Transformer {
             JSONArray newExactMatch = (JSONArray) newObject.get("exactMatch");
             JSONArray oldSeeAlso = (JSONArray) oldObject.get("seeAlso");
             JSONArray newSeeAlso = (JSONArray) newObject.get("seeAlso");
-            // set revisions using size attribute
-            int oldBroaderCount = 0;
-            int newBroaderCount = 0;
-            if (oldBroader != null) {
-                oldBroaderCount = oldBroader.size();
+            // translation added
+            if (oldPrefLabel != null && newPrefLabel != null) {
+                for (Object item : newPrefLabel) {
+                    if (!oldPrefLabel.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("translation added: " + tmp.get("value") + " (" + tmp.get("lang") + ")");
+                        break;
+                    }
+                }
+            } else if (newPrefLabel != null) {
+                for (Object item : newPrefLabel) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("translation added: " + tmp.get("value") + " (" + tmp.get("lang") + ")");
+                }
             }
-            if (newBroader != null) {
-                newBroaderCount = newBroader.size();
+            // broader added
+            if (oldBroader != null && newBroader != null) {
+                for (Object item : newBroader) {
+                    if (!oldBroader.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("broader concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newBroader != null) {
+                for (Object item : newBroader) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("broader concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            if (oldBroaderCount != newBroaderCount) {
-                revisionTypesList.add("LinkingRevision");
+            // narrower added
+            if (oldNarrower != null && newNarrower != null) {
+                for (Object item : newNarrower) {
+                    if (!oldNarrower.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("narrower concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newNarrower != null) {
+                for (Object item : newNarrower) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("narrower concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            int oldNarrowerCount = 0;
-            int newNarrowerCount = 0;
-            if (oldNarrower != null) {
-                oldNarrowerCount = oldNarrower.size();
+            // related added
+            if (oldRelated != null && newRelated != null) {
+                for (Object item : newRelated) {
+                    if (!oldRelated.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("related concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newRelated != null) {
+                for (Object item : newRelated) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("related concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            if (newNarrower != null) {
-                newNarrowerCount = newNarrower.size();
+            // broadMatch added
+            if (oldBroadMatch != null && newBroadMatch != null) {
+                for (Object item : newBroadMatch) {
+                    if (!oldBroadMatch.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("broadMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newBroadMatch != null) {
+                for (Object item : newBroadMatch) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("broadMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            if (oldNarrowerCount != newNarrowerCount) {
-                revisionTypesList.add("LinkingRevision");
+            // narrowMatch added
+            if (oldNarrowMatch != null && newNarrowMatch != null) {
+                for (Object item : newNarrowMatch) {
+                    if (!oldNarrowMatch.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("narrowMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newNarrowMatch != null) {
+                for (Object item : newNarrowMatch) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("narrowMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            int oldRelatedCount = 0;
-            int newRelatedCount = 0;
-            if (oldRelated != null) {
-                oldRelatedCount = oldRelated.size();
+            // relatedMatch added
+            if (oldRelatedMatch != null && newRelatedMatch != null) {
+                for (Object item : newRelatedMatch) {
+                    if (!oldRelatedMatch.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("relatedMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newRelatedMatch != null) {
+                for (Object item : newRelatedMatch) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("relatedMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            if (newRelated != null) {
-                newRelatedCount = newRelated.size();
+            // closeMatch added
+            if (oldCloseMatch != null && newCloseMatch != null) {
+                for (Object item : newCloseMatch) {
+                    if (!oldCloseMatch.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("closeMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newCloseMatch != null) {
+                for (Object item : newCloseMatch) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("closeMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            if (oldRelatedCount != newRelatedCount) {
-                revisionTypesList.add("LinkingRevision");
+            // exactMatch added
+            if (oldExactMatch != null && newExactMatch != null) {
+                for (Object item : newExactMatch) {
+                    if (!oldExactMatch.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("exactMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newExactMatch != null) {
+                for (Object item : newExactMatch) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("exactMatch concept added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                }
             }
-            int oldBroadMatchCount = 0;
-            int newBroadMatchCount = 0;
-            if (oldBroadMatch != null) {
-                oldBroadMatchCount = oldBroadMatch.size();
-            }
-            if (newBroadMatch != null) {
-                newBroadMatchCount = newBroadMatch.size();
-            }
-            if (oldBroadMatchCount != newBroadMatchCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            int oldNarrowMatchCount = 0;
-            int newNarrowMatchCount = 0;
-            if (oldNarrowMatch != null) {
-                oldNarrowMatchCount = oldNarrowMatch.size();
-            }
-            if (newNarrowMatch != null) {
-                newNarrowMatchCount = newNarrowMatch.size();
-            }
-            if (oldNarrowMatchCount != newNarrowMatchCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            int oldRelatedMatchCount = 0;
-            int newRelatedMatchCount = 0;
-            if (oldRelatedMatch != null) {
-                oldRelatedMatchCount = oldRelatedMatch.size();
-            }
-            if (newRelatedMatch != null) {
-                newRelatedMatchCount = newRelatedMatch.size();
-            }
-            if (oldRelatedMatchCount != newRelatedMatchCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            int oldCloseMatchCount = 0;
-            int newCloseMatchCount = 0;
-            if (oldCloseMatch != null) {
-                oldCloseMatchCount = oldCloseMatch.size();
-            }
-            if (newCloseMatch != null) {
-                newCloseMatchCount = newCloseMatch.size();
-            }
-            if (oldCloseMatchCount != newCloseMatchCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            int oldExactMatchCount = 0;
-            int newExactMatchCount = 0;
-            if (oldExactMatch != null) {
-                oldExactMatchCount = oldExactMatch.size();
-            }
-            if (newExactMatch != null) {
-                newExactMatchCount = newExactMatch.size();
-            }
-            if (oldExactMatchCount != newExactMatchCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            int oldSeeAlsoCount = 0;
-            int newSeeAlsoCount = 0;
-            if (oldSeeAlso != null) {
-                oldSeeAlsoCount = oldSeeAlso.size();
-            }
-            if (newSeeAlso != null) {
-                newSeeAlsoCount = newSeeAlso.size();
-            }
-            if (oldSeeAlsoCount != newSeeAlsoCount) {
-                revisionTypesList.add("LinkingRevision");
-            }
-            // releaseType [mendatory]
-            String oldReleaseType = (String) oldObject.get("releaseType");
-            String newReleaseType = (String) newObject.get("releaseType");
-            if (newReleaseType != null) {
-                if (!oldReleaseType.equals(newReleaseType)) {
-                    revisionTypesList.add("SystemRevision");
+            // seeAlso added
+            if (oldSeeAlso != null && newSeeAlso != null) {
+                for (Object item : newSeeAlso) {
+                    if (!oldSeeAlso.contains(item)) {
+                        JSONObject tmp = (JSONObject) item;
+                        descriptionList.add("seeAlso resource added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
+                        break;
+                    }
+                }
+            } else if (newSeeAlso != null) {
+                for (Object item : newSeeAlso) {
+                    JSONObject tmp = (JSONObject) item;
+                    descriptionList.add("seeAlso resource added: " + tmp.get("uri") + " (" + tmp.get("type") + ")");
                 }
             }
         } catch (Exception e) {
@@ -1700,14 +1609,14 @@ public class Transformer {
                     break;
                 }
             }
-            return "ModifyRevision";
+            return "";
         }
         // all revision types
-        if (revisionTypesList.size() == 0) {
-            return "ModifyRevision";
+        if (descriptionList.isEmpty()) {
+            return "";
         } else {
             String revisionTypes = "";
-            for (String item : revisionTypesList) {
+            for (String item : descriptionList) {
                 revisionTypes += item + ",";
             }
             return revisionTypes.substring(0, revisionTypes.length() - 1);

@@ -78,8 +78,7 @@ public class LabelsResource {
             @QueryParam("prefLabel") String prefLabel,
             @QueryParam("vocab") String vocab,
             @QueryParam("context") String context,
-            @QueryParam("draft") String draft,
-            @QueryParam("deprecated") String deprecated)
+            @QueryParam("draft") String draft)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
@@ -100,9 +99,6 @@ public class LabelsResource {
             if (draft == null) {
                 //query += "?s ls:hasReleaseType ls:Public . ";
             }
-            if (deprecated == null) {
-                query += "?s ls:hasStatusType ls:Active . ";
-            }
             if (creator != null) {
                 query += "FILTER(?creator=\"" + creator + "\") ";
             }
@@ -111,9 +107,6 @@ public class LabelsResource {
             }
             if (vocab != null) {
                 query += "FILTER(?vocab=<" + rdf.getPrefixItem("ls_voc:" + vocab) + ">) ";
-            }
-            if (context != null) {
-                query += "FILTER(?context=\"" + context + "\") ";
             }
             query += " } ";
             // SORTING
@@ -728,13 +721,6 @@ public class LabelsResource {
     public Response updateLabel(@PathParam("label") String label, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            // get data from request
-            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
-            if (requestObject.get("user") == null || requestObject.get("item") == null) {
-                throw new JsonFormatException("user or item object is null");
-            }
-            String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item").toString();
             String item = "ls_lab";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -742,6 +728,10 @@ public class LabelsResource {
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
+            // get info
+            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
+            String user = (String) requestObject.get("creator");
+            String releaseType = (String) requestObject.get("releaseType");
             // insert data
             String json_new = json;
             json = Transformer.label_POST(json, label);
@@ -759,11 +749,20 @@ public class LabelsResource {
             }
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist).toJSONString();
-            // get difference
-            String type = Transformer.labelDifference(json_old, json_new);
             // set triples
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putLabelREVISION(item, label, user, type));
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putLabelSPARQLUPDATE(label));
+            if (releaseType != null) {
+                if (releaseType.equals("public")) {
+                    // get difference
+                    String revisions = Transformer.labelDifference(json_old, json_new);
+                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), revisionSPARQLUPDATE(item, label, user, revisions));
+                } else {
+                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), modifySPARQLUPDATE(item, label));
+                }
+            } else {
+                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), modifySPARQLUPDATE(item, label));
+            }
+            // general label action
+            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteItemsSPARQLUPDATE(label));
             RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
             // get result als json
             rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -785,17 +784,11 @@ public class LabelsResource {
         }
     }
 
-    /*@PATCH
+    @DELETE
     @Path("/{label}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateLabelPATCH(@PathParam("label") String label, String json)
-            throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response deleteLabel(@PathParam("label") String label) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            // get data from request
-            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
-            String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item");
             String item = "ls_lab";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -803,96 +796,9 @@ public class LabelsResource {
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
-            // insert data
-            json = Transformer.label_POST(json, label);
-            // get json old
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            String query = GeneralFunctions.getAllElementsForItemID(item, label);
-            List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException("resource " + label + " is not available");
-            }
-            for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
-            }
-            String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, null).toJSONString();
-            // get difference
-            String type = Transformer.vocabularyDifference(json_old, json);
-            // set triples
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putLabelREVISION(item, label, user, type));
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), patchLabelSPARQLUPDATE(label, json));
-            if (!json.contains("flush")) {
-                RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
-            }
-            // get result als json
-            rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
-            query = GeneralFunctions.getAllElementsForItemID(item, label);
-            result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException("resource " + label + " is not available");
-            }
-            for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
-            }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist).toJSONString();
-            return Response.status(Response.Status.CREATED).entity(out).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }*/
-    @DELETE
-    @Path("/{label}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response deleteLabel(@PathParam("label") String label, @QueryParam("user") String user, @QueryParam("type") String type) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
-        try {
-            String item = "ls_lab";
-            if (type.equals("delete")) {
-                // check if resource exists
-                String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
-                List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
-                if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + label + " is not available");
-                }
-                // delete data
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelSPARQLUPDATE(label));
-            } else if (type.equals("deprecated")) {
-                // check if resource exists
-                String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
-                List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
-                if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + label + " is not available");
-                }
-                // insert data
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedLabelREVISION(item, label, user));
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeSPARQLUPDATE(label));
-            } else {
-                throw new FormatException("wrong delete type");
-            }
-            String out = "";
-            if (type.equals("deprecated")) {
-                // get result als json
-                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-                List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
-                String query = GeneralFunctions.getAllElementsForItemID(item, label);
-                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-                List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-                if (result.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + label + " is not available");
-                }
-                for (int i = 0; i < predicates.size(); i++) {
-                    rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
-                }
-                out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist).toJSONString();
-            } else {
-                out = Transformer.empty_JSON("label").toJSONString();
-            }
+            // delete data
+            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelSPARQLUPDATE(label));
+            String out = Transformer.empty_JSON("label").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
@@ -901,7 +807,6 @@ public class LabelsResource {
     }
 
     private static String createLabelSPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -911,7 +816,6 @@ public class LabelsResource {
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Label . ";
         triples += item + ":" + itemid + " a skos:Concept . ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Active . ";
         triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
         triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
@@ -919,20 +823,25 @@ public class LabelsResource {
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
         triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + dateiso + "\"" + " . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "CreateRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:CreateRevision . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
         triples += " }";
         return triples;
     }
 
-    private static String putLabelREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String modifySPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
+        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        String prefixes = rdf.getPREFIXSPARQL();
+        Calendar calender = Calendar.getInstance();
+        Date date = calender.getTime();
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String dateiso = formatter.format(date);
+        String triples = prefixes + "INSERT DATA { ";
+        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
+        triples += " }";
+        return triples;
+    }
+
+    private static String revisionSPARQLUPDATE(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
         String typeArray[] = type.split(",");
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
@@ -942,72 +851,24 @@ public class LabelsResource {
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
         for (String entry : typeArray) {
-            if (!entry.contains("DescriptionRevision") && !entry.contains("ShareRevision") && !entry.contains("SystemRevision") && !entry.contains("LinkingRevision")) {
-                entry = "ModifyRevision";
-            }
             String revID = UniqueIdentifier.getUUID();
             triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
-            triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-            triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-            triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-            triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-            triples += "ls_rev" + ":" + revID + " dc:description \"" + entry + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dct:type ls:" + entry + " . ";
-            triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+            if (!entry.equals("")) {
+                triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
+                triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
+                triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
+                triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
+                triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
+                triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
+                triples += "ls_rev" + ":" + revID + " dc:description \"" + entry + "\"" + " . ";
+                triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+            }
         }
         triples += " }";
         return triples;
     }
 
-    private static String deleteLabelREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
-        Calendar calender = Calendar.getInstance();
-        Date date = calender.getTime();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String dateiso = formatter.format(date);
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Deleted . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeleteRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeleteRevision" + " . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-        triples += " }";
-        return triples;
-    }
-
-    private static String deprecatedLabelREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
-        Calendar calender = Calendar.getInstance();
-        Date date = calender.getTime();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String dateiso = formatter.format(date);
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Deprecated . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeprecatedRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeprecatedRevision" + " . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-        triples += " }";
-        return triples;
-    }
-
-    private static String putLabelSPARQLUPDATE(String id) throws IOException {
+    private static String deleteItemsSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
@@ -1019,123 +880,8 @@ public class LabelsResource {
                 + "OPTIONAL { ?resource skos:broader ?label . } "
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasReleaseType, ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,skos:inScheme)) "
+                + "FILTER (?p IN (dct:contributor,dc:contributor,skos:prefLabel,skos:scopeNote,ls:thumbnail,ls:hasReleaseType,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,skos:inScheme,dc:language)) "
                 + "}";
-        update = update.replace("$identifier", id);
-        return update;
-    }
-
-    private static String patchLabelSPARQLUPDATE(String id, String json) throws IOException, ParseException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        JSONObject labelObject = (JSONObject) new JSONParser().parse(json);
-        List<String> deleteList = new ArrayList<String>();
-        // for patch
-        JSONArray flushArray = (JSONArray) labelObject.get(rdf.getPrefixItem("flush"));
-        if (flushArray != null && !flushArray.isEmpty()) {
-            for (Object element : flushArray) {
-                // nur optional
-                if (element.equals("altLabel")) {
-                    deleteList.add("skos:altLabel");
-                } else if (element.equals("context")) {
-                    deleteList.add("ls:context");
-                } else if (element.equals("related")) {
-                    deleteList.add("skos:related");
-                } else if (element.equals("broader")) {
-                    deleteList.add("skos:broader");
-                } else if (element.equals("narrower")) {
-                    deleteList.add("skos:narrower");
-                } else if (element.equals("closeMatch")) {
-                    deleteList.add("skos:closeMatch");
-                } else if (element.equals("exactMatch")) {
-                    deleteList.add("skos:exactMatch");
-                } else if (element.equals("relatedMatch")) {
-                    deleteList.add("skos:relatedMatch");
-                } else if (element.equals("narrowMatch")) {
-                    deleteList.add("skos:narrowMatch");
-                } else if (element.equals("broadMatch")) {
-                    deleteList.add("skos:broadMatch");
-                } else if (element.equals("seeAlso")) {
-                    deleteList.add("rdfs:seeAlso");
-                }
-            }
-        }
-        // for else
-        JSONArray contributorArray = (JSONArray) labelObject.get(rdf.getPrefixItem("dc:contributor"));
-        if (contributorArray != null && !contributorArray.isEmpty()) {
-            deleteList.add("dct:contributor");
-            deleteList.add("dc:contributor");
-        }
-        JSONArray prefLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:prefLabel"));
-        if (prefLabelArray != null && !prefLabelArray.isEmpty()) {
-            deleteList.add("skos:prefLabel");
-        }
-        JSONArray altLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:altLabel"));
-        if (altLabelArray != null && !altLabelArray.isEmpty()) {
-            deleteList.add("skos:altLabel");
-        }
-        JSONArray preferredLabelArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:preferredLabel"));
-        if (preferredLabelArray != null && !preferredLabelArray.isEmpty()) {
-            deleteList.add("ls:preferredLabel");
-        }
-        JSONArray contextArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:context"));
-        if (contextArray != null && !contextArray.isEmpty()) {
-            deleteList.add("ls:context");
-        }
-        JSONArray relatedArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:related"));
-        if (relatedArray != null && !relatedArray.isEmpty()) {
-            deleteList.add("skos:related");
-        }
-        JSONArray broaderArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broader"));
-        if (broaderArray != null && !broaderArray.isEmpty()) {
-            deleteList.add("skos:broader");
-        }
-        JSONArray narrowerArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrower"));
-        if (narrowerArray != null && !narrowerArray.isEmpty()) {
-            deleteList.add("skos:narrower");
-        }
-        JSONArray closeMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:closeMatch"));
-        if (closeMatchArray != null && !closeMatchArray.isEmpty()) {
-            deleteList.add("skos:closeMatch");
-        }
-        JSONArray exactMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:exactMatch"));
-        if (exactMatchArray != null && !exactMatchArray.isEmpty()) {
-            deleteList.add("skos:exactMatch");
-        }
-        JSONArray relatedMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:relatedMatch"));
-        if (relatedMatchArray != null && !relatedMatchArray.isEmpty()) {
-            deleteList.add("skos:relatedMatch");
-        }
-        JSONArray narrowMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:narrowMatch"));
-        if (narrowMatchArray != null && !narrowMatchArray.isEmpty()) {
-            deleteList.add("skos:narrowMatch");
-        }
-        JSONArray broadMatchArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:broadMatch"));
-        if (broadMatchArray != null && !broadMatchArray.isEmpty()) {
-            deleteList.add("skos:broadMatch");
-        }
-        JSONArray seeAlsoArray = (JSONArray) labelObject.get(rdf.getPrefixItem("rdfs:seeAlso"));
-        if (seeAlsoArray != null && !seeAlsoArray.isEmpty()) {
-            deleteList.add("rdfs:seeAlso");
-        }
-        // SEND DELETE
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label .} "
-                + "WHERE { "
-                + "?label ?p ?o. "
-                + "?label dc:identifier ?identifier. "
-                + "?label dc:identifier ?identifier. "
-                // filter delete all broader/narrower wo ?label das OBJECT ist
-                + "OPTIONAL { ?resource skos:broader ?label . } "
-                + "OPTIONAL { ?resource skos:narrower ?label . } "
-                + "FILTER (?identifier=\"$identifier\") ";
-
-        update += "FILTER (?p IN (";
-        for (String element : deleteList) {
-            update += element + ",";
-        }
-        update = update.substring(0, update.length() - 1);
-        update += ")) }";
         update = update.replace("$identifier", id);
         return update;
     }
@@ -1147,21 +893,6 @@ public class LabelsResource {
                 + "DELETE { ?label ?p ?o. } "
                 + "WHERE { "
                 + "?label ?p ?o. "
-                + "?label dc:identifier ?identifier. "
-                + "FILTER (?identifier=\"$identifier\") "
-                //+ "FILTER (?p IN (skos:inScheme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,skos:prefLabel,skos:altLabel,skos:scopeNote,ls:preferredLabel,ls:hasContext,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso,dc:created,dc:modified)) "
-                + "}";
-        update = update.replace("$identifier", id);
-        return update;
-    }
-
-    private static String deleteLabelStatusTypeSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "DELETE { ?label ls:hasStatusType ls:Active. } "
-                + "WHERE { "
-                + "?label ls:hasStatusType ls:Active. "
                 + "?label dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
                 + "}";

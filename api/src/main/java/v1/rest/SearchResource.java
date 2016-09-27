@@ -54,11 +54,11 @@ public class SearchResource {
                     + "?Subject skos:inScheme ?scheme . "
                     + "?scheme dc:title ?schemeTitle . "
                     + "?Subject skos:prefLabel ?prefLabel . "
-                    + "?Subject ls:preferredLabel ?preferredLabel . "
+                    + "?Subject ls:thumbnail ?preferredLabel . "
                     + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                     + "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
-                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:preferredLabel ?BroaderPreferredTerm.} "
-                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:preferredLabel ?NarrowerPreferredTerm .} ";
+                    + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
+                    + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} ";
             if (fields != null) {
                 if (fields.contains("prefLabel")) {
                     sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i')) ";
