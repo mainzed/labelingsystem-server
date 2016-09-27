@@ -14,7 +14,6 @@ import exceptions.Logging;
 import exceptions.RdfException;
 import exceptions.ResourceNotAvailableException;
 import exceptions.UniqueIdentifierException;
-import v1.restconfig.PATCH;
 import v1.utils.transformer.Transformer;
 import v1.utils.config.ConfigProperties;
 import v1.utils.generalfuncs.GeneralFunctions;
@@ -31,7 +30,6 @@ import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
@@ -51,15 +49,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-/**
- * REST API for Vocabularies
- *
- * @author Florian Thiery M.Sc.
- * @author i3mainz - Institute for Spatial Information and Surveying Technology
- * @version 23.06.2016
- */
 @Path("/vocabs")
 public class VocabsResource {
 
@@ -79,19 +69,16 @@ public class VocabsResource {
             @QueryParam("contributor") String contributor,
             @QueryParam("statusType") String statusType,
             @QueryParam("releaseType") String releaseType,
-            @QueryParam("draft") String draft,
-            @QueryParam("deprecated") String deprecated)
+            @QueryParam("draft") String draft)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = rdf.getPREFIXSPARQL();
-
             query += "SELECT * WHERE { "
                     + "?s ?p ?o . "
                     + "?s a ls:Vocabulary . "
                     + "?s dc:identifier ?identifier . "
-                    + "?s ls:hasStatusType ?statusType . "
                     + "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:contributor ?contributor . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:title ?title . } "; // because of sorting
@@ -99,17 +86,11 @@ public class VocabsResource {
             if (draft == null) {
                 query += "?s ls:hasReleaseType ls:Public . ";
             }
-            if (deprecated == null) {
-                query += "?s ls:hasStatusType ls:Active . ";
-            }
             if (creator != null) {
                 query += "FILTER(?creator=\"" + creator + "\") ";
             }
             if (contributor != null) {
                 query += "FILTER(?contributor=\"" + contributor + "\") ";
-            }
-            if (statusType != null) {
-                query += "FILTER(?statusType=<" + rdf.getPrefixItem("ls:" + statusType) + ">) ";
             }
             if (releaseType != null) {
                 query += "FILTER(?releaseType=<" + rdf.getPrefixItem("ls:" + releaseType) + ">) ";
@@ -656,13 +637,6 @@ public class VocabsResource {
     public Response updateVocabulary(@PathParam("vocabulary") String vocabulary, String json)
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            // get data from request
-            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
-            if (requestObject.get("user") == null || requestObject.get("item") == null) {
-                throw new JsonFormatException("user or item object is null");
-            }
-            String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item").toString();
             String item = "ls_voc";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
@@ -671,33 +645,17 @@ public class VocabsResource {
                 throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
             // insert data
-            String json_new = json;
             json = Transformer.vocabulary_POST(json, vocabulary);
-            // get json old
+            // set triples
+            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), modifySPARQLUPDATE(item, vocabulary));
+            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteItemsSPARQLUPDATE(vocabulary));
+            RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
+            // get result als json
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
             List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
-            }
-            for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
-            }
-            String json_old = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
-            // get difference
-            String type = Transformer.vocabularyDifference(json_old, json_new);
-            // set triples
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularySPARQLUPDATE(vocabulary));
-            RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
-            // get result als json
-            rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            query = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-            result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
             if (result.size() < 1) {
                 throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
@@ -712,17 +670,11 @@ public class VocabsResource {
         }
     }
 
-    /*@PATCH
+    @DELETE
     @Path("/{vocabulary}")
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response updateVocabularyPATCH(@PathParam("vocabulary") String vocabulary, String json)
-            throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response deleteVocabulary(@PathParam("vocabulary") String vocabulary) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            // get data from request
-            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
-            String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item").toString();
             String item = "ls_voc";
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
@@ -730,108 +682,15 @@ public class VocabsResource {
             if (resultExist.size() < 1) {
                 throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
             }
-            // insert data
-            String json_new = json;
-            json = Transformer.vocabulary_POST(json, vocabulary);
-            // get json old
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            String query = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-            List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
+            // delete data
+            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularySPARQLUPDATE(vocabulary));
+            // delete labels if available
+            String queryLabels = GeneralFunctions.getAllLabelsForVocabulary(vocabulary);
+            List<BindingSet> resultLabels = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryLabels);
+            if (resultLabels.size() > 0) {
+                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelsSPARQLUPDATE(vocabulary));
             }
-            for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
-            }
-            String json_old = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
-            // get difference
-            String type = Transformer.vocabularyDifference(json_old, json_new);
-            // set triples
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putVocabularyREVISION(item, vocabulary, user, type));
-            RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), patchVocabularySPARQLUPDATE(vocabulary, json));
-            if (!json.contains("flush")) {
-                RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
-            }
-            // get result als json
-            rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-            query = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-            result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-            predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-            objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-            if (result.size() < 1) {
-                throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
-            }
-            for (int i = 0; i < predicates.size(); i++) {
-                rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
-            }
-            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
-            return Response.status(Response.Status.CREATED).entity(out).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }*/
-    @DELETE
-    @Path("/{vocabulary}")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response deleteVocabulary(@PathParam("vocabulary") String vocabulary, @QueryParam("user") String user, @QueryParam("type") String type) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
-        try {
-            String item = "ls_voc";
-            if (type.equals("delete")) {
-                // check if resource exists
-                String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-                List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
-                if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
-                }
-                // delete data
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularySPARQLUPDATE(vocabulary));
-                // delete labels if available
-                String queryLabels = GeneralFunctions.getAllLabelsForVocabulary(vocabulary);
-                List<BindingSet> resultLabels = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryLabels);
-                if (resultLabels.size() > 0) {
-                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelsSPARQLUPDATE(vocabulary));
-                }
-            } else if (type.equals("deprecated")) {
-                // check if resource exists
-                String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-                List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);
-                if (resultExist.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
-                }
-                // insert data
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deprecatedVocabularyREVISION(item, vocabulary, user));
-                RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteVocabularyStatusTypeSPARQLUPDATE(vocabulary));
-                // set deprecated labels if available
-                String queryLabels = GeneralFunctions.getAllLabelsForVocabulary(vocabulary);
-                List<BindingSet> resultLabels = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryLabels);
-                if (resultLabels.size() > 0) {
-                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(vocabulary));
-                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(vocabulary));
-                }
-            } else {
-                throw new FormatException("wrong delete type");
-            }
-            String out = "";
-            if (type.equals("deprecated")) {
-                // get result als json
-                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-                String query = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
-                List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
-                List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
-                List<String> objects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-                if (result.size() < 1) {
-                    throw new ResourceNotAvailableException("resource " + vocabulary + " is not available");
-                }
-                for (int i = 0; i < predicates.size(); i++) {
-                    rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
-                }
-                out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
-            } else {
-                out = Transformer.empty_JSON("vocab").toJSONString();
-            }
+            String out = Transformer.empty_JSON("vocab").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
@@ -840,7 +699,6 @@ public class VocabsResource {
     }
 
     private static String createVocabularySPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -850,7 +708,6 @@ public class VocabsResource {
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Vocabulary . ";
         triples += item + ":" + itemid + " a skos:ConceptScheme . ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Active . ";
         triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
         triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
@@ -858,95 +715,25 @@ public class VocabsResource {
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
         triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + dateiso + "\"" + " . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "CreateRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:CreateRevision . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
         triples += " }";
         return triples;
     }
 
-    private static String putVocabularyREVISION(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
-        String typeArray[] = type.split(",");
+    private static String modifySPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
-        String triples = prefixes + "INSERT DATA { ";
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        for (String entry : typeArray) {
-            if (!entry.contains("DescriptionRevision") && !entry.contains("ShareRevision") && !entry.contains("SystemRevision")) {
-                entry = "ModifyRevision";
-            }
-            String revID = UniqueIdentifier.getUUID();
-            triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
-            triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-            triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-            triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-            triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-            triples += "ls_rev" + ":" + revID + " dc:description \"" + entry + "\"" + " . ";
-            triples += "ls_rev" + ":" + revID + " dct:type ls:" + entry + " . ";
-            triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-        }
-        triples += " }";
-        return triples;
-    }
-
-    private static String deleteVocabularyREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
-        Calendar calender = Calendar.getInstance();
-        Date date = calender.getTime();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String dateiso = formatter.format(date);
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Deleted . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeleteRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeleteRevision" + " . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
         triples += " }";
         return triples;
     }
 
-    private static String deprecatedVocabularyREVISION(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
-        String revID = UniqueIdentifier.getUUID();
-        Calendar calender = Calendar.getInstance();
-        Date date = calender.getTime();
-        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String dateiso = formatter.format(date);
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String triples = prefixes + "INSERT DATA { ";
-        triples += item + ":" + itemid + " ls:hasStatusType ls:Deprecated . ";
-        triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-        triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-        triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-        triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-        triples += "ls_rev" + ":" + revID + " dc:description \"" + "DeprecatedRevision" + "\"" + " . ";
-        triples += "ls_rev" + ":" + revID + " dct:type ls:" + "DeprecatedRevision" + " . ";
-        triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-        triples += " }";
-        return triples;
-    }
-
-    private static String putVocabularySPARQLUPDATE(String id) throws IOException {
+    private static String deleteItemsSPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
@@ -955,70 +742,11 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:hasTopConcept,dct:contributor,dc:contributor,dc:title,dc:description,ls:hasReleaseType,dcat:theme)) "
+                + "FILTER (?p IN (dct:contributor,dc:contributor,dc:title,dc:description,dc:language,ls:hasReleaseType)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
     }
-
-    /*private static String patchVocabularySPARQLUPDATE(String id, String json) throws IOException, ParseException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
-        List<String> deleteList = new ArrayList<String>();
-        // for patch
-        JSONArray flushArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("flush"));
-        if (flushArray != null && !flushArray.isEmpty()) {
-            for (Object element : flushArray) {
-                // nur optional
-                if (element.equals("topConcept")) {
-                    deleteList.add("skos:hasTopConcept");
-                }
-            }
-        }
-        // for else
-        JSONArray titleArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:title"));
-        if (titleArray != null && !titleArray.isEmpty()) {
-            deleteList.add("dc:title");
-        }
-        JSONArray descriptionArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:description"));
-        if (descriptionArray != null && !descriptionArray.isEmpty()) {
-            deleteList.add("dc:description");
-        }
-        JSONArray hasTopConceptArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("skos:hasTopConcept"));
-        if (hasTopConceptArray != null && !hasTopConceptArray.isEmpty()) {
-            deleteList.add("skos:hasTopConcept");
-        }
-        JSONArray contributorArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:contributor"));
-        if (contributorArray != null && !contributorArray.isEmpty()) {
-            deleteList.add("dct:contributor");
-            deleteList.add("dc:contributor");
-        }
-        JSONArray hasReleaseTypeArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
-        if (hasReleaseTypeArray != null && !hasReleaseTypeArray.isEmpty()) {
-            deleteList.add("ls:hasReleaseType");
-        }
-        JSONArray themenArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dcat:theme"));
-        if (themenArray != null && !themenArray.isEmpty()) {
-            deleteList.add("dcat:theme");
-        }
-        // SEND DELETE
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "DELETE { ?vocabulary ?p ?o. } "
-                + "WHERE { "
-                + "?vocabulary ?p ?o. "
-                + "?vocabulary dc:identifier ?identifier. "
-                + "FILTER (?identifier=\"$identifier\") ";
-
-        update += "FILTER (?p IN (";
-        for (String element : deleteList) {
-            update += element + ",";
-        }
-        update = update.substring(0, update.length() - 1);
-        update += ")) }";
-        update = update.replace("$identifier", id);
-        return update;
-    }*/
 
     private static String deleteVocabularySPARQLUPDATE(String id) throws IOException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -1029,53 +757,8 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                //+ "FILTER (?p IN (skos:hasTopConcept,dc:title,dc:description,ls:hasReleaseType,dcat:theme,dct:creator,dc:creator,dct:contributor,dc:contributor,dct:license,dc:created,dc:modified)) "
                 + "}";
         update = update.replace("$identifier", id);
-        return update;
-    }
-
-    private static String deleteVocabularyStatusTypeSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "DELETE { ?vocabulary ls:hasStatusType ls:Active. } "
-                + "WHERE { "
-                + "?vocabulary ls:hasStatusType ls:Active. "
-                + "?vocabulary dc:identifier ?identifier. "
-                + "FILTER (?identifier=\"$identifier\") "
-                + "}";
-        update = update.replace("$identifier", id);
-        return update;
-    }
-
-    private static String deleteLabelStatusTypeActiveInSchemeSPARQLUPDATE(String vocid) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "DELETE { ?label ls:hasStatusType ls:Active. } "
-                + "WHERE { "
-                + "?label ls:hasStatusType ls:Active. "
-                + "?label skos:inScheme ?vocab. "
-                + "?vocab dc:identifier ?identifier. "
-                + "FILTER (?identifier=\"$identifier\") "
-                + "}";
-        update = update.replace("$identifier", vocid);
-        return update;
-    }
-
-    private static String addLabelStatusTypeDeprecatedInSchemeSPARQLUPDATE(String vocid) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-        String prefixes = rdf.getPREFIXSPARQL();
-        String update = prefixes
-                + "INSERT { ?label ls:hasStatusType ls:Deprecated. } "
-                + "WHERE { "
-                + "?label ls:hasStatusType ls:Active. "
-                + "?label skos:inScheme ?vocab. "
-                + "?vocab dc:identifier ?identifier. "
-                + "FILTER (?identifier=\"$identifier\") "
-                + "}";
-        update = update.replace("$identifier", vocid);
         return update;
     }
 
@@ -1087,7 +770,7 @@ public class VocabsResource {
                 + "WHERE { "
                 + "?label ?p ?o. "
                 + "?label skos:inScheme ?scheme. "
-                + "FILTER (?scheme=<"+rdf.getPrefixItem("ls_voc:"+vocabid)+">) "
+                + "FILTER (?scheme=<" + rdf.getPrefixItem("ls_voc:" + vocabid) + ">) "
                 + "}";
         return update;
     }
