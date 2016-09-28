@@ -1,7 +1,7 @@
 # Version 1.0
 
 The Labeling System API provides programmatic access to the Labeling System functionality and content.
-Version 1 of the API is limited to the essentials of the workbench (Version ??) functionality.
+Version 1 of the API is limited to the essentials of the frontend (**Version XXX**) functionality.
 
 The API is [REST API](http://en.wikipedia.org/wiki/Representational_State_Transfer "RESTful")
 and uses a SQlite database for user authentication purposes.
@@ -53,6 +53,9 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 - **[<code>GET</code> labels/:id.n3](GET_labels_id_n3)**
 - **[<code>GET</code> labels/:id.jsonrdf](GET_labels_id_jsonrdf)**
 - **[<code>GET</code> labels/:id.jsonld](GET_labels_id_jsonld)**
+- **[<code>GET</code> labels/:id.csv](GET_labels_id_csv)**
+- **[<code>GET</code> labels/:id/hierarchy](GET_labels_id_hierarchy)**
+- **[<code>GET</code> labels/:id/relations](GET_labels_id_hierarchy)**
 - **[<code>POST</code> labels](POST_labels)**
 - **[<code>PUT</code> labels/:id](PUT_labels_id)**
 - **[<code>DELETE</code> labels/:id](DELETE_labels_id)**
@@ -91,11 +94,15 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 
 - **[<code>GET</code> retcat](GET_retcat)**
 - **[<code>GET</code> retcat/:id](GET_retcat_id)**
+- **[<code>GET</code> retcat/info/qualities](GET_retcat_info_qualities)**
+- **[<code>GET</code> retcat/info/groups](GET_retcat_info_groups)**
+- **[<code>GET</code> retcat/info/groups](GET_retcat_info_types)**
 - **[<code>GET</code> retcat/vocabulary/:id](GET_retcat_vocabulary_id)**
 - **[<code>POST</code> retcat/vocabulary/:id](POST_retcat_vocabulary_id)**
 - **[<code>PUT</code> retcat/vocabulary/:id](PUT_retcat_vocabulary_id)**
-- **[<code>GET</code> retcat/info/qualities](GET_retcat_info_qualities)**
-- **[<code>GET</code> retcat/info/groups](GET_retcat_info_groups)**
+- **[<code>GET</code> retcat/vocabulary/:id/list](GET_retcat_vocabulary_id_list)**
+- **[<code>POST</code> retcat/vocabulary/:id/list](POST_retcat_vocabulary_id_list)**
+- **[<code>PUT</code> retcat/vocabulary/:id/list](PUT_retcat_vocabulary_id_list)**
 
 #### ReTCat detail information functions
 
@@ -163,7 +170,6 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 - **[<code>GET</code> retcat/query/html](GET_retcat_query_html)**
 - **[<code>GET</code> retcat/info/html](GET_retcat_info_html)**
 
-
 ### Search functions
 
 #### SPARQL
@@ -186,12 +192,13 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 ### Authentication
 
 - **[<code>POST</code> auth/login](POST_auth_login)**
-- **[<code>POST</code> auth/status](POST_auth_status)**
+- **[<code>GET</code> auth/status](GET_auth_status)**
 - **[<code>POST</code> auth/logout](POST_auth_logout)**
 - **[<code>POST</code> auth/newuser](POST_auth_newuser)**
 - **[<code>POST</code> auth/deactivate](POST_auth_deactivate)**
 - **[<code>POST</code> auth/activate](POST_auth_activate)**
 - **[<code>POST</code> auth/hash](POST_auth_hash)**
+- **[<code>GET</code> auth/users](POST_auth_users)**
 
 ### System functions
 
@@ -206,7 +213,7 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 
 #### CSV upload
 
-- **[<code>POST</code> importcsv/mode/start/creator/:creator/validator/:validator](POST_importcsv)**
+- **[<code>POST</code> importcsv/mode/start/creator/:creator/vocabulary/:vocabID/validator/:validator](POST_importcsv)**
 - **[<code>GET</code> importcsv/mode/:mode](GET_importcsv)**
 
 ***
