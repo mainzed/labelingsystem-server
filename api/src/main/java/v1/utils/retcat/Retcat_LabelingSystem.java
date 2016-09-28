@@ -32,10 +32,9 @@ public class Retcat_LabelingSystem {
                 + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
-                + "?scheme ls:hasReleaseType ls:Public . "
                 + "?Subject skos:prefLabel ?pl . "
                 + "?Subject ls:thumbnail ?prefLabel . "
-                + "?Subject ls:hasStatusType ls:Active . "
+                + "?Subject ls:hasReleaseType ls:Public . "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
@@ -293,8 +292,8 @@ public class Retcat_LabelingSystem {
         String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                 + "SELECT * { "
                 + "<" + url + "> ls:thumbnail ?prefLabel. "
-                + "<" + url + "> ls:hasStatusType ?statusType. "
                 + "<" + url + "> skos:inScheme ?scheme . "
+				+ "<" + url + "> ls:hasReleaseType ?releaseType . "
                 + "?scheme dc:title ?schemeTitle . "
                 + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm. } "
@@ -339,10 +338,10 @@ public class Retcat_LabelingSystem {
                 } else {
                     jsonOut.put("label", "");
                 }
-                JSONObject statusType = (JSONObject) tmpElement.get("statusType");
-                stValue = (String) statusType.get("value");
+                JSONObject releaseType = (JSONObject) tmpElement.get("releaseType");
+                stValue = (String) releaseType.get("value");
                 jsonOut.put("type", "ls");
-                jsonOut.put("status", stValue.replace(rdf.getPrefixItem("ls:"), ""));
+                jsonOut.put("releaseType", stValue.replace(rdf.getPrefixItem("ls:"), ""));
             }
             for (Object element : bindingsArray) {
                 JSONObject tmpElement = (JSONObject) element;

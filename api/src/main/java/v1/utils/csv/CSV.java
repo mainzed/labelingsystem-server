@@ -121,20 +121,6 @@ public class CSV implements Runnable {
             label += "<" + rdf.getPrefixItem("ls_age:" + creator) + "> ";
             label += ". ";
             TRIPLE_LIST.add(label);
-            // dcelements contributor
-            label = "";
-            label += "<" + rdf.getPrefixItem("ls_lab:" + uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("dc:contributor") + "> ";
-            label += "\"" + creator + "\" ";
-            label += ". ";
-            TRIPLE_LIST.add(label);
-            // dcterms contributor
-            label = "";
-            label += "<" + rdf.getPrefixItem("ls_lab:" + uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("dct:contributor") + "> ";
-            label += "<" + rdf.getPrefixItem("ls_age:" + creator) + "> ";
-            label += ". ";
-            TRIPLE_LIST.add(label);
             // dcterms date
             Calendar cal = Calendar.getInstance();
             Date time = cal.getTime();

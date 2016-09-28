@@ -594,19 +594,15 @@ public class VocabsResource {
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public Response postVocabulary(String json) throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
-            // get data from request
-            JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
-            if (requestObject.get("user") == null || requestObject.get("item") == null) {
-                throw new JsonFormatException("user or item object is null");
-            }
-            String user = (String) requestObject.get("user").toString();
-            json = (String) requestObject.get("item").toString();
             // get variables
             String item = "ls_voc";
             String itemID = UniqueIdentifier.getUUID();
+			// parse creator
+            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+            String creator = (String) jsonObject.get("creator");
             // create triples
             json = Transformer.vocabulary_POST(json, itemID);
-            String triples = createVocabularySPARQLUPDATE(item, itemID, user);
+            String triples = createVocabularySPARQLUPDATE(item, itemID, creator);
             // input triples
             RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
             RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
@@ -698,24 +694,23 @@ public class VocabsResource {
         }
     }
 
-    private static String createVocabularySPARQLUPDATE(String item, String itemid, String user) throws ConfigException, IOException, UniqueIdentifierException {
+    private static String createVocabularySPARQLUPDATE(String item, String itemid, String creator) throws ConfigException, IOException, UniqueIdentifierException {
         Calendar calender = Calendar.getInstance();
-        Date date = calender.getTime();
+        Date d = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        String dateiso = formatter.format(date);
+        String date = formatter.format(d);
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Vocabulary . ";
         triples += item + ":" + itemid + " a skos:ConceptScheme . ";
-        triples += item + ":" + itemid + " dc:creator \"" + user + "\"" + " . ";
-        triples += item + ":" + itemid + " dct:creator ls_age:" + user + " . ";
-        triples += item + ":" + itemid + " dc:contributor \"" + user + "\"" + " . ";
-        triples += item + ":" + itemid + " dct:contributor ls_age:" + user + " . ";
+        triples += item + ":" + itemid + " dc:creator \"" + creator + "\"" + " . ";
+        triples += item + ":" + itemid + " dct:creator ls_age:" + creator + " . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
         triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
-        triples += item + ":" + itemid + " dc:created \"" + dateiso + "\"" + " . ";
-        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
+        triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
+        triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
+		triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
         triples += " }";
         return triples;
     }
@@ -742,7 +737,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dct:contributor,dc:contributor,dc:title,dc:description,dc:language,ls:hasReleaseType)) "
+                + "FILTER (?p IN (dc:title,dc:description,dc:language,ls:hasReleaseType)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
