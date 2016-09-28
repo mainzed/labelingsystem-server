@@ -1258,23 +1258,16 @@ public class Transformer {
 				}
 			}
 			// set equal concepts
-			if (equalConcepts != null) {
+			if (equalConceptsBool != null) {
 				if (equalConcepts.size() > 0 && equalConceptsBool.equals("true")) {
 					JSONArray equalArray = new JSONArray();
 					for (String concept : equalConcepts) {
 						String[] conceptSplit = concept.split("/");
-						String url = ConfigProperties.getPropertyParam("api") + "/v1/labels/" + conceptSplit[conceptSplit.length - 1];
+						String url = ConfigProperties.getPropertyParam("api") + "/v1/labels/" + conceptSplit[conceptSplit.length - 1] + ".json?equalConcepts=false";
 						URL obj = new URL(url);
 						HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 						con.setRequestMethod("GET");
-						con.setRequestProperty("Accept", "application/sparql-results+json");
-						//String urlParameters = "";
-						con.setDoOutput(true);
-						DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(wr, "UTF-8"));
-						//writer.write(urlParameters);
-						writer.close();
-						wr.close();
+						con.setRequestProperty("Accept-Encoding", "json");
 						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 						String inputLine;
 						StringBuilder response = new StringBuilder();
