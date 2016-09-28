@@ -14,7 +14,44 @@ RESTful API for Labeling System applications
 
 RESTful API to provide cool URIs for Labeling System items
 
-## Set-Up Server (Requirements)
+## Set-Up Server
+
+### required
+
+* Java 8
+* Tomcat
+* RDF4J 2.0
+* labeling system api / item / workbench
+
+### recommended
+
+* CentOS
+ * Linux release 7.2.1511 (Core)
+* nginx (Port 80)
+ * nginx/1.6.3
+* Tomcat (Port 8080)
+ * Version 8.5.4
+* Java
+ * openjdk version "1.8.0_101"
+ * OpenJDK Runtime Environment (build 1.8.0_101-b13)
+ * OpenJDK 64-Bit Server VM (build 25.101-b13, mixed mode)
+* SQlite support
+* RDF4J
+ * server/workbench 2.0
+
+### folder structure
+
+* /[tomcat]/webapps/api.war
+* /[tomcat]/webapps/item.war
+* /[tomcat]/webapps/rdf4j-server.war
+* /[tomcat]/webapps/rdf4j-workbench.war (optional)
+* /[tomcat]/webapps/{nameOfWebApp}
+
+* /[..]/db/ls.sqlite
+* /[tomcat]/webapps/share/
+* /[tomcat]/webapps/dump/
+
+## how to set-up the server
 
 - Tomcat
 - RDF4J Triplestore
@@ -46,6 +83,8 @@ RESTful API to provide cool URIs for Labeling System items
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
 
 # FAQ
+
+## How to add a retcat item?
 
 ## Credits
 
