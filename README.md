@@ -1,30 +1,43 @@
-#Labeling System - Server Applications
+# Introduction
 
-##Applications
+The Labeling System server ...
 
-###api
+# Getting Started
+
+## Components
+
+### api
 
 RESTful API for Labeling System applications
 
-###item
+### item
 
 RESTful API to provide cool URIs for Labeling System items
 
-###db
+## Set-Up Server (Requirements)
 
-SQlite database for auth and retcat functions
+- Tomcat
+- RDF4J Triplestore
+- LS API
+- LS Item API
+- SQlite Database
+- create folders and rights
 
-##Wiki
+## Configure API
+
+- config.properties
+
+## Wiki
 
 [Labeling System Wiki](../../wiki)
 
-##Development
+## Development Hints
 
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
 
-##Demo Version
+# FAQ
 
-##Credits
+## Credits
 
 Software Developers:
 
@@ -32,7 +45,7 @@ Software Developers:
  - Institut für Raumbezogene Informations- und Messtechnik (i3mainz)
  - Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
 
-##License
+## License
 
 MIT License
 
