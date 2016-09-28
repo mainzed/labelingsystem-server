@@ -36,7 +36,7 @@ RESTful API to provide cool URIs for Labeling System items
 - https://github.com/labelingsystem-showcase/ls-core
 - https://github.com/labelingsystem-showcase/ls-reference
 
-## Beispiele
+## API usage examples
 
 - https://github.com/labelingsystem-showcase/js-examples
 - https://github.com/labelingsystem-showcase/sparqlsearch
