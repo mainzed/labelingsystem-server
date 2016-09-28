@@ -31,6 +31,16 @@ RESTful API to provide cool URIs for Labeling System items
 
 [Labeling System Wiki](../../wiki)
 
+## Ontologie
+
+- https://github.com/labelingsystem-showcase/ls-core
+- https://github.com/labelingsystem-showcase/ls-reference
+
+## Beispiele
+
+- https://github.com/labelingsystem-showcase/js-examples
+- https://github.com/labelingsystem-showcase/sparqlsearch
+
 ## Development Hints
 
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
