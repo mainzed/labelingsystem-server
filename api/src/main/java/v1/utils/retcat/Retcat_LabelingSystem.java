@@ -32,13 +32,13 @@ public class Retcat_LabelingSystem {
                 + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
-                + "?Subject skos:prefLabel ?pl . "
                 + "?Subject ls:thumbnail ?prefLabel . "
+                + "OPTIONAL {?Subject skos:prefLabel ?pl . } "
                 + "?Subject ls:hasReleaseType ls:Public . "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
-                + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
+                + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i') || regex(?prefLabel, '" + searchword + "', 'i')) "
                 + "}";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -86,11 +86,13 @@ public class Retcat_LabelingSystem {
             // for every subject value get object from list and write values in it 
             SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
             // get Label
-            JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-            String labelValue = (String) labelObject.get("value");
-            String labelLang = (String) labelObject.get("xml:lang");
-            tmpAutosuggest.setLabel(labelValue);
-            tmpAutosuggest.setLanguage(labelLang);
+			JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+			if (labelObject != null) {
+				String labelValue = (String) labelObject.get("value");
+				String labelLang = (String) labelObject.get("xml:lang");
+				tmpAutosuggest.setLabel(labelValue);
+				tmpAutosuggest.setLanguage(labelLang);
+			}
             // get Scheme
             JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
             String schemeValue = (String) schemeObject.get("value");
