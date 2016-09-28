@@ -8,11 +8,13 @@ The Labeling System server ...
 
 ### api
 
-RESTful API for Labeling System applications
+RESTful API for Labeling System applications.
+
+API Documentation (Version 1): https://github.com/labelingsystem/server/tree/rdf4j/apidoc/v1
 
 ### item
 
-RESTful API to provide cool URIs for Labeling System items
+RESTful API to provide cool URIs for Labeling System items.
 
 ## Set-Up Server
 
@@ -37,38 +39,42 @@ RESTful API to provide cool URIs for Labeling System items
  * OpenJDK 64-Bit Server VM (build 25.101-b13, mixed mode)
 * SQlite support
 * RDF4J
- * server/workbench 2.0
+ * server and workbench 2.0
 
 ### folder structure
 
-* /[tomcat]/webapps/api.war
-* /[tomcat]/webapps/item.war
-* /[tomcat]/webapps/rdf4j-server.war
-* /[tomcat]/webapps/rdf4j-workbench.war (optional)
-* /[tomcat]/webapps/{nameOfWebApp}
+#### required foldes and files with r/w rights for Tomcat
 
-* /[..]/db/ls.sqlite
+* /[..]/db/
 * /[tomcat]/webapps/share/
 * /[tomcat]/webapps/dump/
+* /[tomcat]/webapps/{name of frontend app}
 
-## how to set-up the server
+#### required files
 
-- Tomcat
-- RDF4J Triplestore
-- LS API
-- LS Item API
-- SQlite Database
-- create folders and rights
+* /[tomcat]/webapps/**api.war**
+* /[tomcat]/webapps/**item.war**
+* /[tomcat]/webapps/**rdf4j-server.war**
+* /[tomcat]/webapps/**rdf4j-workbench.war** (optional)
+* /[..]/db/**ls.sqlite** (db with r/w rights for Tomcat)
 
-## Configure API
+### How to set-up the server?
 
-- config.properties
+1. install **CentOS**
+2. install **nginx**
+3. install **OpenJDK**
+4. install **Tomcat**
+5. configure nginx (Port 80) and Tomcat (Port 8080)
+6. create folders and set r/w rights for Tomcat role
+7. set **SQLite** database into db folder and set full r/w rights
+8. deploy war files for triplestore (**rdf4j-server.war**, **rdf4j-workbench.war**)
+9. create **labelingsystem** repository in RDF4J
+10. configure API and ITEM in their WAR packages using **config.properties**
+11. deploy war files for ls backend (**api.war**, **item.war**)
+12. configure frontend app and set host for API
+13. deploy Labeling System frontend app
 
-## Wiki
-
-[Labeling System Wiki](../../wiki)
-
-## Ontologie
+## Ontology
 
 - https://github.com/labelingsystem-showcase/ls-core
 - https://github.com/labelingsystem-showcase/ls-reference
