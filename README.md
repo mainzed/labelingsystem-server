@@ -1,10 +1,10 @@
 # Introduction
 
-The Labeling System server ...
+The Labeling System consists of several components: the frontend web-app, the server api and resource service, a RDF4J triplestore and a SQLite database. The [datamodel](https://github.com/labelingsystem-showcase/ls-reference) is represented in an ontology using linked data vocabularies.
 
 # Getting Started
 
-## Components
+## Server Components
 
 ### api
 
@@ -23,23 +23,16 @@ RESTful API to provide cool URIs for Labeling System items.
 * Java 8
 * Tomcat
 * RDF4J 2.0
-* labeling system api / item / workbench
+* Labeling System API / ITEM / FRONTEND
 
 ### recommended
 
-* CentOS
- * Linux release 7.2.1511 (Core)
-* nginx (Port 80)
- * nginx/1.6.3
-* Tomcat (Port 8080)
- * Version 8.5.4
-* Java
- * openjdk version "1.8.0_101"
- * OpenJDK Runtime Environment (build 1.8.0_101-b13)
- * OpenJDK 64-Bit Server VM (build 25.101-b13, mixed mode)
+* CentOS (Linux release 7.2.1511 (Core))
+* nginx (nginx/1.6.3) (Port 80)
+* Tomcat (Version 8.5.4) (Port 8080)
+* Java (openjdk version "1.8.0_101") (OpenJDK Runtime Environment (build 1.8.0_101-b13)) (OpenJDK 64-Bit Server VM (build 25.101-b13, mixed mode))
+* RDF4J (server and workbench 2.0)
 * SQlite support
-* RDF4J
- * server and workbench 2.0
 
 ### folder structure
 
