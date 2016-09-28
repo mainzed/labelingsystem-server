@@ -69,7 +69,8 @@ public class VocabsResource {
             @QueryParam("contributor") String contributor,
             @QueryParam("statusType") String statusType,
             @QueryParam("releaseType") String releaseType,
-            @QueryParam("draft") String draft)
+            @QueryParam("draft") String draft,
+            @QueryParam("statistics") String statistics)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
@@ -149,7 +150,7 @@ public class VocabsResource {
                     JSONObject tmpObject2 = new JSONObject();
                     tmpObject2.put(key, tmpObject);
                     String hh = tmpObject2.toString();
-                    JSONObject tmp = Transformer.vocabulary_GET(hh, h, fields);
+                    JSONObject tmp = Transformer.vocabulary_GET(hh, h, fields, statistics);
                     outArray.add(tmp);
                 }
             }
@@ -222,7 +223,7 @@ public class VocabsResource {
     @GET
     @Path("/{vocabulary}")
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getVocabulary(@PathParam("vocabulary") String vocabulary, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getVocabulary(@PathParam("vocabulary") String vocabulary, @HeaderParam("Accept") String acceptHeader, @QueryParam("statistics") String statistics, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
@@ -237,7 +238,7 @@ public class VocabsResource {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
             if (acceptHeader.contains("application/json")) {
-                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null, statistics).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -254,7 +255,7 @@ public class VocabsResource {
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
-                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null, statistics).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -279,7 +280,7 @@ public class VocabsResource {
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else {
-                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+                String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null, statistics).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -308,7 +309,7 @@ public class VocabsResource {
     @GET
     @Path("/{vocabulary}.json")
     @Produces("application/json;charset=UTF-8")
-    public Response getVocabulary_JSON(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getVocabulary_JSON(@PathParam("vocabulary") String vocabulary, @QueryParam("pretty") boolean pretty, @QueryParam("statistics") String statistics, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String item = "ls_voc";
@@ -322,7 +323,7 @@ public class VocabsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null, statistics).toJSONString();
             if (pretty) {
                 JsonParser parser = new JsonParser();
                 JsonObject json = parser.parse(out).getAsJsonObject();
@@ -597,7 +598,7 @@ public class VocabsResource {
             // get variables
             String item = "ls_voc";
             String itemID = UniqueIdentifier.getUUID();
-			// parse creator
+            // parse creator
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             String creator = (String) jsonObject.get("creator");
             // create triples
@@ -618,7 +619,7 @@ public class VocabsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), itemID, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), itemID, null, "false").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
@@ -658,7 +659,7 @@ public class VocabsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + vocabulary, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null).toJSONString();
+            String out = Transformer.vocabulary_GET(rdf.getModel("RDF/JSON"), vocabulary, null, "false").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
@@ -710,7 +711,7 @@ public class VocabsResource {
         triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
-		triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
+        triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
         triples += " }";
         return triples;
     }
