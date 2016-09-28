@@ -16,6 +16,14 @@ API Documentation (Version 1): https://github.com/labelingsystem/server/tree/rdf
 
 RESTful API to provide cool URIs for Labeling System items.
 
+### databases
+
+RDF4J triplestore and SQlite
+
+### web server
+
+nginx and Tomcat
+
 ## Set-Up Server
 
 ### required
