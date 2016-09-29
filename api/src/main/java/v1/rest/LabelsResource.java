@@ -24,9 +24,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 import javax.ws.rs.Consumes;
@@ -75,8 +77,8 @@ public class LabelsResource {
             @QueryParam("vocab") String vocab,
             @QueryParam("context") String context,
             @QueryParam("draft") String draft,
-			@QueryParam("equalConcepts") String equalConcepts,
-			@QueryParam("revisions") String revisions)
+            @QueryParam("equalConcepts") String equalConcepts,
+            @QueryParam("revisions") String revisions)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
@@ -673,10 +675,10 @@ public class LabelsResource {
             // get variables
             String item = "ls_lab";
             String itemID = UniqueIdentifier.getUUID();
-			// parse data
+            // parse data
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             String creator = (String) jsonObject.get("creator");
-			String vocabID = (String) jsonObject.get("vocabID");
+            String vocabID = (String) jsonObject.get("vocabID");
             // create triples
             json = Transformer.label_POST(json, itemID, creator);
             String triples = createLabelSPARQLUPDATE(item, itemID, creator, vocabID);
@@ -743,8 +745,8 @@ public class LabelsResource {
             if (releaseType != null) {
                 if (releaseType.equals("public")) {
                     // get difference
-                    String revisions = Transformer.labelDifference(json_old, json_new);
-                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), revisionSPARQLUPDATE(item, label, user, revisions));
+                    HashMap<String, String> revisions = Transformer.labelDifference(json_old, json_new);
+                    RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), revisionSPARQLUPDATE(item, label, revisions));
                 } else {
                     RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), modifySPARQLUPDATE(item, label));
                 }
@@ -814,8 +816,8 @@ public class LabelsResource {
         triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
-		triples += item + ":" + itemid + " skos:inScheme ls_voc:" + vocabID + " . ";
-		triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
+        triples += item + ":" + itemid + " skos:inScheme ls_voc:" + vocabID + " . ";
+        triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
         triples += " }";
         return triples;
     }
@@ -833,8 +835,7 @@ public class LabelsResource {
         return triples;
     }
 
-    private static String revisionSPARQLUPDATE(String item, String itemid, String user, String type) throws ConfigException, IOException, UniqueIdentifierException {
-        String typeArray[] = type.split(",");
+    private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
@@ -842,20 +843,18 @@ public class LabelsResource {
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        for (String entry : typeArray) {
-            String revID = UniqueIdentifier.getUUID();
-            triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
-            if (!entry.equals("")) {
-                triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
-                triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
-                triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
-                triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-                triples += "ls_rev" + ":" + revID + " ls:action \"" + entry + "\"" + " . ";
-				triples += "ls_rev" + ":" + revID + " ls:objectType \"" + entry + "\"" + " . ";
-				triples += "ls_rev" + ":" + revID + " ls:valueBefore \"" + entry + "\"" + " . ";
-				triples += "ls_rev" + ":" + revID + " ls:valueAfter \"" + entry + "\"" + " . ";
-                triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-            }
+        String revID = UniqueIdentifier.getUUID();
+        triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
+        if (!revisions.isEmpty()) {
+            triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";
+            triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
+            triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
+            triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " ls:objectType \"" + revisions.get("objectType") + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+            triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
         }
         triples += " }";
         return triples;
@@ -872,7 +871,7 @@ public class LabelsResource {
                 // filter delete all broader,narrower,exactMatches wo ?label das OBJECT ist
                 + "OPTIONAL { ?resource skos:broader ?label . } "
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
-				+ "OPTIONAL { ?resource skos:exactMatch ?label . } "
+                + "OPTIONAL { ?resource skos:exactMatch ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
                 + "FILTER (?p IN (skos:prefLabel,skos:scopeNote,ls:thumbnail,ls:hasReleaseType,dc:language,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso)) "
                 + "}";
