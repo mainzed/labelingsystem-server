@@ -75,7 +75,8 @@ public class LabelsResource {
             @QueryParam("vocab") String vocab,
             @QueryParam("context") String context,
             @QueryParam("draft") String draft,
-			@QueryParam("equalConcepts") String equalConcepts)
+			@QueryParam("equalConcepts") String equalConcepts,
+			@QueryParam("revisions") String revisions)
             throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // QUERY STRING
@@ -154,7 +155,7 @@ public class LabelsResource {
                     JSONObject tmpObject2 = new JSONObject();
                     tmpObject2.put(key, tmpObject);
                     String hh = tmpObject2.toString();
-                    JSONObject tmp = Transformer.label_GET(hh, h, fields, retcatlist, equalConcepts);
+                    JSONObject tmp = Transformer.label_GET(hh, h, fields, retcatlist, equalConcepts, revisions);
                     outArray.add(tmp);
                 }
             }
@@ -227,7 +228,7 @@ public class LabelsResource {
     @GET
     @Path("/{label}")
     @Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-    public Response getLabel(@PathParam("label") String label, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+    public Response getLabel(@PathParam("label") String label, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @QueryParam("revisions") String revisions, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -243,7 +244,7 @@ public class LabelsResource {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
             if (acceptHeader.contains("application/json")) {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts).toJSONString();
+                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -260,7 +261,7 @@ public class LabelsResource {
             } else if (acceptHeader.contains("application/rdf+json")) {
                 return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
             } else if (acceptHeader.contains("text/html")) {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts).toJSONString();
+                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -285,7 +286,7 @@ public class LabelsResource {
             } else if (acceptHeader.contains("application/ld+json")) {
                 return Response.ok(rdf.getModel("JSON-LD")).build();
             } else {
-                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts).toJSONString();
+                String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
                 if (pretty) {
                     JsonParser parser = new JsonParser();
                     JsonObject json = parser.parse(out).getAsJsonObject();
@@ -314,7 +315,7 @@ public class LabelsResource {
     @GET
     @Path("/{label}.json")
     @Produces("application/json;charset=UTF-8")
-    public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+    public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @QueryParam("revisions") String revisions, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -329,7 +330,7 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts).toJSONString();
+            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
             if (pretty) {
                 JsonParser parser = new JsonParser();
                 JsonObject json = parser.parse(out).getAsJsonObject();
@@ -677,7 +678,7 @@ public class LabelsResource {
             String creator = (String) jsonObject.get("creator");
 			String vocabID = (String) jsonObject.get("vocabID");
             // create triples
-            json = Transformer.label_POST(json, itemID);
+            json = Transformer.label_POST(json, itemID, creator);
             String triples = createLabelSPARQLUPDATE(item, itemID, creator, vocabID);
             // input triples
             RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
@@ -695,7 +696,7 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), itemID, null, retcatlist, "false").toJSONString();
+            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), itemID, null, retcatlist, "false", "false").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
@@ -723,7 +724,7 @@ public class LabelsResource {
             String releaseType = (String) requestObject.get("releaseType");
             // insert data
             String json_new = json;
-            json = Transformer.label_POST(json, label);
+            json = Transformer.label_POST(json, label, user);
             // get json old
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -737,7 +738,7 @@ public class LabelsResource {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
-            String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false").toJSONString();
+            String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false").toJSONString();
             // set triples
             if (releaseType != null) {
                 if (releaseType.equals("public")) {
@@ -765,7 +766,7 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
-            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false").toJSONString();
+            String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false").toJSONString();
             return Response.status(Response.Status.CREATED).entity(out).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
@@ -863,13 +864,14 @@ public class LabelsResource {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
-                + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label .} "
+                + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label . ?resource skos:exactMatch ?label . } "
                 + "WHERE { "
                 + "?label ?p ?o. "
                 + "?label dc:identifier ?identifier. "
-                // filter delete all broader/narrower wo ?label das OBJECT ist
+                // filter delete all broader,narrower,exactMatches wo ?label das OBJECT ist
                 + "OPTIONAL { ?resource skos:broader ?label . } "
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
+				+ "OPTIONAL { ?resource skos:exactMatch ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
                 + "FILTER (?p IN (skos:prefLabel,skos:scopeNote,ls:thumbnail,ls:hasReleaseType,dc:language,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso)) "
                 + "}";

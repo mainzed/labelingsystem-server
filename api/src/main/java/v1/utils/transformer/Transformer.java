@@ -580,7 +580,7 @@ public class Transformer {
 		return agentObject;
 	}
 
-	public static String label_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
+	public static String label_POST(String json, String id, String creator) throws IOException, UniqueIdentifierException, ParseException {
 		//init
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		// parse json
@@ -748,6 +748,34 @@ public class Transformer {
 				tmpObject.put("type", "uri");
 				tmpObject.put("value", element);
 				arrayNew.add(tmpObject);
+				// exactMatch
+				if (element.contains("//" + ConfigProperties.getPropertyParam("host"))) {
+					String[] conceptSplit = element.split("/");
+					String url = ConfigProperties.getPropertyParam("api") + "/v1/labels/" + conceptSplit[conceptSplit.length - 1] + ".json?equalConcepts=false";
+					URL obj = new URL(url);
+					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+					con.setRequestMethod("GET");
+					con.setRequestProperty("Accept-Encoding", "json");
+					BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+					String inputLine;
+					StringBuilder response = new StringBuilder();
+					while ((inputLine = in.readLine()) != null) {
+						response.append(inputLine);
+					}
+					in.close();
+					JSONObject equalConcept = (JSONObject) new JSONParser().parse(response.toString());
+					String equalConceptCreator = (String) equalConcept.get("creator");
+					if (equalConceptCreator.equals(creator)) {
+						JSONObject tmpLabelObject = new JSONObject();
+						JSONArray arrayNew2 = new JSONArray();
+						JSONObject tmpObject2 = new JSONObject();
+						tmpObject2.put("type", "uri");
+						tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
+						arrayNew2.add(tmpObject2);
+						tmpLabelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew2);
+						rdfObject.put(element, tmpLabelObject);
+					}
+				}
 			}
 			labelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew);
 		}
@@ -862,12 +890,13 @@ public class Transformer {
 		labelObject.remove("broadMatch");
 		labelObject.remove("seeAlso");
 		labelObject.remove("equalConcepts");
+		labelObject.remove("revisions");
 		// add object
 		rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
 		return rdfObject.toJSONString();
 	}
 
-	public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist, String equalConceptsBool) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
+	public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist, String equalConceptsBool, String revisionsBool) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
 		JSONObject labelObject = null;
 		try {
 			//init
@@ -1229,6 +1258,29 @@ public class Transformer {
 					}
 					if (fields == null || fields.contains("releaseType")) {
 						labelObject.put(rdf.getPrefixItem("releaseType"), value);
+					}
+				}
+			}
+			// set revisions
+			if (revisionsBool != null) {
+				if (revisionsBool.equals("true")) {
+					// change skos:changeNote
+					JSONArray revisionsArray = (JSONArray) labelObject.get(rdf.getPrefixItem("skos:changeNote"));
+					if (revisionsArray != null && !revisionsArray.isEmpty()) {
+						labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
+						List<String> listRevisions = new ArrayList();
+						for (Object element : revisionsArray) {
+							JSONObject obj = (JSONObject) element;
+							String value = (String) obj.get("value");
+							listRevisions.add(value);
+						}
+						// set last modified
+						Collections.sort(listRevisions);
+						JSONArray revisionArray = new JSONArray();
+						for (String item : listRevisions) {
+							revisionArray.add(item);
+						}
+						labelObject.put("revisions", revisionArray);
 					}
 				}
 			}
