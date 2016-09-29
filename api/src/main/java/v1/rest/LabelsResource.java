@@ -850,9 +850,10 @@ public class LabelsResource {
                 triples += "ls_rev" + ":" + revID + " a ls:Revision . ";
                 triples += "ls_rev" + ":" + revID + " a prov:Activity . ";
                 triples += "ls_rev" + ":" + revID + " dc:identifier \"" + revID + "\"" + " . ";
-                triples += "ls_rev" + ":" + revID + " dc:creator \"" + user + "\"" + " . ";
-                triples += "ls_rev" + ":" + revID + " dct:creator ls_age:" + user + " . ";
-                triples += "ls_rev" + ":" + revID + " dc:description \"" + entry + "\"" + " . ";
+                triples += "ls_rev" + ":" + revID + " ls:action \"" + entry + "\"" + " . ";
+				triples += "ls_rev" + ":" + revID + " ls:objectType \"" + entry + "\"" + " . ";
+				triples += "ls_rev" + ":" + revID + " ls:valueBefore \"" + entry + "\"" + " . ";
+				triples += "ls_rev" + ":" + revID + " ls:valueAfter \"" + entry + "\"" + " . ";
                 triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
             }
         }
