@@ -162,14 +162,14 @@ public class Retcat_LabelingSystem {
         String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
         String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                 + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
-                + "?Subject skos:inScheme ?scheme . "
+                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
-                + "?Subject skos:prefLabel ?pl . "
                 + "?Subject ls:thumbnail ?prefLabel . "
+                + "OPTIONAL {?Subject skos:prefLabel ?pl . } "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
-                + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
+                + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i') || regex(?prefLabel, '" + searchword + "', 'i')) "
                 + "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                 + "}";
         URL obj = new URL(url);

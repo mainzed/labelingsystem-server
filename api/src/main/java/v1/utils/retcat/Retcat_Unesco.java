@@ -149,7 +149,7 @@ public class Retcat_Unesco {
         jsonOut.put("label", labelValue);
         jsonOut.put("lang", "en");
         // get retcat info
-        String type = "fao";
+        String type = "unesco";
         String quality = "";
         String group = "";
         for (RetcatItem item : RetcatItems.getAllRetcatItems()) {

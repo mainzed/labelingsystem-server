@@ -66,8 +66,6 @@ public class VocabsResource {
             @QueryParam("offset") String offset,
             @QueryParam("limit") String limit,
             @QueryParam("creator") String creator,
-            @QueryParam("contributor") String contributor,
-            @QueryParam("statusType") String statusType,
             @QueryParam("releaseType") String releaseType,
             @QueryParam("draft") String draft,
             @QueryParam("statistics") String statistics)
@@ -89,9 +87,6 @@ public class VocabsResource {
             }
             if (creator != null) {
                 query += "FILTER(?creator=\"" + creator + "\") ";
-            }
-            if (contributor != null) {
-                query += "FILTER(?contributor=\"" + contributor + "\") ";
             }
             if (releaseType != null) {
                 query += "FILTER(?releaseType=<" + rdf.getPrefixItem("ls:" + releaseType) + ">) ";

@@ -477,36 +477,6 @@ public class RevisionsResource {
 		}
 	}
 
-	@DELETE
-	@Path("/{revision}")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response deleteRevision(@PathParam("revision") String revision) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
-		try {
-			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteRevisionSPARQLUPDATE(revision));
-			// get result als json
-			String out = Transformer.empty_JSON("revision").toJSONString();
-			return Response.status(Response.Status.CREATED).entity(out).build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RevisionsResource"))
-					.header("Content-Type", "application/json;charset=UTF-8").build();
-		}
-	}
-
-	private static String deleteRevisionSPARQLUPDATE(String id) throws IOException {
-		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
-		String prefixes = rdf.getPREFIXSPARQL();
-		String update = prefixes
-				+ "DELETE { ?revision ?p ?o. ?item skos:changeNote ?revision. } "
-				+ "WHERE { "
-				+ "?revision ?p ?o. "
-				+ "?revision dc:identifier ?identifier. "
-				+ "?item skos:changeNote ?revision . "
-				+ "FILTER (?identifier=\"$identifier\") "
-				+ "}";
-		update = update.replace("$identifier", id);
-		return update;
-	}
-
 	private static class FeedReturnStreamingOutput implements StreamingOutput {
 
 		@Override

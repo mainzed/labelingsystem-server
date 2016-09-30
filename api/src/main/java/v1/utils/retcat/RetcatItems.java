@@ -55,7 +55,7 @@ public class RetcatItems {
                 "AGROVOC is a controlled vocabulary covering all areas of interest of the Food and Agriculture Organization (FAO) of the United Nations, including food, nutrition, agriculture, fisheries, forestry, environment etc. It is published by FAO and edited by a community of experts.",
                 "/v1/retcat/query/skosmos/fao", "/v1/retcat/info/skosmos/fao", "//aims.fao.org", "other reference thesauri", "fao", "en", "low"));
         retcatList.add(new RetcatItem("UNESCO Thesaurus",
-                "TThe UNESCO Thesaurus is a controlled and structured list of terms used in subject analysis and retrieval of documents and publications in the fields of education, culture, natural sciences, social and human sciences, communication and information. Continuously enriched and updated, its multidisciplinary terminology reflects the evolution of UNESCO's programmes and activities.",
+                "The UNESCO Thesaurus is a controlled and structured list of terms used in subject analysis and retrieval of documents and publications in the fields of education, culture, natural sciences, social and human sciences, communication and information. Continuously enriched and updated, its multidisciplinary terminology reflects the evolution of UNESCO's programmes and activities.",
                 "/v1/retcat/query/skosmos/unesco", "/v1/retcat/info/skosmos/unesco", "//vocabularies.unesco.org", "other reference thesauri", "unesco", "en", "high"));
         // INTERPRET AS SKOS CONCEPT
         // DBPEDIA
