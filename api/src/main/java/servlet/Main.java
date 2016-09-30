@@ -24,7 +24,7 @@ public class Main extends HttpServlet {
             JSONObject versionObject = new JSONObject();
             versionObject.put("1.0", ConfigProperties.getPropertyParam("api") + "/v1");
             outObject.put("versions", versionObject);
-            outObject.put("wiki", "https://github.com/labelingsystem/server/wiki");
+            outObject.put("wiki", "https://github.com/labelingsystem/server");
             // get last build data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
