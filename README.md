@@ -1,6 +1,6 @@
 # Introduction
 
-The Labeling System consists of several components: the frontend web-app, the server api and resource service, a RDF4J triplestore and a SQLite database. The [datamodel](https://github.com/labelingsystem-showcase/ls-reference) is represented in an ontology using linked data vocabularies.
+The Labeling System consists of several components: the frontend web-app, the server api and resource service, a RDF4J triplestore and a SQLite database. The [datamodel](https://github.com/labelingsystem-ontology) is represented in an ontology using linked data vocabularies.
 
 # Getting Started
 
