@@ -96,12 +96,13 @@ public class Transformer {
 		vocabularyObject.remove("lastModified");
 		vocabularyObject.remove("releaseType");
 		vocabularyObject.remove("statistics");
+		vocabularyObject.remove("creatorInfo");
 		// add object
 		rdfObject.put(rdf.getPrefixItem("ls_voc" + ":" + id), vocabularyObject);
 		return rdfObject.toJSONString();
 	}
 
-	public static JSONObject vocabulary_GET(String json, String id, String fields, String statisticsBool) throws IOException, UniqueIdentifierException, ParseException, TransformRdfToApiJsonException {
+	public static JSONObject vocabulary_GET(String json, String id, String fields, String statisticsBool, String creatorInfoBool) throws IOException, UniqueIdentifierException, ParseException, TransformRdfToApiJsonException {
 		JSONObject vocabularyObject = null;
 		try {
 			//init
@@ -308,6 +309,27 @@ public class Transformer {
 						statistics.put("lastModifiedLabel", "no content");
 					}
 					vocabularyObject.put(rdf.getPrefixItem("statistics"), statistics);
+				}
+			}
+			// set creator info
+			if (creatorInfoBool != null) {
+				if (creatorInfoBool.equals("true")) {
+					String url = ConfigProperties.getPropertyParam("api") + "/v1/agents/" + vocabularyObject.get("creator") + ".json";
+					URL obj = new URL(url);
+					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+					con.setRequestMethod("GET");
+					con.setRequestProperty("Accept-Encoding", "json");
+					if (con.getResponseCode()==200) {
+						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String inputLine;
+						StringBuilder response = new StringBuilder();
+						while ((inputLine = in.readLine()) != null) {
+							response.append(inputLine);
+						}
+						in.close();
+						JSONObject simillarConcept = (JSONObject) new JSONParser().parse(response.toString());
+						vocabularyObject.put("creatorInfo", simillarConcept);
+					}
 				}
 			}
 		} catch (Exception e) {
