@@ -34,7 +34,7 @@ public class Retcat_LabelingSystem {
                 + "?scheme dc:title ?schemeTitle . "
                 + "?Subject ls:thumbnail ?prefLabel . "
                 + "OPTIONAL {?Subject skos:prefLabel ?pl . } "
-                + "?Subject ls:hasReleaseType ls:Public . "
+                //+ "?Subject ls:hasReleaseType ls:Public . "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "

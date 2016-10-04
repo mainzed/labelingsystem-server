@@ -76,7 +76,6 @@ public class LabelsResource {
 			@QueryParam("releaseType") String releaseType,
 			@QueryParam("prefLabel") String prefLabel,
 			@QueryParam("vocab") String vocab,
-			@QueryParam("draft") String draft,
 			@QueryParam("equalConcepts") String equalConcepts,
 			@QueryParam("revisions") String revisions)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
@@ -94,9 +93,6 @@ public class LabelsResource {
 					+ "OPTIONAL { ?s skos:inScheme ?vocab . } " // because of filtering
 					+ "OPTIONAL { ?s ls:hasContext ?context . } "; // because of filtering
 			// FILTERING
-			if (draft == null) {
-				query += "?s ls:hasReleaseType ls:Public . ";
-			}
 			if (creator != null) {
 				query += "FILTER(?creator=\"" + creator + "\") ";
 			}
@@ -823,7 +819,6 @@ public class LabelsResource {
 		triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
 		triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
 		triples += item + ":" + itemid + " skos:inScheme ls_voc:" + vocabID + " . ";
-		triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
 		triples += " }";
 		return triples;
 	}

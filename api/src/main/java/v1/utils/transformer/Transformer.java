@@ -266,16 +266,12 @@ public class Transformer {
 						}
 					}
 					int labelCount = 0;
-					int draftLabels = 0;
 					int descriptions = 0;
 					int prefLabels = 0;
 					List<String> listModify = new ArrayList();
 					for (int i = 0; i < subjects.size(); i++) {
 						if (objects.get(i).equals(rdf.getPrefixItem("ls:Label"))) {
 							labelCount++;
-						}
-						if (objects.get(i).equals(rdf.getPrefixItem("ls:Draft"))) {
-							draftLabels++;
 						}
 						if (predicates.get(i).equals(rdf.getPrefixItem("skos:scopeNote"))) {
 							descriptions++;
@@ -296,8 +292,6 @@ public class Transformer {
 					links.put("count", externalLinks + internalLinks);
 					statistics.put("links", links);
 					labels.put("count", labelCount);
-					labels.put("public", labelCount - draftLabels);
-					labels.put("draft", draftLabels);
 					statistics.put("labels", labels);
 					descriptive.put("wayback", waybackLinks);
 					descriptive.put("descriptions", descriptions);
@@ -873,21 +867,6 @@ public class Transformer {
 			}
 			labelObject.put(rdf.getPrefixItem("rdfs:seeAlso"), arrayNew);
 		}
-		// change releasetype
-		String releaseString = (String) labelObject.get("releaseType");
-		if (releaseString != null && !releaseString.isEmpty()) {
-			labelObject.remove("releaseType");
-			JSONArray releaseArrayNew = new JSONArray();
-			JSONObject releaseObject = new JSONObject();
-			releaseObject.put("type", "uri");
-			if (releaseString.equals("draft")) {
-				releaseObject.put("value", rdf.getPrefixItem("ls:Draft"));
-			} else {
-				releaseObject.put("value", rdf.getPrefixItem("ls:Public"));
-			}
-			releaseArrayNew.add(releaseObject);
-			labelObject.put(rdf.getPrefixItem("ls:hasReleaseType"), releaseArrayNew);
-		}
 		// delete items
 		labelObject.remove("id");
 		labelObject.remove("creator");
@@ -1267,23 +1246,6 @@ public class Transformer {
 				labelObject.remove("lastModified");
 				labelObject.put("lastModified", listModify.get(listModify.size() - 1));
 			}
-			// change ls:hasReleaseType
-			JSONArray releaseTypeArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:hasReleaseType"));
-			if (releaseTypeArray != null && !releaseTypeArray.isEmpty()) {
-				for (Object element : releaseTypeArray) {
-					labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
-					JSONObject obj = (JSONObject) element;
-					String value = (String) obj.get("value");
-					if (value.contains("Draft")) {
-						value = "draft";
-					} else {
-						value = "public";
-					}
-					if (fields == null || fields.contains("releaseType")) {
-						labelObject.put(rdf.getPrefixItem("releaseType"), value);
-					}
-				}
-			}
 			// change ls:releasedAt
 			JSONArray releasedAtArray = (JSONArray) labelObject.get(rdf.getPrefixItem("ls:released"));
 			if (releasedAtArray != null && !releasedAtArray.isEmpty()) {
@@ -1365,7 +1327,6 @@ public class Transformer {
 			labelObject.remove(rdf.getPrefixItem("ls:thumbnail"));
 			labelObject.remove(rdf.getPrefixItem("skos:prefLabel"));
 			labelObject.remove(rdf.getPrefixItem("skos:scopeNote"));
-			labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
 			labelObject.remove(rdf.getPrefixItem("skos:broader"));
 			labelObject.remove(rdf.getPrefixItem("skos:narrower"));
 			labelObject.remove(rdf.getPrefixItem("skos:related"));
@@ -1385,6 +1346,7 @@ public class Transformer {
 			labelObject.remove(rdf.getPrefixItem("ls:hasContext"));
 			labelObject.remove(rdf.getPrefixItem("skos:altLabel"));
 			labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
+			labelObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
 		} catch (Exception e) {
 			int errorLine = -1;
 			for (StackTraceElement element : e.getStackTrace()) {

@@ -152,13 +152,6 @@ public class CSV implements Runnable {
             label += "\"" + uuid + "\" ";
             label += ". ";
             TRIPLE_LIST.add(label);
-            // ls release type
-            label = "";
-            label += "<" + rdf.getPrefixItem("ls_lab:" + uuid) + "> ";
-            label += "<" + rdf.getPrefixItem("ls:hasReleaseType") + "> ";
-            label += "<" + rdf.getPrefixItem("ls:Draft") + "> ";
-            label += ". ";
-            TRIPLE_LIST.add(label);
             // skos prefLabel (multiple, obligatory)
             for (int i = 0; i < prefLabel.length; i = i + 2) {
                 if (i == 0) {
