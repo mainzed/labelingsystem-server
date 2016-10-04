@@ -1399,7 +1399,7 @@ public class Transformer {
 		return labelObject;
 	}
 
-	public static HashMap<String, String> labelDifference(String json_old, String json_new) throws ParseException, RevisionTypeException {
+	public static HashMap<String, String> getLabelDifference(String json_old, String json_new) throws ParseException, RevisionTypeException {
 		HashMap<String, String> hm = new HashMap();
 		try {
 			// jsons
@@ -1528,10 +1528,12 @@ public class Transformer {
 							String tmp = (String) item;
 							hm.put("valueBefore", tmp);
 							hm.put("bidirectional", tmp);
+							hm.put("bidirectional-del", tmp);
 						}
 						for (Object item : newBroader) {
 							String tmp = (String) item;
 							hm.put("valueAfter", tmp);
+							hm.put("bidirectional-add", tmp);
 						}
 					} else if (oldBroader.size() > newBroader.size()) { // deleted
 						hm.put("objectType", "broader");
@@ -1592,10 +1594,12 @@ public class Transformer {
 							String tmp = (String) item;
 							hm.put("valueBefore", tmp);
 							hm.put("bidirectional", tmp);
+							hm.put("bidirectional-del", tmp);
 						}
 						for (Object item : newNarrower) {
 							String tmp = (String) item;
 							hm.put("valueAfter", tmp);
+							hm.put("bidirectional-add", tmp);
 						}
 					} else if (oldNarrower.size() > newNarrower.size()) { // deleted
 						hm.put("objectType", "narrower");
@@ -1951,11 +1955,13 @@ public class Transformer {
 							JSONObject tmp = (JSONObject) item;
 							hm.put("valueBefore", tmp.get("uri") + " (" + tmp.get("type") + ")");
 							String tmpUriSplit[] = tmp.get("uri").toString().split("/");
-							hm.put("bidirectional", tmpUriSplit[tmpUriSplit.length - 1]);
+							hm.put("bidirectional-del", tmpUriSplit[tmpUriSplit.length - 1]);
 						}
 						for (Object item : newExactMatchTmp) {
 							JSONObject tmp = (JSONObject) item;
 							hm.put("valueAfter", tmp.get("uri") + " (" + tmp.get("type") + ")");
+							String tmpUriSplit[] = tmp.get("uri").toString().split("/");
+							hm.put("bidirectional-add", tmpUriSplit[tmpUriSplit.length - 1]);
 						}
 					} else if (oldExactMatch.size() > newExactMatch.size()) { // deleted
 						hm.put("objectType", "exactMatch");
@@ -1964,8 +1970,8 @@ public class Transformer {
 							if (!newExactMatch.contains(item)) {
 								JSONObject tmp = (JSONObject) item;
 								hm.put("valueBefore", tmp.get("uri") + " (" + tmp.get("type") + ")");
-								hm.put("valueAfter", "");
 								String tmpUriSplit[] = tmp.get("uri").toString().split("/");
+								hm.put("valueAfter", "");
 								hm.put("bidirectional", tmpUriSplit[tmpUriSplit.length - 1]);
 								break;
 							}

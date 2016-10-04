@@ -11,6 +11,8 @@ import exceptions.ConfigException;
 import exceptions.Logging;
 import exceptions.RdfException;
 import exceptions.ResourceNotAvailableException;
+import exceptions.SparqlParseException;
+import exceptions.SparqlQueryException;
 import exceptions.UniqueIdentifierException;
 import v1.utils.transformer.Transformer;
 import v1.utils.config.ConfigProperties;
@@ -49,6 +51,9 @@ import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.eclipse.rdf4j.query.BindingSet;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.repository.RepositoryException;
 import org.json.simple.parser.JSONParser;
 import v1.utils.retcat.RetcatItem;
 
@@ -718,7 +723,7 @@ public class LabelsResource {
 			// get info
 			JSONObject requestObject = (JSONObject) new JSONParser().parse(json);
 			String user = (String) requestObject.get("creator");
-			String releaseType = (String) requestObject.get("releaseType");
+			String vocabID = (String) requestObject.get("vocabID");
 			// insert data
 			String json_new = json;
 			json = Transformer.label_POST(json, label, user);
@@ -736,11 +741,17 @@ public class LabelsResource {
 			}
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false").toJSONString();
-			// set triples
+			// set revision
+			// get release type of vocabulary
+			query = rdf.getPREFIXSPARQL();
+			query += "SELECT * WHERE { ls_voc:" + vocabID + " ls:hasReleaseType ?rt . }";
+			result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+			List<String> releaseTypeList = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "rt");
+			String releaseType = releaseTypeList.get(0);
 			if (releaseType != null) {
-				if (releaseType.equals("public")) {
+				if (releaseType.contains("Public") || releaseType.contains("public")) {
 					// get difference
-					HashMap<String, String> revisions = Transformer.labelDifference(json_old, json_new);
+					HashMap<String, String> revisions = Transformer.getLabelDifference(json_old, json_new);
 					RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), revisionSPARQLUPDATE(item, label, revisions));
 				} else {
 					RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), modifySPARQLUPDATE(item, label));
@@ -830,7 +841,7 @@ public class LabelsResource {
 		return triples;
 	}
 
-	private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException {
+	private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException {
 		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 		String prefixes = rdf.getPREFIXSPARQL();
 		String triples = prefixes + "INSERT DATA { ";
@@ -840,6 +851,7 @@ public class LabelsResource {
 		String dateiso = formatter.format(date);
 		String revID = UniqueIdentifier.getUUID();
 		String revID2 = UniqueIdentifier.getUUID();
+		String revID3 = UniqueIdentifier.getUUID();
 		triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
 		if (!revisions.isEmpty()) {
 			if (revisions.get("releaseTypeChange").equals("true")) {
@@ -854,16 +866,146 @@ public class LabelsResource {
 				triples += "ls_rev" + ":" + revID + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
 				triples += "ls_rev" + ":" + revID + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
 				triples += "ls_rev" + ":" + revID + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
-				if (revisions.get("bidirectional") != null) {
-					/*triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID2 + " . ";
-					triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
-					triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
-					triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
-					triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
-					triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + revisions.get("objectType") + "\"" + " . ";
-					triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
-					triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
-					triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";*/
+				if (revisions.get("action") != null) {
+					if (revisions.get("bidirectional") != null) { // if bidirectional link
+						String query = rdf.getPREFIXSPARQL();
+						query += "SELECT * WHERE { ls_lab:" + revisions.get("bidirectional") + " skos:inScheme ?v. ?v ls:hasReleaseType ?rt . }";
+						List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+						List<String> releaseTypeList = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "rt");
+						String releaseType = releaseTypeList.get(0);
+						if (releaseType.contains("Public") || releaseType.contains("public")) { // if label is public
+							if (revisions.get("action").equals("add")) {
+								if (revisions.get("objectType").equals("narrower")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "broader" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("broader")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "narrower" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("exactMatch")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "exactMatch" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+							} else if (revisions.get("action").equals("delete")) {
+								if (revisions.get("objectType").equals("narrower")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "broader" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("broader")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "narrower" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("exactMatch")) {
+									triples += item + ":" + revisions.get("bidirectional") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + revisions.get("action") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "exactMatch" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+							} else if (revisions.get("action").equals("modify")) {
+								if (revisions.get("objectType").equals("narrower")) {
+									triples += item + ":" + revisions.get("bidirectional-del") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + "delete" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "broader" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+									triples += item + ":" + revisions.get("bidirectional-add") + " skos:changeNote ls_rev:" + revID3 + " . ";
+									triples += "ls_rev" + ":" + revID3 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID3 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID3 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:action \"" + "add" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:objectType \"" + "broader" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("broader")) {
+									triples += item + ":" + revisions.get("bidirectional-del") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + "delete" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "narrower" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+									triples += item + ":" + revisions.get("bidirectional-add") + " skos:changeNote ls_rev:" + revID3 + " . ";
+									triples += "ls_rev" + ":" + revID3 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID3 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID3 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:action \"" + "add" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:objectType \"" + "narrower" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+								if (revisions.get("objectType").equals("exactMatch")) {
+									triples += item + ":" + revisions.get("bidirectional-del") + " skos:changeNote ls_rev:" + revID2 + " . ";
+									triples += "ls_rev" + ":" + revID2 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID2 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID2 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:action \"" + "delete" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:objectType \"" + "exactMatch" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID2 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+									triples += item + ":" + revisions.get("bidirectional-add") + " skos:changeNote ls_rev:" + revID3 + " . ";
+									triples += "ls_rev" + ":" + revID3 + " a ls:Revision . ";
+									triples += "ls_rev" + ":" + revID3 + " a prov:Activity . ";
+									triples += "ls_rev" + ":" + revID3 + " dc:identifier \"" + revID2 + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:action \"" + "add" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:objectType \"" + "exactMatch" + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueBefore \"" + revisions.get("valueBefore") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " ls:valueAfter \"" + revisions.get("valueAfter") + "\"" + " . ";
+									triples += "ls_rev" + ":" + revID3 + " prov:startedAtTime \"" + dateiso + "\"" + " . ";
+								}
+							}
+						}
+					}
 				}
 			}
 		}
