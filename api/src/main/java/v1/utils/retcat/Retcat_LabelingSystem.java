@@ -28,10 +28,11 @@ public class Retcat_LabelingSystem {
 
     public static Map<String, SuggestionItem> queryAll(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-                + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
+                + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?firstName ?lastName ?orcid WHERE { "
                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
+				+ "OPTIONAL { ?Subject dct:creator ?creator . ?creator foaf:firstName ?firstName . ?creator foaf:lastName ?lastName . ?creator dct:publisher ?orcid . }"
                 + "?Subject ls:thumbnail ?prefLabel . "
                 + "OPTIONAL {?Subject skos:prefLabel ?pl . } "
                 //+ "?Subject ls:hasReleaseType ls:Public . "
@@ -98,6 +99,20 @@ public class Retcat_LabelingSystem {
             String schemeValue = (String) schemeObject.get("value");
             String schemeLang = (String) schemeObject.get("xml:lang");
             tmpAutosuggest.setSchemeTitle(schemeValue);
+			// get ORCID
+            JSONObject oridObject = (JSONObject) tmpElement.get("orcid");
+            if (oridObject != null) {
+				String oridValue = (String) oridObject.get("value");
+				tmpAutosuggest.setOrcid(oridValue);
+			}
+			// get name
+            JSONObject firstNameObject = (JSONObject) tmpElement.get("firstName");
+            JSONObject lastNameObject = (JSONObject) tmpElement.get("lastName");
+			if (firstNameObject != null && lastNameObject != null) {
+				String firstNameValue = (String) firstNameObject.get("value");
+				String lastNameValue = (String) lastNameObject.get("value");
+				tmpAutosuggest.setCreator(firstNameValue + " " + lastNameValue);
+			}
             // get scopeNote
             JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
             if (scopeNoteObject != null) {
@@ -160,10 +175,11 @@ public class Retcat_LabelingSystem {
 
     public static Map<String, SuggestionItem> queryVocab(String searchword, String vocabulary) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-                + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
+                + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?firstName ?lastName ?orcid WHERE { "
                  + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
+				+ "OPTIONAL { ?Subject dct:creator ?creator . ?creator foaf:firstName ?firstName . ?creator foaf:lastName ?lastName . ?creator dct:publisher ?orcid . }"
                 + "?Subject ls:thumbnail ?prefLabel . "
                 + "OPTIONAL {?Subject skos:prefLabel ?pl . } "
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
@@ -228,6 +244,20 @@ public class Retcat_LabelingSystem {
             String schemeValue = (String) schemeObject.get("value");
             String schemeLang = (String) schemeObject.get("xml:lang");
             tmpAutosuggest.setSchemeTitle(schemeValue);
+			// get ORCID
+            JSONObject oridObject = (JSONObject) tmpElement.get("orcid");
+            if (oridObject != null) {
+				String oridValue = (String) oridObject.get("value");
+				tmpAutosuggest.setOrcid(oridValue);
+			}
+			// get name
+            JSONObject firstNameObject = (JSONObject) tmpElement.get("firstName");
+            JSONObject lastNameObject = (JSONObject) tmpElement.get("lastName");
+			if (firstNameObject != null && lastNameObject != null) {
+				String firstNameValue = (String) firstNameObject.get("value");
+				String lastNameValue = (String) lastNameObject.get("value");
+				tmpAutosuggest.setCreator(firstNameValue + " " + lastNameValue);
+			}
             // get scopeNote
             JSONObject scopeNoteObject = (JSONObject) tmpElement.get("scopeNote");
             if (scopeNoteObject != null) {
@@ -291,12 +321,13 @@ public class Retcat_LabelingSystem {
     public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
                 + "SELECT * { "
                 + "<" + url + "> ls:thumbnail ?prefLabel. "
                 + "<" + url + "> skos:inScheme ?scheme . "
 				+ "<" + url + "> ls:hasReleaseType ?releaseType . "
                 + "?scheme dc:title ?schemeTitle . "
+				+ "OPTIONAL { ?Subject dct:creator ?creator . ?creator foaf:firstName ?firstName . ?creator foaf:lastName ?lastName . ?creator dct:publisher ?orcid . }"
                 + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm. } "
                 + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm . } "
@@ -360,6 +391,30 @@ public class Retcat_LabelingSystem {
                 String descValue = (String) scopeNote.get("value");
                 jsonOut.put("scheme", descValue);
             }
+			for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject orcid = (JSONObject) tmpElement.get("orcid");
+                String ordidValue = (String) orcid.get("value");
+                jsonOut.put("orcid", ordidValue);
+            }
+			String firstNameValue = "";
+			String lastNameValue = "";
+			for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject firstName = (JSONObject) tmpElement.get("firstName");
+                if (firstName != null) {
+					firstNameValue = (String) firstName.get("value");
+				}
+            }
+			
+			for (Object element : bindingsArray) {
+                JSONObject tmpElement = (JSONObject) element;
+                JSONObject lastName = (JSONObject) tmpElement.get("lastName");
+                if (lastName != null) {
+					lastNameValue = (String) lastName.get("value");
+				}
+            }
+			jsonOut.put("creator", firstNameValue + " " + lastNameValue);
             HashMap<String, String> hmBroader = new HashMap();
             for (Object element : bindingsArray) {
                 JSONObject tmpElement = (JSONObject) element;

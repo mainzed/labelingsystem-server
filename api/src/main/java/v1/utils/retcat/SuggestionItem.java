@@ -18,6 +18,8 @@ public class SuggestionItem {
 	private String quality = "";
 	private String group = "";
 	private String language = "";
+	private String creator = "";
+	private String orcid = "";
 
 	public SuggestionItem(String URL) {
 		url = URL;
@@ -133,6 +135,22 @@ public class SuggestionItem {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+
+	public String getOrcid() {
+		return orcid;
+	}
+
+	public void setOrcid(String orcid) {
+		this.orcid = orcid;
 	}
 	
 }

@@ -820,6 +820,9 @@ public class RetcatResource {
                 suggestionObject.put("label", tmpAS.getLabels().iterator().next());
                 // scheme
                 suggestionObject.put("scheme", tmpAS.getSchemeTitle());
+				// creator
+                suggestionObject.put("orcid", tmpAS.getOrcid());
+				suggestionObject.put("creator", tmpAS.getCreator());
                 // descriptions
                 if (tmpAS.getDescriptions().size() > 0) {
                     suggestionObject.put("description", tmpAS.getDescriptions().iterator().next());
