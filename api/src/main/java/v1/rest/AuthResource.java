@@ -179,10 +179,10 @@ public class AuthResource {
 		}
 	}
 
-	@POST
+	@GET
 	@Path("/hash")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getHash(@FormParam("str") String str) {
+	public Response getHash(@QueryParam("str") String str) {
 		try {
 			String salt = Crypt.generateHash();
 			String hash = salt + Crypt.SHA1(salt + str);
