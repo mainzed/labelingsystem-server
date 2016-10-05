@@ -28,7 +28,7 @@ public class ImportcsvResource {
     public static double status = -1.0;
     public static String action = "";
     public static String creator = null;
-	public static String vocab = null;
+    public static String vocab = null;
     public static boolean preflabel = false;
     public static boolean validator = true;
     public static String csvContent = "";
@@ -45,22 +45,21 @@ public class ImportcsvResource {
 
     // https://examples.javacodegeeks.com/enterprise-java/rest/jersey/jersey-file-upload-example/
     @POST
-    @Path("/mode/{mode}/creator/{creator}/vocabulary/{vocab}/validator/{validator}")
+    @Path("/mode/{mode}/vocabulary/{vocab}/validator/{validator}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public Response csvUpload(@FormDataParam("fileName") InputStream fileInputStream, @FormDataParam("fileName") FormDataContentDisposition contentDispositionHeader,
-            @PathParam("mode") String MODE, @PathParam("creator") String CREATOR, @PathParam("validator") String VALIDATOR, @PathParam("vocab") String VOCAB) {
+            @PathParam("mode") String MODE, @PathParam("validator") String VALIDATOR, @PathParam("vocab") String VOCAB) {
         try {
             if (MODE.equals("start")) {
                 mode = MODE;
-                creator = CREATOR;
-				vocab = VOCAB;
+                vocab = VOCAB;
                 validator = Boolean.valueOf(VALIDATOR);
                 SHARE_WEB = ConfigProperties.getPropertyParam("share_web");
                 SERVER_UPLOAD_LOCATION_FOLDER = ConfigProperties.getPropertyParam("share_server");
             }
             CONTEXT = String.valueOf(System.currentTimeMillis());
-            FILENAME = CONTEXT + "_" + CREATOR.replace(" ", "") + ".ttl";
+            FILENAME = CONTEXT + ".ttl";
             FILELINK = SHARE_WEB + FILENAME;
             String filePath = SERVER_UPLOAD_LOCATION_FOLDER + contentDispositionHeader.getFileName();
             // save the file to the server
@@ -119,7 +118,7 @@ public class ImportcsvResource {
             maxSteps = (csvLines.length - 1) * 1; // 100% (1 = label)
             System.out.println("csv-test");
         } else {
-            maxSteps = (csvLines.length - 1) * 2; // 100% (4 = label + label (validate))
+            maxSteps = (csvLines.length - 1) * 2; // 100% (2 = label + label (validate))
             System.out.println("csv-input");
         }
         (new Thread(new CSV())).start();
