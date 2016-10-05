@@ -11,8 +11,9 @@ public class RetcatItem {
 	private String type = "";
 	private String language = "";
 	private String quality = "";
+	private boolean defaultValue = false;
 
-	public RetcatItem(String name, String description, String queryURL, String labelURL, String prefix, String group, String type, String language, String quality) {
+	public RetcatItem(String name, String description, String queryURL, String labelURL, String prefix, String group, String type, String language, String quality, boolean defaultValue) {
 		this.name = name;
 		this.description = description;
 		this.queryURL = queryURL;
@@ -22,6 +23,7 @@ public class RetcatItem {
 		this.type = type;
 		this.language = language;
 		this.quality = quality;
+		this.defaultValue = defaultValue;
 	}
 
 	public String getName() {
@@ -94,6 +96,14 @@ public class RetcatItem {
 
 	public void setQuality(String quality) {
 		this.quality = quality;
+	}
+
+	public boolean getDefaultValue() {
+		return defaultValue;
+	}
+
+	public void setDefaultValue(boolean defaultValue) {
+		this.defaultValue = defaultValue;
 	}
 	
 }
