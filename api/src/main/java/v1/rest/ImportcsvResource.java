@@ -116,10 +116,10 @@ public class ImportcsvResource {
         System.out.println("=================================");
         String[] csvLines = csvContent.split("\r\n");
         if (validator) {
-            maxSteps = (csvLines.length - 1) * 2; // 100% (2 = label + relation)
+            maxSteps = (csvLines.length - 1) * 1; // 100% (1 = label)
             System.out.println("csv-test");
         } else {
-            maxSteps = (csvLines.length - 1) * 4; // 100% (4 = label + relation + label (validate) + relation (validate))
+            maxSteps = (csvLines.length - 1) * 2; // 100% (4 = label + label (validate))
             System.out.println("csv-input");
         }
         (new Thread(new CSV())).start();

@@ -104,15 +104,17 @@ public class CSV implements Runnable {
 			// check for empty lines
 			for (int i = 0; i < csvLines.length; i++) {
 				if (csvLines[i].equals("")) {
-					errorArray.add("error: empty line found in line " + i);
+					errorArray.add("error: empty line found in line " + (i+1));
 					error = true;
 					errors++;
 				}
 			}
 			// check for header names
 			String[] header = csvLines[0].split("\t");
-			if (!header[0].equals("thumbnail") || header[1].equals("description") || header[2].equals("translations") && header[3].equals("end")) {
-				errorArray.add("error: wrong header-names in first line");
+			if (header[0].contains("thumbnail") && header[1].contains("description") && header[2].contains("translations") && header[3].contains("end")) {
+			} else {
+				String headerStr = header[0] + "," + header[1] + "," + header[2] + "," + header[3];
+				errorArray.add("error: wrong header-names in first line -> " + headerStr);
 				error = true;
 				errors++;
 			}
@@ -122,17 +124,17 @@ public class CSV implements Runnable {
 				error = true;
 				errors++;
 			}
-			// check for tabstop or wrong fieldcound
+			// check for tabstop or wrong field-count
 			for (int i = 0; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
 				if (tokens.length != 4) {
-					errorArray.add("error: delimiter wrong or not enough fields (=4) in line " + i);
+					errorArray.add("error: delimiter wrong or not enough fields (=4) in line " + (i+1));
 					error = true;
 					errors++;
 				}
 			}
 			// thumbnail check
-			for (int i = 0; i < csvLines.length; i++) {
+			for (int i = 1; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
 				if (tokens[0].equals("")) {
 					errorArray.add("error: no thumbnail in line " + i);
@@ -141,20 +143,20 @@ public class CSV implements Runnable {
 				}
 			}
 			// translation check
-			for (int i = 0; i < csvLines.length; i++) {
+			for (int i = 1; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
 				if (tokens[2].split(";").length % 2 != 0) {
-					errorArray.add("error: language or deliminiter error for translations in line " + i);
+					errorArray.add("error: language or deliminiter error for translations in line " + (i+1));
 					error = true;
 					errors++;
 				}
 			}
 			// language check for translations (same as thumbnail)
-			for (int i = 0; i < csvLines.length; i++) {
+			for (int i = 1; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
 				for (int j = 0; j < tokens.length; j = j + 2) {
 					if (tokens[j + 1].equals(vocabLanguage)) {
-						errorArray.add("error: translation language is same as thumbnail langauge in line " + i);
+						errorArray.add("error: translation language is same as thumbnail langauge in line " + (i+1));
 						error = true;
 						errors++;
 					}
@@ -185,7 +187,7 @@ public class CSV implements Runnable {
 				}
 				for (String lang : languages) {
 					if (!languagesAllowed.contains(lang)) {
-						errorArray.add("error: a language for a translation not allowed in line " + i);
+						errorArray.add("error: a language for a translation not allowed in line " + (i+1));
 						error = true;
 						errors++;
 					}
