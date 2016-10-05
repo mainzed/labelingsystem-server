@@ -141,7 +141,7 @@ public class RDF4J_20 {
             // GET NUMBER OF STATEMENTS (CHECK)
             int after = getNumberOfStatements(repositoryID, rdf4jServer);
             if (before == after) {
-                throw new NoInputException();
+                //throw new NoInputException();
             }
         } catch (Exception e) {
             if (e.toString().contains("NoInputException")) {

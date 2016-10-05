@@ -812,8 +812,6 @@ public class LabelsResource {
 		triples += item + ":" + itemid + " a skos:Concept . ";
 		triples += item + ":" + itemid + " dc:creator \"" + creator + "\"" + " . ";
 		triples += item + ":" + itemid + " dct:creator ls_age:" + creator + " . ";
-		triples += item + ":" + itemid + " dc:contributor \"" + creator + "\"" + " . ";
-		triples += item + ":" + itemid + " dct:contributor ls_age:" + creator + " . ";
 		triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
 		triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
 		triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";

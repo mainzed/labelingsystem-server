@@ -80,7 +80,6 @@ public class VocabsResource {
                     + "?s a ls:Vocabulary . "
                     + "?s dc:identifier ?identifier . "
                     + "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
-                    + "OPTIONAL { ?s dc:contributor ?contributor . } " // because of sorting, filtering
                     + "OPTIONAL { ?s dc:title ?title . } "; // because of sorting
             // FILTERING
             if (draft == null) {

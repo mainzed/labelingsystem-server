@@ -72,6 +72,33 @@ public class RetcatResource {
                     .header("Content-Type", "application/json;charset=UTF-8").build();
         }
     }
+	
+	@GET
+	@Path("/predefined")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getPredefinedRetcatList() {
+        try {
+            JSONArray outArray = new JSONArray();
+            // add items
+            for (RetcatItem item : RetcatItems.getPredifnedRetcatItems()) {
+                JSONObject tmpRETCAT = new JSONObject();
+                tmpRETCAT.put("name", item.getName());
+                tmpRETCAT.put("description", item.getDescription());
+                tmpRETCAT.put("queryURL", item.getQueryURL());
+                tmpRETCAT.put("labelURL", item.getLabelURL());
+                tmpRETCAT.put("prefix", item.getPrefix());
+                tmpRETCAT.put("group", item.getGroup());
+                tmpRETCAT.put("type", item.getType());
+                tmpRETCAT.put("language", item.getLanguage());
+                tmpRETCAT.put("quality", item.getQuality());
+                outArray.add(tmpRETCAT);
+            }
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
 
     @GET
     @Path("/{retcat}")

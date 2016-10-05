@@ -68,5 +68,26 @@ public class RetcatItems {
                 "/v1/retcat/query/geonames", "/v1/retcat/info/geonames", "//sws.geonames.org", "additional information", "geonames", "en", "low"));
         return retcatList;
     }
+	
+	public static List<RetcatItem> getPredifnedRetcatItems() throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+        List<RetcatItem> retcatList = new ArrayList();
+        // LOCAL LABELING SYSTEM
+        retcatList.add(new RetcatItem("Local Labeling System",
+                "The local Labeling System vocabularies.",
+                "/v1/retcat/query/labelingsystem", "/v1/retcat/info/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "div", "high"));
+        // GETTY
+        retcatList.add(new RetcatItem("Getty AAT",
+                "AAT is a structured vocabulary, including terms, descriptions, and other metadata for generic concepts related to art, architecture, conservation, archaeology, and other cultural heritage. Included are work types, styles, materials, techniques, and others.",
+                "/v1/retcat/query/getty/aat", "/v1/retcat/info/getty", "//vocab.getty.edu", "common reference thesauri (CH)", "getty", "en", "high"));
+        // HERITAGE DATA
+        retcatList.add(new RetcatItem("Heritage Data Historic England",
+                "FISH Archaeological Sciences Thesaurus + FISH Building Materials Thesaurus + FISH Event Types Thesaurus + FISH Archaeological Objects Thesaurus + FISH Maritime Craft Types Thesaurus FISH Thesaurus of Monument Types + Historic England Periods Authority File + Components + Evidence.",
+                "/v1/retcat/query/heritagedata/historicengland", "/v1/retcat/info/heritagedata", "//purl.org/heritagedata/schemes", "common reference thesauri (CH)", "heritagedata", "en", "high"));
+        // DBPEDIA
+        retcatList.add(new RetcatItem("DBpedia",
+                "DBpedia is a project aiming to extract structured content from the information created as part of the Wikipedia project. ",
+                "/v1/retcat/query/dbpedia", "/v1/retcat/info/dbpedia", "//dbpedia.org/resource", "additional information", "dbpedia", "de", "low"));
+        return retcatList;
+    }
 
 }

@@ -12,6 +12,7 @@ import org.jdom.JDOMException;
 import rdf.RDF;
 import rdf.RDF4J_20;
 import v1.utils.config.ConfigProperties;
+import v1.utils.db.SQlite;
 
 @Path("/tests")
 public class TestsResource {
@@ -24,12 +25,35 @@ public class TestsResource {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String prefixes = rdf.getPREFIXSPARQL();
 			String update = prefixes
-                + "DELETE { ?vocab ?p1 ?o1. ?label ?p2 ?o2. ?o3 ?p3 ?vocab. ?o4 ?p4 ?label. } "
+                + "DELETE { ?revision ?p2 ?o. } "
+                + "WHERE { "
+				+ "?revision ?p2 ?o. "
+				+ "?revision a ls:Revision. "
+				+ "?label ?p ?revision. "
+				+ "?label dc:creator \"test\". "
+                + "}";
+			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), update);
+			update = prefixes
+                + "DELETE { ?o3 ?p3 ?vocab. } "
                 + "WHERE { "
                 + "?o3 ?p3 ?vocab. "
 				+ "?vocab ?p1 ?o1. "
 				+ "?vocab dc:creator \"test\". "
+                + "}";
+			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), update);
+			update = prefixes
+                + "DELETE { ?o4 ?p4 ?label. } "
+                + "WHERE { "
 				+ "?o4 ?p4 ?label. "
+				+ "?label ?p2 ?o2. "
+				+ "?label dc:creator \"test\". "
+                + "}";
+			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), update);
+			update = prefixes
+                + "DELETE { ?vocab ?p1 ?o1. ?label ?p2 ?o2. } "
+                + "WHERE { "
+				+ "?vocab ?p1 ?o1. "
+				+ "?vocab dc:creator \"test\". "
 				+ "?label ?p2 ?o2. "
 				+ "?label dc:creator \"test\". "
                 + "}";
@@ -37,6 +61,13 @@ public class TestsResource {
 			// load rdf
             String fileURL = ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/tests/test.rdf";
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"),ConfigProperties.getPropertyParam("ts_server"), "LOAD <" + fileURL + ">");
+			// delete from sqlite db
+			SQlite.deleteRetcatEntryForList("2420a664-7b1c-4da6-aba3-d0694221ee8a");
+			SQlite.deleteRetcatEntry("2420a664-7b1c-4da6-aba3-d0694221ee8a");
+			SQlite.deleteRetcatEntryForList("b82b65ba-f75f-4018-b10c-4cfb227aeddd");
+			SQlite.deleteRetcatEntry("b82b65ba-f75f-4018-b10c-4cfb227aeddd");
+			SQlite.deleteRetcatEntryForList("ed089ba2-27f1-4a72-a769-78e98704ce36");
+			SQlite.deleteRetcatEntry("ed089ba2-27f1-4a72-a769-78e98704ce36");
 			// output
 			return Response.status(Response.Status.NO_CONTENT).build();
         } catch (Exception e) {
