@@ -121,7 +121,11 @@ public class ImportcsvResource {
 				datei.delete();
 			}
 			importData();
-			return Response.status(200).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
+			if (CSV.JSON_STRING.contains("errors")) {
+				return Response.status(Response.Status.BAD_REQUEST).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
+			} else {
+				return Response.status(200).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
+			}
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.ImportcsvResource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
@@ -172,7 +176,7 @@ public class ImportcsvResource {
 	public void finish() {
 		outString = CSV.JSON_STRING;
 	}
-	
+
 	public void importData() {
 		status = 0.0;
 		currentStep = 0;
