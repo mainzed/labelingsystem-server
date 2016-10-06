@@ -55,7 +55,7 @@ public class GenericResource {
 	public Response getVocabulary(@HeaderParam("Accept") String acceptHeader, @PathParam("vocabulary") String itemID) throws IOException, JDOMException, ParserConfigurationException, TransformerException {
 		try {
 			String HOST_API = ConfigProperties.getPropertyParam("api");
-			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + itemID + "/labels";
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + itemID + "/concepts";
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "vocabs/" + itemID + ".json");
 				return Response.temporaryRedirect(targetURIForRedirection).build();
@@ -138,7 +138,7 @@ public class GenericResource {
 			}
 			// init out
 			String HOST_API = ConfigProperties.getPropertyParam("api");
-			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + vocID + "/labels/" + itemID;
+			String HOST_HTMLPAGE = ConfigProperties.getPropertyParam("workbench") + "vocabularies/" + vocID + "/concepts/" + itemID;
 			// output
 			if (acceptHeader.startsWith("application/json")) {
 				URI targetURIForRedirection = new URI(HOST_API + "labels/" + itemID + ".json");
