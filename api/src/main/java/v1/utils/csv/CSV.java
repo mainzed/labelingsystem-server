@@ -239,14 +239,14 @@ public class CSV implements Runnable {
             error = true;
         } finally {
             if (errors == 0) {
-                outputJSONobject.put("success", "true");
+                outputJSONobject.put("success", true);
                 outputJSONobject.put("importedlabels", importedlabels);
                 outputJSONobject.put("triples", TRIPLE_LIST.size());
             } else {
-                outputJSONobject.put("success", "false");
+                outputJSONobject.put("success", false);
                 outputJSONobject.put("errors", errors);
+				outputJSONobject.put("messages", errorArray);
             }
-            outputJSONobject.put("messages", errorArray);
             System.out.println(ImportcsvResource.status);
             if (error) {
                 ImportcsvResource.status = 100.0;
