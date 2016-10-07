@@ -319,7 +319,7 @@ public class Transformer {
 					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 					con.setRequestMethod("GET");
 					con.setRequestProperty("Accept-Encoding", "json");
-					if (con.getResponseCode()==200) {
+					if (con.getResponseCode() == 200) {
 						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 						String inputLine;
 						StringBuilder response = new StringBuilder();
@@ -786,34 +786,6 @@ public class Transformer {
 				tmpObject.put("type", "uri");
 				tmpObject.put("value", element);
 				arrayNew.add(tmpObject);
-				// exactMatch
-				if (element.contains("//" + ConfigProperties.getPropertyParam("host"))) {
-					String[] conceptSplit = element.split("/");
-					String url = ConfigProperties.getPropertyParam("api") + "/v1/labels/" + conceptSplit[conceptSplit.length - 1] + ".json?equalConcepts=false";
-					URL obj = new URL(url);
-					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-					con.setRequestMethod("GET");
-					con.setRequestProperty("Accept-Encoding", "json");
-					BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-					String inputLine;
-					StringBuilder response = new StringBuilder();
-					while ((inputLine = in.readLine()) != null) {
-						response.append(inputLine);
-					}
-					in.close();
-					JSONObject equalConcept = (JSONObject) new JSONParser().parse(response.toString());
-					String equalConceptCreator = (String) equalConcept.get("creator");
-					if (equalConceptCreator.equals(creator)) {
-						JSONObject tmpLabelObject = new JSONObject();
-						JSONArray arrayNew2 = new JSONArray();
-						JSONObject tmpObject2 = new JSONObject();
-						tmpObject2.put("type", "uri");
-						tmpObject2.put("value", rdf.getPrefixItem("ls_lab" + ":" + id));
-						arrayNew2.add(tmpObject2);
-						tmpLabelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew2);
-						rdfObject.put(element, tmpLabelObject);
-					}
-				}
 			}
 			labelObject.put(rdf.getPrefixItem("skos:exactMatch"), arrayNew);
 		}
@@ -1317,6 +1289,16 @@ public class Transformer {
 			}
 			// set equal concepts
 			if (equalConceptsBool != null) {
+				// get bidirectional concepts
+				RDF rdf2 = new RDF(ConfigProperties.getPropertyParam("host"));
+				String query = rdf2.getPREFIXSPARQL();
+				query += "SELECT * WHERE { ?em skos:exactMatch ls_lab:" + id + ". } ";
+				List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+				List<String> em = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "em");
+				for (String value : em) {
+					equalConcepts.add(value);
+				}
+				// get concept json objects
 				if (equalConcepts.size() > 0 && equalConceptsBool.equals("true")) {
 					JSONArray equalArray = new JSONArray();
 					for (String concept : equalConcepts) {
@@ -1347,7 +1329,7 @@ public class Transformer {
 					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 					con.setRequestMethod("GET");
 					con.setRequestProperty("Accept-Encoding", "json");
-					if (con.getResponseCode()==200) {
+					if (con.getResponseCode() == 200) {
 						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 						String inputLine;
 						StringBuilder response = new StringBuilder();
@@ -1960,14 +1942,10 @@ public class Transformer {
 						for (Object item : oldExactMatchTmp) {
 							JSONObject tmp = (JSONObject) item;
 							hm.put("valueBefore", tmp.get("uri") + " (" + tmp.get("type") + ")");
-							String tmpUriSplit[] = tmp.get("uri").toString().split("/");
-							hm.put("bidirectional-del", tmpUriSplit[tmpUriSplit.length - 1]);
 						}
 						for (Object item : newExactMatchTmp) {
 							JSONObject tmp = (JSONObject) item;
 							hm.put("valueAfter", tmp.get("uri") + " (" + tmp.get("type") + ")");
-							String tmpUriSplit[] = tmp.get("uri").toString().split("/");
-							hm.put("bidirectional-add", tmpUriSplit[tmpUriSplit.length - 1]);
 						}
 					} else if (oldExactMatch.size() > newExactMatch.size()) { // deleted
 						hm.put("objectType", "exactMatch");
@@ -1976,9 +1954,7 @@ public class Transformer {
 							if (!newExactMatch.contains(item)) {
 								JSONObject tmp = (JSONObject) item;
 								hm.put("valueBefore", tmp.get("uri") + " (" + tmp.get("type") + ")");
-								String tmpUriSplit[] = tmp.get("uri").toString().split("/");
 								hm.put("valueAfter", "");
-								hm.put("bidirectional", tmpUriSplit[tmpUriSplit.length - 1]);
 								break;
 							}
 						}
@@ -1990,8 +1966,6 @@ public class Transformer {
 								JSONObject tmp = (JSONObject) item;
 								hm.put("valueBefore", "");
 								hm.put("valueAfter", tmp.get("uri") + " (" + tmp.get("type") + ")");
-								String tmpUriSplit[] = tmp.get("uri").toString().split("/");
-								hm.put("bidirectional", tmpUriSplit[tmpUriSplit.length - 1]);
 								break;
 							}
 						}

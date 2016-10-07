@@ -52,7 +52,7 @@ public class Retcat_GeoNames {
             String countryName = (String) tmpElement.get("countryName");
             String lat = (String) tmpElement.get("lat");
             String lon = (String) tmpElement.get("lng");
-            tmpAutosuggest.setDescription(adminName1 + ", " + countryName + " POINT(" + lon + " " + lat + ")");
+            tmpAutosuggest.setDescription(adminName1 + ", " + countryName);
             tmpAutosuggest.setSchemeTitle("GeoNames");
             // get retcat info
             String type = "geonames";
@@ -108,7 +108,7 @@ public class Retcat_GeoNames {
         int startTagLON = response.indexOf("<lng>");
         int endTagLON = response.indexOf("</lng>");
         String lon = response.substring(startTagLON, endTagLON).replace("<lng>", "");
-        String desc = an1 + ", " + cn + " POINT(" + lon + " " + lat + ")";
+        String desc = an1 + ", " + cn;
         // output
         JSONObject jsonOut = new JSONObject();
         jsonOut.put("label", name);
