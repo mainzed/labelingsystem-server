@@ -77,7 +77,8 @@ public class LabelsResource {
 			@QueryParam("prefLabel") String prefLabel,
 			@QueryParam("vocab") String vocab,
 			@QueryParam("equalConcepts") String equalConcepts,
-			@QueryParam("revisions") String revisions)
+			@QueryParam("revisions") String revisions,
+			@QueryParam("creatorInfo") String creatorInfo)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
 			// QUERY STRING
@@ -153,7 +154,7 @@ public class LabelsResource {
 					JSONObject tmpObject2 = new JSONObject();
 					tmpObject2.put(key, tmpObject);
 					String hh = tmpObject2.toString();
-					JSONObject tmp = Transformer.label_GET(hh, h, fields, retcatlist, equalConcepts, revisions);
+					JSONObject tmp = Transformer.label_GET(hh, h, fields, retcatlist, equalConcepts, revisions, creatorInfo);
 					outArray.add(tmp);
 				}
 			}
@@ -226,7 +227,14 @@ public class LabelsResource {
 	@GET
 	@Path("/{label}")
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
-	public Response getLabel(@PathParam("label") String label, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @QueryParam("revisions") String revisions, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
+	public Response getLabel(@PathParam("label") String label, 
+			@HeaderParam("Accept") String acceptHeader, 
+			@QueryParam("pretty") boolean pretty, 
+			@QueryParam("equalConcepts") String equalConcepts, 
+			@QueryParam("revisions") String revisions, 
+			@QueryParam("creatorInfo") String creatorInfo, 
+			@HeaderParam("Accept-Encoding") String acceptEncoding) 
+			throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -242,7 +250,7 @@ public class LabelsResource {
 				rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
 			}
 			if (acceptHeader.contains("application/json")) {
-				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
+				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions, creatorInfo).toJSONString();
 				if (pretty) {
 					JsonParser parser = new JsonParser();
 					JsonObject json = parser.parse(out).getAsJsonObject();
@@ -259,7 +267,7 @@ public class LabelsResource {
 			} else if (acceptHeader.contains("application/rdf+json")) {
 				return Response.ok(rdf.getModel("RDF/JSON")).header("Content-Type", "application/json;charset=UTF-8").build();
 			} else if (acceptHeader.contains("text/html")) {
-				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
+				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions, creatorInfo).toJSONString();
 				if (pretty) {
 					JsonParser parser = new JsonParser();
 					JsonObject json = parser.parse(out).getAsJsonObject();
@@ -284,7 +292,7 @@ public class LabelsResource {
 			} else if (acceptHeader.contains("application/ld+json")) {
 				return Response.ok(rdf.getModel("JSON-LD")).build();
 			} else {
-				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
+				String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions, creatorInfo).toJSONString();
 				if (pretty) {
 					JsonParser parser = new JsonParser();
 					JsonObject json = parser.parse(out).getAsJsonObject();
@@ -313,7 +321,13 @@ public class LabelsResource {
 	@GET
 	@Path("/{label}.json")
 	@Produces("application/json;charset=UTF-8")
-	public Response getLabel_JSON(@PathParam("label") String label, @QueryParam("pretty") boolean pretty, @QueryParam("equalConcepts") String equalConcepts, @QueryParam("revisions") String revisions, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
+	public Response getLabel_JSON(@PathParam("label") String label, 
+			@QueryParam("pretty") boolean pretty, 
+			@QueryParam("equalConcepts") String equalConcepts, 
+			@QueryParam("revisions") String revisions, 
+			@QueryParam("creatorInfo") String creatorInfo, 
+			@HeaderParam("Accept-Encoding") String acceptEncoding) 
+			throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -328,7 +342,7 @@ public class LabelsResource {
 			for (int i = 0; i < predicates.size(); i++) {
 				rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
 			}
-			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions).toJSONString();
+			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, equalConcepts, revisions, creatorInfo).toJSONString();
 			if (pretty) {
 				JsonParser parser = new JsonParser();
 				JsonObject json = parser.parse(out).getAsJsonObject();
@@ -694,7 +708,7 @@ public class LabelsResource {
 			for (int i = 0; i < predicates.size(); i++) {
 				rdf.setModelTriple(item + ":" + itemID, predicates.get(i), objects.get(i));
 			}
-			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), itemID, null, retcatlist, "false", "false").toJSONString();
+			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), itemID, null, retcatlist, "false", "false", "false").toJSONString();
 			return Response.status(Response.Status.CREATED).entity(out).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))
@@ -736,7 +750,7 @@ public class LabelsResource {
 				rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
 			}
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
-			String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false").toJSONString();
+			String json_old = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false", "false").toJSONString();
 			// set revision
 			// get release type of vocabulary
 			query = rdf.getPREFIXSPARQL();
@@ -770,7 +784,7 @@ public class LabelsResource {
 			for (int i = 0; i < predicates.size(); i++) {
 				rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
 			}
-			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false").toJSONString();
+			String out = Transformer.label_GET(rdf.getModel("RDF/JSON"), label, null, retcatlist, "false", "false", "false").toJSONString();
 			return Response.status(Response.Status.CREATED).entity(out).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))

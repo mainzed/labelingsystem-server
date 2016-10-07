@@ -915,12 +915,13 @@ public class Transformer {
 		labelObject.remove("equalConcepts");
 		labelObject.remove("revisions");
 		labelObject.remove("released");
+		labelObject.remove("creatorInfo");
 		// add object
 		rdfObject.put(rdf.getPrefixItem("ls_lab" + ":" + id), labelObject);
 		return rdfObject.toJSONString();
 	}
 
-	public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist, String equalConceptsBool, String revisionsBool) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
+	public static JSONObject label_GET(String json, String id, String fields, List<RetcatItem> retcatlist, String equalConceptsBool, String revisionsBool, String creatorInfoBool) throws IOException, UniqueIdentifierException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, TransformRdfToApiJsonException {
 		JSONObject labelObject = null;
 		try {
 			//init
@@ -1336,6 +1337,27 @@ public class Transformer {
 						equalArray.add(simillarConcept);
 					}
 					labelObject.put("equalConcepts", equalArray);
+				}
+			}
+			// set creator info
+			if (creatorInfoBool != null) {
+				if (creatorInfoBool.equals("true")) {
+					String url = ConfigProperties.getPropertyParam("api") + "/v1/agents/" + labelObject.get("creator") + ".json";
+					URL obj = new URL(url);
+					HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+					con.setRequestMethod("GET");
+					con.setRequestProperty("Accept-Encoding", "json");
+					if (con.getResponseCode()==200) {
+						BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+						String inputLine;
+						StringBuilder response = new StringBuilder();
+						while ((inputLine = in.readLine()) != null) {
+							response.append(inputLine);
+						}
+						in.close();
+						JSONObject simillarConcept = (JSONObject) new JSONParser().parse(response.toString());
+						labelObject.put("creatorInfo", simillarConcept);
+					}
 				}
 			}
 			// delete items
