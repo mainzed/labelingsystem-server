@@ -488,10 +488,14 @@ public class Retcat_HeritageData {
             JSONObject tmpElement = (JSONObject) element;
             JSONObject scopeNote = (JSONObject) tmpElement.get("scopeNote");
             String descValue = "";
+            String descLang = "";
             if (scopeNote != null) {
                 descValue = (String) scopeNote.get("value");
+                descLang = (String) scopeNote.get("xml:lang");
             }
-            jsonOut.put("description", descValue);
+            if (descLang.equals("en")) {
+                jsonOut.put("description", descValue);
+            }
         }
         for (Object element : bindingsArray) {
             JSONObject tmpElement = (JSONObject) element;
