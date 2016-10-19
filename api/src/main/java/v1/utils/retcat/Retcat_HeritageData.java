@@ -86,8 +86,10 @@ public class Retcat_HeritageData {
             JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
             String labelValue = (String) labelObject.get("value");
             String labelLang = (String) labelObject.get("xml:lang");
-            tmpAutosuggest.setLabel(labelValue);
-            tmpAutosuggest.setLanguage(labelLang);
+            if (labelLang.equals("en")) {
+                tmpAutosuggest.setLabel(labelValue);
+                tmpAutosuggest.setLanguage(labelLang);
+            }
             // get Scheme
             JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
             String schemeValue = (String) schemeObject.get("value");
@@ -98,15 +100,18 @@ public class Retcat_HeritageData {
             if (scopeNoteObject != null) {
                 String scopeNoteValue = (String) scopeNoteObject.get("value");
                 String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                tmpAutosuggest.setDescription(scopeNoteValue);
+                if (scopeNoteLang.equals("en")) {
+                    tmpAutosuggest.setDescription(scopeNoteValue);
+                }
             }
             // get broader 
             String broaderVL = "";
             String broaderURI = "";
+            String broaderLang = "";
             JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
             if (broaderObject != null) {
                 String broaderValue = (String) broaderObject.get("value");
-                String broaderLang = (String) broaderObject.get("xml:lang");
+                broaderLang = (String) broaderObject.get("xml:lang");
                 broaderVL = broaderValue.replace("<", "").replace(">", "");
             }
             JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
@@ -115,16 +120,19 @@ public class Retcat_HeritageData {
             }
             if (!broaderURI.equals("")) {
                 HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                hstmpBroader.put(broaderURI, broaderVL);
-                tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                if (broaderLang.equals("en")) {
+                    hstmpBroader.put(broaderURI, broaderVL);
+                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                }
             }
             // get narrower 
             String narrowerVL = "";
             String narrowerURI = "";
+            String narrowerLang = "";
             JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
             if (narrowerObject != null) {
                 String narrowerValue = (String) narrowerObject.get("value");
-                String narrowerLang = (String) narrowerObject.get("xml:lang");
+                narrowerLang = (String) narrowerObject.get("xml:lang");
                 narrowerVL = narrowerValue.replace("<", "").replace(">", "");
             }
             JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
@@ -133,8 +141,10 @@ public class Retcat_HeritageData {
             }
             if (!narrowerURI.equals("")) {
                 HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                hstmpNarrower.put(narrowerURI, narrowerVL);
-                tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                if (narrowerLang.equals("en")) {
+                    hstmpNarrower.put(narrowerURI, narrowerVL);
+                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                }
             }
             // get retcat info
             String type = "heritagedata";
@@ -214,8 +224,10 @@ public class Retcat_HeritageData {
             JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
             String labelValue = (String) labelObject.get("value");
             String labelLang = (String) labelObject.get("xml:lang");
-            tmpAutosuggest.setLabel(labelValue);
-            tmpAutosuggest.setLanguage(labelLang);
+            if (labelLang.equals("en")) {
+                tmpAutosuggest.setLabel(labelValue);
+                tmpAutosuggest.setLanguage(labelLang);
+            }
             // get Scheme
             JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
             String schemeValue = (String) schemeObject.get("value");
@@ -226,15 +238,18 @@ public class Retcat_HeritageData {
             if (scopeNoteObject != null) {
                 String scopeNoteValue = (String) scopeNoteObject.get("value");
                 String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                tmpAutosuggest.setDescription(scopeNoteValue);
+                if (scopeNoteLang.equals("en")) {
+                    tmpAutosuggest.setDescription(scopeNoteValue);
+                }
             }
             // get broader 
             String broaderVL = "";
             String broaderURI = "";
+            String broaderLang = "";
             JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
             if (broaderObject != null) {
                 String broaderValue = (String) broaderObject.get("value");
-                String broaderLang = (String) broaderObject.get("xml:lang");
+                broaderLang = (String) broaderObject.get("xml:lang");
                 broaderVL = broaderValue.replace("<", "").replace(">", "");
             }
             JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
@@ -243,16 +258,19 @@ public class Retcat_HeritageData {
             }
             if (!broaderURI.equals("")) {
                 HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                hstmpBroader.put(broaderURI, broaderVL);
-                tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                if (broaderLang.equals("en")) {
+                    hstmpBroader.put(broaderURI, broaderVL);
+                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                }
             }
             // get narrower 
             String narrowerVL = "";
             String narrowerURI = "";
+            String narrowerLang = "";
             JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
             if (narrowerObject != null) {
                 String narrowerValue = (String) narrowerObject.get("value");
-                String narrowerLang = (String) narrowerObject.get("xml:lang");
+                narrowerLang = (String) narrowerObject.get("xml:lang");
                 narrowerVL = narrowerValue.replace("<", "").replace(">", "");
             }
             JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
@@ -261,8 +279,10 @@ public class Retcat_HeritageData {
             }
             if (!narrowerURI.equals("")) {
                 HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                hstmpNarrower.put(narrowerURI, narrowerVL);
-                tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                if (narrowerLang.equals("en")) {
+                    hstmpNarrower.put(narrowerURI, narrowerVL);
+                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                }
             }
             // get retcat info
             String type = "heritagedata";
@@ -291,10 +311,6 @@ public class Retcat_HeritageData {
                 + "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                //+ "FILTER(LANGMATCHES(LANG(?prefLabel), \"en\")) "
-                //+ "FILTER(LANGMATCHES(LANG(?scopeNote), \"en\")) "
-                //+ "FILTER(LANGMATCHES(LANG(?BroaderPreferredTerm), \"en\")) "
-                //+ "FILTER(LANGMATCHES(LANG(?NarrowerPreferredTerm), \"en\")) "
                 + "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) "
                 + "FILTER(?scheme=<http://purl.org/heritagedata/schemes/11> || ?scheme=<http://purl.org/heritagedata/schemes/10> || ?scheme=<http://purl.org/heritagedata/schemes/12> || ?scheme=<http://purl.org/heritagedata/schemes/17> || ?scheme=<http://purl.org/heritagedata/schemes/19> || ?scheme=<http://purl.org/heritagedata/schemes/14> || ?scheme=<http://purl.org/heritagedata/schemes/15> || ?scheme=<http://purl.org/heritagedata/schemes/18> || ?scheme=<http://purl.org/heritagedata/schemes/20> || ?scheme=<http://purl.org/heritagedata/schemes/13> || ?scheme=<http://purl.org/heritagedata/schemes/21> || ?scheme=<http://purl.org/heritagedata/schemes/22>) "
                 + "}";
@@ -346,8 +362,10 @@ public class Retcat_HeritageData {
             JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
             String labelValue = (String) labelObject.get("value");
             String labelLang = (String) labelObject.get("xml:lang");
-            tmpAutosuggest.setLabel(labelValue);
-            tmpAutosuggest.setLanguage(labelLang);
+            if (labelLang.equals("en")) {
+                tmpAutosuggest.setLabel(labelValue);
+                tmpAutosuggest.setLanguage(labelLang);
+            }
             // get Scheme
             JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
             String schemeValue = (String) schemeObject.get("value");
@@ -358,15 +376,18 @@ public class Retcat_HeritageData {
             if (scopeNoteObject != null) {
                 String scopeNoteValue = (String) scopeNoteObject.get("value");
                 String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
-                tmpAutosuggest.setDescription(scopeNoteValue);
+                if (scopeNoteLang.equals("en")) {
+                    tmpAutosuggest.setDescription(scopeNoteValue);
+                }
             }
             // get broader 
             String broaderVL = "";
             String broaderURI = "";
+            String broaderLang = "";
             JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
             if (broaderObject != null) {
                 String broaderValue = (String) broaderObject.get("value");
-                String broaderLang = (String) broaderObject.get("xml:lang");
+                broaderLang = (String) broaderObject.get("xml:lang");
                 broaderVL = broaderValue.replace("<", "").replace(">", "");
             }
             JSONObject broaderURIObject = (JSONObject) tmpElement.get("BroaderPreferred");
@@ -375,16 +396,19 @@ public class Retcat_HeritageData {
             }
             if (!broaderURI.equals("")) {
                 HashMap<String, String> hstmpBroader = new HashMap<String, String>();
-                hstmpBroader.put(broaderURI, broaderVL);
-                tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                if (broaderLang.equals("en")) {
+                    hstmpBroader.put(broaderURI, broaderVL);
+                    tmpAutosuggest.setBroaderTerm(hstmpBroader);
+                }
             }
             // get narrower 
             String narrowerVL = "";
             String narrowerURI = "";
+            String narrowerLang = "";
             JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
             if (narrowerObject != null) {
                 String narrowerValue = (String) narrowerObject.get("value");
-                String narrowerLang = (String) narrowerObject.get("xml:lang");
+                narrowerLang = (String) narrowerObject.get("xml:lang");
                 narrowerVL = narrowerValue.replace("<", "").replace(">", "");
             }
             JSONObject narrowerURIObject = (JSONObject) tmpElement.get("NarrowerPreferred");
@@ -393,8 +417,10 @@ public class Retcat_HeritageData {
             }
             if (!narrowerURI.equals("")) {
                 HashMap<String, String> hstmpNarrower = new HashMap<String, String>();
-                hstmpNarrower.put(narrowerURI, narrowerVL);
-                tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                if (narrowerLang.equals("en")) {
+                    hstmpNarrower.put(narrowerURI, narrowerVL);
+                    tmpAutosuggest.setNarrowerTerm(hstmpNarrower);
+                }
             }
             // get retcat info
             String type = "heritagedata";
@@ -415,7 +441,7 @@ public class Retcat_HeritageData {
 
     public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         String sparqlendpoint = "http://heritagedata.org/live/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>"
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
                 + "SELECT * WHERE { "
                 + "<" + url + "> skos:prefLabel ?prefLabel. "
                 + "<" + url + "> skos:inScheme ?scheme . "
@@ -423,7 +449,7 @@ public class Retcat_HeritageData {
                 + "OPTIONAL { <" + url + "> skos:scopeNote ?scopeNote . } "
                 + "OPTIONAL {<" + url + "> skos:broader ?BroaderPreferred . ?BroaderPreferred skos:prefLabel ?BroaderPreferredTerm. } "
                 + "OPTIONAL {<" + url + "> skos:narrower ?NarrowerPreferred . ?NarrowerPreferred skos:prefLabel ?NarrowerPreferredTerm . } "
-                + " }";
+                + "}";
         URL obj = new URL(sparqlendpoint);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
@@ -453,8 +479,10 @@ public class Retcat_HeritageData {
             JSONObject prefLabel = (JSONObject) tmpElement.get("prefLabel");
             String labelValue = (String) prefLabel.get("value");
             String labelLang = (String) prefLabel.get("xml:lang");
-            jsonOut.put("label", labelValue);
-            jsonOut.put("lang", labelLang);
+            if (labelLang.equals("en")) {
+                jsonOut.put("label", labelValue);
+                jsonOut.put("lang", labelLang);
+            }
         }
         for (Object element : bindingsArray) {
             JSONObject tmpElement = (JSONObject) element;
@@ -479,7 +507,10 @@ public class Retcat_HeritageData {
             if (bpObj != null) {
                 String bp = (String) bpObj.get("value");
                 String bpt = (String) bptObj.get("value");
-                hmBroader.put(bpt, bp);
+                String bptLang = (String) bptObj.get("xml:lang");
+                if (bptLang.equals("en")) {
+                    hmBroader.put(bpt, bp);
+                }
             }
         }
         JSONArray tmpArrayBroader = new JSONArray();
@@ -501,7 +532,10 @@ public class Retcat_HeritageData {
             if (npObj != null) {
                 String np = (String) npObj.get("value");
                 String npt = (String) nptObj.get("value");
-                hmNarrower.put(npt, np);
+                String nptLang = (String) nptObj.get("xml:lang");
+                if (nptLang.equals("en")) {
+                    hmNarrower.put(npt, np);
+                }
             }
         }
         JSONArray tmpArrayNarrower = new JSONArray();
