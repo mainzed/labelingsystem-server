@@ -13,14 +13,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-@Path("/languages")
-public class LanguagesResource {
+@Path("/licenses")
+public class LicensesResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getLanguages() {
+	public Response getLicenses() {
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(LanguagesResource.class.getClassLoader().getResource("languages.json").getFile()), "UTF8"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(LanguagesResource.class.getClassLoader().getResource("licenses.json").getFile()), "UTF8"));
 			String inputLine;
 			StringBuilder response = new StringBuilder();
 			while ((inputLine = br.readLine()) != null) {
@@ -30,7 +30,7 @@ public class LanguagesResource {
 			JSONArray jsonArray = (JSONArray) new JSONParser().parse(response.toString());
 			return Response.ok(jsonArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LanguagesResource"))
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LanguagesRLicensesResourceesource"))
 					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}

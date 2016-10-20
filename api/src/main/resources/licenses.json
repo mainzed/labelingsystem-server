@@ -1,0 +1,17 @@
+[{
+        "short": "CC0 1.0",
+        "link": "http://creativecommons.org/publicdomain/zero/1.0/legalcode",
+        "value": "Public Domain Dedication 1.0 universal"
+    }, {
+        "short": "CC BY 4.0",
+        "link": "http://creativecommons.org/licenses/by/4.0/legalcode",
+        "value": "Creative Commons Attribution 4.0 International"
+    }, {
+        "short": "PDDL 1.0",
+        "link": "http://opendatacommons.org/licenses/pddl/1.0/",
+        "value": "Open Data Commons Public Domain Dedication and License v1.0"
+    }, {
+        "short": "ODC-BY 1.0",
+        "link": "http://opendatacommons.org/licenses/by/1.0/",
+        "value": "Open Data Commons Attribution License v1.0"
+}]
