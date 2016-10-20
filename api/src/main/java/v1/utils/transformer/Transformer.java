@@ -74,6 +74,24 @@ public class Transformer {
             descriptionArrayNew.add(descriptionObject);
             vocabularyObject.put(rdf.getPrefixItem("dc:description"), descriptionArrayNew);
         }
+        // change license
+        String license = (String) vocabularyObject.get("license");
+        if (license != null) {
+            vocabularyObject.remove("license");
+            JSONArray licenseArrayNew = new JSONArray();
+            JSONObject licenseObject = new JSONObject();
+            licenseObject.put("type", "uri");
+            licenseObject.put("value", license);
+            licenseArrayNew.add(licenseObject);
+            vocabularyObject.put(rdf.getPrefixItem("dct:license"), licenseArrayNew);
+        } else { // set public domain as default
+            JSONArray licenseArrayNew = new JSONArray();
+            JSONObject licenseObject = new JSONObject();
+            licenseObject.put("type", "uri");
+            licenseObject.put("value", "http://creativecommons.org/publicdomain/zero/1.0/legalcode");
+            licenseArrayNew.add(licenseObject);
+            vocabularyObject.put(rdf.getPrefixItem("dct:license"), licenseArrayNew);
+        }
         // change releasetype
         String releaseString = (String) vocabularyObject.get("releaseType");
         if (releaseString != null && !releaseString.isEmpty()) {

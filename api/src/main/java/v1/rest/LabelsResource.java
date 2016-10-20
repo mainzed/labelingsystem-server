@@ -827,7 +827,6 @@ public class LabelsResource {
         triples += item + ":" + itemid + " dc:creator \"" + creator + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + creator + " . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
-        triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " skos:inScheme ls_voc:" + vocabID + " . ";
@@ -1029,7 +1028,7 @@ public class LabelsResource {
                 + "OPTIONAL { ?resource skos:narrower ?label . } "
                 + "OPTIONAL { ?resource skos:related ?label . } "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (skos:prefLabel,skos:scopeNote,ls:thumbnail,ls:hasReleaseType,dc:language,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso)) "
+                + "FILTER (?p IN (skos:prefLabel,skos:scopeNote,ls:thumbnail,ls:hasReleaseType,dct:license,dc:language,skos:related,skos:broader,skos:narrower,skos:closeMatch,skos:exactMatch,skos:relatedMatch,skos:narrowMatch,skos:broadMatch,rdfs:seeAlso)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;

@@ -703,7 +703,6 @@ public class VocabsResource {
         triples += item + ":" + itemid + " dc:creator \"" + creator + "\"" + " . ";
         triples += item + ":" + itemid + " dct:creator ls_age:" + creator + " . ";
         triples += item + ":" + itemid + " dc:identifier \"" + itemid + "\"" + " . ";
-        triples += item + ":" + itemid + " dct:license <http://creativecommons.org/licenses/by/4.0/> . ";
         triples += item + ":" + itemid + " dc:created \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " dc:modified \"" + date + "\"" + " . ";
         triples += item + ":" + itemid + " ls:hasReleaseType ls:Draft . ";
@@ -733,7 +732,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dc:title,dc:description,dc:language,ls:hasReleaseType)) "
+                + "FILTER (?p IN (dc:title,dc:description,dc:language,ls:hasReleaseType,dct:license)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
