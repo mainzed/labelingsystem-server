@@ -92,13 +92,13 @@ public class Transformer {
             licenseArrayNew.add(licenseObject);
             vocabularyObject.put(rdf.getPrefixItem("dct:license"), licenseArrayNew);
         }
-		// change rights
-        String rights = (String) vocabularyObject.get("rights");
-        if (rights != null) {
-            vocabularyObject.remove("rights");
+		// change origin
+        String origin = (String) vocabularyObject.get("origin");
+        if (origin != null) {
+            vocabularyObject.remove("origin");
             JSONObject tmpObject = new JSONObject();
-            tmpObject.put("type", "literal");
-            tmpObject.put("value", rights);
+            tmpObject.put("type", "uri");
+            tmpObject.put("value", origin);
             JSONArray arrayNew = new JSONArray();
             arrayNew.add(tmpObject);
             vocabularyObject.put(rdf.getPrefixItem("dc:rights"), arrayNew);
@@ -140,7 +140,7 @@ public class Transformer {
         vocabularyObject.remove("description");
         vocabularyObject.remove("created");
         vocabularyObject.remove("license");
-		vocabularyObject.remove("rights");
+		vocabularyObject.remove("origin");
         vocabularyObject.remove("lastModified");
         vocabularyObject.remove("releaseType");
         vocabularyObject.remove("statistics");
@@ -246,8 +246,8 @@ public class Transformer {
                     vocabularyObject.remove(rdf.getPrefixItem("dc:rights"));
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
-                    if (fields == null || fields.contains("rights")) {
-                        vocabularyObject.put("rights", value);
+                    if (fields == null || fields.contains("origin")) {
+                        vocabularyObject.put("origin", value);
                     }
                 }
             }
@@ -958,7 +958,7 @@ public class Transformer {
         labelObject.remove("description");
         labelObject.remove("created");
         labelObject.remove("license");
-		labelObject.remove("rights");
+		labelObject.remove("origin");
         labelObject.remove("modifications");
         labelObject.remove("lastModified");
         labelObject.remove("revisionIDs");
@@ -1317,7 +1317,7 @@ public class Transformer {
                 labelObject.remove("lastModified");
                 labelObject.put("lastModified", listModify.get(listModify.size() - 1));
             }
-            // set released, license and rights
+            // set released, license and origin
             RDF rdf3 = new RDF(ConfigProperties.getPropertyParam("host"));
             String queryRL = rdf3.getPREFIXSPARQL();
             queryRL += "SELECT * WHERE { ls_lab:" + id + " skos:inScheme ?scheme. OPTIONAL { ?scheme dct:license ?license. } OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } } ";
@@ -1337,7 +1337,7 @@ public class Transformer {
 			}
 			if (rights != null && rights.size() > 0) {
 				if (rights.get(0) != null) {
-					labelObject.put(rdf.getPrefixItem("rights"), rights.get(0));
+					labelObject.put(rdf.getPrefixItem("origin"), rights.get(0));
 				}
 			}
             // set revisions
