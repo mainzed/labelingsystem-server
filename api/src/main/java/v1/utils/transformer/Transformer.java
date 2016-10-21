@@ -1320,18 +1320,26 @@ public class Transformer {
             // set released, license and rights
             RDF rdf3 = new RDF(ConfigProperties.getPropertyParam("host"));
             String queryRL = rdf3.getPREFIXSPARQL();
-            queryRL += "SELECT * WHERE { ls_lab:" + id + " skos:inScheme ?scheme. ?scheme dct:license ?license. OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } } ";
+            queryRL += "SELECT * WHERE { ls_lab:" + id + " skos:inScheme ?scheme. OPTIONAL { ?scheme dct:license ?license. } OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } } ";
             List<BindingSet> resultRL = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryRL);
             List<String> license = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "license");
             List<String> released = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "released");
 			List<String> rights = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "rights");
-            labelObject.put(rdf.getPrefixItem("license"), license.get(0));
-            if (released.get(0) != null) {
-                labelObject.put(rdf.getPrefixItem("released"), released.get(0));
-            }
-			if (rights.get(0) != null) {
-                labelObject.put(rdf.getPrefixItem("rights"), rights.get(0));
-            }
+            if (license != null && license.size() > 0) {
+				if (license.get(0) != null) {
+					labelObject.put(rdf.getPrefixItem("license"), license.get(0));
+				}
+			}
+            if (released != null && released.size() > 0) {
+				if (released.get(0) != null) {
+					labelObject.put(rdf.getPrefixItem("released"), released.get(0));
+				}
+			}
+			if (rights != null && rights.size() > 0) {
+				if (rights.get(0) != null) {
+					labelObject.put(rdf.getPrefixItem("rights"), rights.get(0));
+				}
+			}
             // set revisions
             labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
             if (revisionsBool != null) {
