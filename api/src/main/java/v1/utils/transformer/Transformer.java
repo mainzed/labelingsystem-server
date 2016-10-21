@@ -92,6 +92,17 @@ public class Transformer {
             licenseArrayNew.add(licenseObject);
             vocabularyObject.put(rdf.getPrefixItem("dct:license"), licenseArrayNew);
         }
+		// change rights
+        String rights = (String) vocabularyObject.get("rights");
+        if (rights != null) {
+            vocabularyObject.remove("rights");
+            JSONObject tmpObject = new JSONObject();
+            tmpObject.put("type", "literal");
+            tmpObject.put("value", rights);
+            JSONArray arrayNew = new JSONArray();
+            arrayNew.add(tmpObject);
+            vocabularyObject.put(rdf.getPrefixItem("dc:rights"), arrayNew);
+        }
         // change releasetype
         String releaseString = (String) vocabularyObject.get("releaseType");
         if (releaseString != null && !releaseString.isEmpty()) {
@@ -129,6 +140,7 @@ public class Transformer {
         vocabularyObject.remove("description");
         vocabularyObject.remove("created");
         vocabularyObject.remove("license");
+		vocabularyObject.remove("rights");
         vocabularyObject.remove("lastModified");
         vocabularyObject.remove("releaseType");
         vocabularyObject.remove("statistics");
@@ -227,6 +239,18 @@ public class Transformer {
                     }
                 }
             }
+			// change dc:rights
+            JSONArray rightsArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:rights"));
+            if (rightsArray != null && !rightsArray.isEmpty()) {
+                for (Object element : rightsArray) {
+                    vocabularyObject.remove(rdf.getPrefixItem("dc:rights"));
+                    JSONObject obj = (JSONObject) element;
+                    String value = (String) obj.get("value");
+                    if (fields == null || fields.contains("rights")) {
+                        vocabularyObject.put("rights", value);
+                    }
+                }
+            }
             // change dc:modified
             JSONArray modifiedArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:modified"));
             if (modifiedArray != null && !modifiedArray.isEmpty()) {
@@ -281,7 +305,8 @@ public class Transformer {
             vocabularyObject.remove(rdf.getPrefixItem("dc:title"));
             vocabularyObject.remove(rdf.getPrefixItem("dc:description"));
             vocabularyObject.remove(rdf.getPrefixItem("dc:created"));
-            vocabularyObject.remove(rdf.getPrefixItem("dc:license"));
+            vocabularyObject.remove(rdf.getPrefixItem("dct:license"));
+			vocabularyObject.remove(rdf.getPrefixItem("dc:rights"));
             vocabularyObject.remove(rdf.getPrefixItem("dc:modified"));
             vocabularyObject.remove(rdf.getPrefixItem("ls:hasReleaseType"));
             vocabularyObject.remove(rdf.getPrefixItem("ls:released"));
@@ -933,6 +958,7 @@ public class Transformer {
         labelObject.remove("description");
         labelObject.remove("created");
         labelObject.remove("license");
+		labelObject.remove("rights");
         labelObject.remove("modifications");
         labelObject.remove("lastModified");
         labelObject.remove("revisionIDs");
@@ -1291,16 +1317,20 @@ public class Transformer {
                 labelObject.remove("lastModified");
                 labelObject.put("lastModified", listModify.get(listModify.size() - 1));
             }
-            // set released and license
+            // set released, license and rights
             RDF rdf3 = new RDF(ConfigProperties.getPropertyParam("host"));
             String queryRL = rdf3.getPREFIXSPARQL();
-            queryRL += "SELECT * WHERE { ls_lab:" + id + " skos:inScheme ?scheme. ?scheme dct:license ?license. OPTIONAL { ?scheme ls:released ?released } } ";
+            queryRL += "SELECT * WHERE { ls_lab:" + id + " skos:inScheme ?scheme. ?scheme dct:license ?license. OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } } ";
             List<BindingSet> resultRL = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryRL);
             List<String> license = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "license");
             List<String> released = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "released");
+			List<String> rights = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(resultRL, "rights");
             labelObject.put(rdf.getPrefixItem("license"), license.get(0));
             if (released.get(0) != null) {
                 labelObject.put(rdf.getPrefixItem("released"), released.get(0));
+            }
+			if (rights.get(0) != null) {
+                labelObject.put(rdf.getPrefixItem("rights"), rights.get(0));
             }
             // set revisions
             labelObject.remove(rdf.getPrefixItem("skos:changeNote"));

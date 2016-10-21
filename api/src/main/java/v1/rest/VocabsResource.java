@@ -732,7 +732,7 @@ public class VocabsResource {
                 + "?vocabulary ?p ?o. "
                 + "?vocabulary dc:identifier ?identifier. "
                 + "FILTER (?identifier=\"$identifier\") "
-                + "FILTER (?p IN (dc:title,dc:description,dc:language,ls:hasReleaseType,dct:license)) "
+                + "FILTER (?p IN (dc:title,dc:description,dc:language,ls:hasReleaseType,dct:license,dc:rights)) "
                 + "}";
         update = update.replace("$identifier", id);
         return update;
