@@ -31,11 +31,11 @@ nano /etc/crontab
 
 ### set cronjob
 
-#### jede minute
+#### every minute
 ```
 * * * * * root /opt/dump.sh
 ```
-#### zweimal am Tag (11:59 und 23:59)
+#### two times a day (11:59h and 23:59h)
 ```
 59 11 * * * root /opt/dump.sh
 59 23 * * * root /opt/dump.sh
