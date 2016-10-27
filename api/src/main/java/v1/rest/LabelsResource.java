@@ -57,6 +57,7 @@ import org.eclipse.rdf4j.repository.RepositoryException;
 import org.json.simple.parser.JSONParser;
 import v1.utils.inherit.InheritFromVocab;
 import v1.utils.retcat.RetcatItem;
+import v1.utils.validatejson.ValidateJSONObject;
 
 @Path("/labels")
 public class LabelsResource {
@@ -694,6 +695,9 @@ public class LabelsResource {
 		try {
 			// get variables
 			String item = "ls_lab";
+			// validate
+			ValidateJSONObject.validateLabel(json);
+			// set uuid
 			String itemID = UniqueIdentifier.getUUID();
 			// parse data
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
@@ -737,6 +741,8 @@ public class LabelsResource {
 			throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
 			String item = "ls_lab";
+			// validate
+			ValidateJSONObject.validateLabel(json);
 			// check if resource exists
 			String queryExist = GeneralFunctions.getAllElementsForItemID(item, label);
 			List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);

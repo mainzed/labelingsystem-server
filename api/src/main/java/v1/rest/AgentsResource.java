@@ -45,6 +45,7 @@ import org.json.simple.JSONObject;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import v1.utils.validatejson.ValidateJSONObject;
 
 /**
  * REST API for Vocabularies
@@ -525,9 +526,11 @@ public class AgentsResource {
         try {
             // get variables
             String item = "ls_age";
+			// validate
+			ValidateJSONObject.validateAgent(json);
             // parse name
-            JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
-            String itemID = (String) jsonObject.get("id");
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
+			String itemID = (String) jsonObject.get("id");
             // create triples
             json = Transformer.agent_POST(json, itemID);
             String triples = createAgentSPARQLUPDATE(item, itemID);
@@ -562,6 +565,8 @@ public class AgentsResource {
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             String item = "ls_age";
+			// validate
+			ValidateJSONObject.validateAgent(json);
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, agent);
             List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);

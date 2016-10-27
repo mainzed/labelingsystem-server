@@ -49,6 +49,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.parser.JSONParser;
+import v1.utils.validatejson.ValidateJSONObject;
 
 @Path("/vocabs")
 public class VocabsResource {
@@ -592,6 +593,9 @@ public class VocabsResource {
         try {
             // get variables
             String item = "ls_voc";
+			// validate
+			ValidateJSONObject.validateVocabulary(json);
+			// set uuid
             String itemID = UniqueIdentifier.getUUID();
             // parse creator
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
@@ -630,6 +634,8 @@ public class VocabsResource {
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             String item = "ls_voc";
+			// validate
+			ValidateJSONObject.validateVocabulary(json);
             // check if resource exists
             String queryExist = GeneralFunctions.getAllElementsForItemID(item, vocabulary);
             List<BindingSet> resultExist = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryExist);

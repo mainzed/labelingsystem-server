@@ -93,17 +93,6 @@ public class Transformer {
 			licenseArrayNew.add(licenseObject);
 			vocabularyObject.put(rdf.getPrefixItem("dct:license"), licenseArrayNew);
 		}
-		// change origin
-		String origin = (String) vocabularyObject.get("origin");
-		if (origin != null) {
-			vocabularyObject.remove("origin");
-			JSONObject tmpObject = new JSONObject();
-			tmpObject.put("type", "uri");
-			tmpObject.put("value", origin);
-			JSONArray arrayNew = new JSONArray();
-			arrayNew.add(tmpObject);
-			vocabularyObject.put(rdf.getPrefixItem("dc:rights"), arrayNew);
-		}
 		// change releasetype
 		String releaseString = (String) vocabularyObject.get("releaseType");
 		if (releaseString != null && !releaseString.isEmpty()) {
@@ -237,18 +226,6 @@ public class Transformer {
 					String value = (String) obj.get("value");
 					if (fields == null || fields.contains("license")) {
 						vocabularyObject.put("license", value);
-					}
-				}
-			}
-			// change dc:rights
-			JSONArray rightsArray = (JSONArray) vocabularyObject.get(rdf.getPrefixItem("dc:rights"));
-			if (rightsArray != null && !rightsArray.isEmpty()) {
-				for (Object element : rightsArray) {
-					vocabularyObject.remove(rdf.getPrefixItem("dc:rights"));
-					JSONObject obj = (JSONObject) element;
-					String value = (String) obj.get("value");
-					if (fields == null || fields.contains("origin")) {
-						vocabularyObject.put("origin", value);
 					}
 				}
 			}
@@ -1328,9 +1305,6 @@ public class Transformer {
 					}
 					if (item.getReleased() != null) {
 						labelObject.put(rdf.getPrefixItem("released"), item.getReleased());
-					}
-					if (item.getOwner() != null) {
-						labelObject.put(rdf.getPrefixItem("origin"), item.getOwner());
 					}
 				}
 			}

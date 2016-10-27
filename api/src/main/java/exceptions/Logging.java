@@ -72,6 +72,10 @@ public class Logging {
         if (exception.toString().contains("NullPointerException")) {
             code = "1";
             userMessage = "some value is not available";
+        } else if (exception.toString().contains("ValidateJSONObjectException")) {
+            code = "2";
+			String[] ex = exception.toString().split(": ");
+            userMessage = "validate JSON object exception: " + ex[1];
         }
         // output
         jsonobj_error.put("errors", jsonobj_error_data);
