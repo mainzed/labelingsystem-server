@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Labeling System prefLabel examples</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100italic,900italic,900,700italic,700,500italic,500,400italic,300italic,300,100);
+* { font-family: "Roboto",sans-serif; }
+.ls-div { border: 1px solid; background: lightgrey; width:250px; padding:10px; font-size: 16px;}
+.ls-div-language { font-style: italic; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Labeling System prefLabel examples</h1>
+<h2>uses <a href="http://143.93.114.135/api/">API.v1</a> & jquery</h2>
+<p>&nbsp;</p>
+<div id="div1" class="ls-div" lswidgettype="detail-label" dataid="af6a3be9-aa20-4480-875f-58f7365b2ad5"></div>
+<p></p>
+<div id="div2" class="ls-div" lswidgettype="detail-label" dataid="7afff40f-3e17-4272-aedd-e66b78c4756c"></div>
+<script>
+!function(elements) {
+    for (var i=0; i<elements.length; i++) {
+		var query = "http://143.93.114.135/api/v1/labels/:id";
+	    query = query.replace(":id",$(elements[i]).attr("dataid"));
+	    $.ajax({
+			url: query,
+			async: false,
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error(errorThrown);
+			},
+		    success:function(response) {
+		      	try {
+					response = JSON.parse(response);
+				} catch (e) {}
+		      	var labels = response.prefLabels;
+		      	for (item in labels) {
+		      		if (labels[item]["isThumbnail"]) {
+		      			$(elements[i]).append('<p>'+labels[item]["value"]+' <span class="ls-div-language">'+labels[item]["lang"]+'</span></p>');
+		      		}
+		      	}
+		    }
+		 });
+	}
+}($("div[lswidgettype='detail-label']"));
+</script>
+</body>
+</html>

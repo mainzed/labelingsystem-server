@@ -1,0 +1,102 @@
+@charset "utf-8";
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100italic,900italic,900,700italic,700,500italic,500,400italic,300italic,300,100);
+body {
+	color: #eee;
+	font-family: "Roboto",sans-serif;
+	font-weight: 400;
+	list-style: outside none none;
+	text-decoration: none;
+	margin: 25;
+	padding: 0;
+	background-color: #333;
+}
+table, th, td {
+	border: 1px solid #dddddd;
+	border-collapse: collapse;
+}
+table {
+	border-radius: 5;
+	border-spacing: 0;
+	font-size: 14px;
+	font-weight: 300;
+	width: 100%;
+	table-layout: fixed;
+}
+th {
+	background-color: #bbbbbb;
+	padding: 7px;
+	color: black;
+	text-align:left;
+}
+td {
+	padding: 7px;
+	vertical-align: top;
+	text-align:left;
+}
+tr {
+	line-height:20px;
+}
+tr.nobg {
+	background-color: #ffffff;
+	color: black;
+}
+tr.bg {
+	background-color: #eeeeee;
+	color: black;
+}
+.btn-default {
+    background-color: #eee;
+    border-color: #000;
+    color: #333;
+}
+.btn {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857;
+    margin-bottom: 0;
+    padding: 6px 12px;
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    margin-right:10px;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+.resultsleft {
+	float:left;
+	margin:10px;
+	font-weight:500;
+	font-size:14px;
+}
+.resultsright {
+	float:right;
+	margin:10px;
+	font-weight:300;
+	font-size:14px;
+}
+#searchstring {
+	padding:12px;
+	margin-bottom: 12px;
+	font-family: monospace;
+	height: 15px;
+	width: 50%;
+	color: black;
+	border: 1px solid #bbb;
+	border-radius: 4px;
+	line-height: 1.42857;
+}
+a:link    {color: #08c;text-decoration:underline}
+a:visited {color: #08c;text-decoration:underline}
+a:hover   {color: #08c;text-decoration:none}
+a.hover   {color: #08c;text-decoration:none}
+a:active  {color: #08c;text-decoration:underline}
+
+a.grey:link {color: #fff;text-decoration:underline}
+a.grey:visited {color: #fff;text-decoration:underline}
+a.grey:hover   {color: #fff;text-decoration:none}
+a.grey.hover   {color: #fff;text-decoration:none}
+a.grey:active  {color: #fff;text-decoration:underline}

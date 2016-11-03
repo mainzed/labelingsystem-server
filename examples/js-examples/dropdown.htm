@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Labeling System dropdown examples</title>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<style>
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100italic,900italic,900,700italic,700,500italic,500,400italic,300italic,300,100);
+* { font-family: "Roboto",sans-serif; }
+select { font-size: 16px; border: 1px solid; width: 300px; height:30px; }
+</style>
+</head>
+<body>
+<h1>Labeling System dropdown examples</h1>
+<h2>uses <a href="http://143.93.114.135/api/">API.v1</a> & jquery</h2>
+<p>&nbsp;</p>
+<p>dropdown lookup for all labels in the vocabulary "bones" in the system</p>
+<select id="vocabs" lswidgettype="dropdown" dataid="" datatype="vocabulary"></select>
+<p>dropdown lookup for all vocabularies in the system</p>
+<select id="bones" lswidgettype="dropdown" dataid="f1c512e8-a13a-410e-8c8b-d369c0532f83" datatype="label"></select>
+<script>
+!function(elements) {
+    for (var i=0; i<elements.length; i++) {
+	    var query;
+	    if ($(elements[i]).attr("datatype")==="vocabulary") {
+	    	query = "http://143.93.114.135/api/v1/vocabs";
+	    } else if ($(elements[i]).attr("datatype")==="label") {
+	    	query = "http://143.93.114.135/api/v1/labels?vocab=:id";
+	    	query = query.replace(":id",$(elements[i]).attr("dataid"));
+	    }
+	    $.ajax({
+			headers: {
+    			Accept: "application/json;charset=UTF-8"
+  			},
+			type : 'GET',
+			url: query,
+			async: false,
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.error(errorThrown);
+			},
+		    success:function(response) {
+		      	try {
+					response = JSON.parse(response);
+				} catch (e) {}
+		      	if ($(elements[i]).attr("datatype")==="vocabulary") {
+			      	for (item in response) {
+			      		var value = response[item]["title"]["value"];
+			      		var lang = response[item]["title"]["lang"];
+						var id = response[item]["id"];
+			      		$(elements[i]).append('<option value="'+id+'">'+value+"@"+lang+'</option>');
+			      	}
+			    } else if ($(elements[i]).attr("datatype")==="label") {
+			      	for (item in response) {
+			      		var labels = response[item]["prefLabels"];
+			      		for (label in labels) {
+				      		if (labels[label]["isThumbnail"]) {
+					      		var value = labels[label]["value"];
+					      		var lang = labels[label]["lang"];
+								var id = labels[label]["id"];
+					      		$(elements[i]).append('<option value="'+id+'">'+value+"@"+lang+'</option>');
+					      	}
+				      	}
+			      	}
+			    }
+		    }
+		});
+	}
+}($("select[lswidgettype='dropdown']"));
+</script>
+</body>
+</html>
