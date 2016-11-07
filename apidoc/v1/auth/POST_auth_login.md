@@ -1,6 +1,6 @@
 # Authentification
 
-    GET auth/login
+    POST auth/login
 
 ## Description
 
@@ -45,7 +45,7 @@ Login to the editor mode.
 ## Example
 **Request**
 
-    Code Example
+    none
 
 **Response**
 
