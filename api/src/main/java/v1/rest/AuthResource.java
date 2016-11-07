@@ -204,7 +204,7 @@ public class AuthResource {
     @GET
     @Path("/users")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getUserList(@QueryParam("user") String user) {
+    public Response getUserList() {
         try {
             JSONArray users = SQlite.getUsersInfo();
             return Response.ok(users).header("Content-Type", "application/json;charset=UTF-8").build();
