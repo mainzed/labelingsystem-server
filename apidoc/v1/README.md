@@ -197,8 +197,8 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 - **[<code>POST</code> auth/newuser](auth/POST_auth_newuser.md)**
 - **[<code>POST</code> auth/deactivate](auth/POST_auth_deactivate.md)**
 - **[<code>POST</code> auth/activate](auth/POST_auth_activate.md)**
-- **[<code>POST</code> auth/hash](auth/POST_auth_hash.md)**
-- **[<code>GET</code> auth/users](auth/POST_auth_users.md)**
+- **[<code>GET</code> auth/hash](auth/GET_auth_hash.md)**
+- **[<code>GET</code> auth/users](auth/GET_auth_users.md)**
 
 ### System functions
 
