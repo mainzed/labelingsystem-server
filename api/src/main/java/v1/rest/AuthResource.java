@@ -117,8 +117,7 @@ public class AuthResource {
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             if (e.toString().contains("AccessDeniedException")) {
-                return Response.status(Response.Status.FORBIDDEN).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
-                        .header("Content-Type", "application/json;charset=UTF-8").build();
+                return Response.status(Response.Status.FORBIDDEN).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
                         .header("Content-Type", "application/json;charset=UTF-8").build();
