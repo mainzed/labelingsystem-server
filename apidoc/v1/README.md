@@ -191,14 +191,14 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 
 ### Authentication
 
-- **[<code>POST</code> auth/login](POST_auth_login.md)**
-- **[<code>GET</code> auth/status](GET_auth_status)**
-- **[<code>POST</code> auth/logout](POST_auth_logout)**
-- **[<code>POST</code> auth/newuser](POST_auth_newuser)**
-- **[<code>POST</code> auth/deactivate](POST_auth_deactivate)**
-- **[<code>POST</code> auth/activate](POST_auth_activate)**
-- **[<code>POST</code> auth/hash](POST_auth_hash)**
-- **[<code>GET</code> auth/users](POST_auth_users)**
+- **[<code>POST</code> auth/login](auth/POST_auth_login.md)**
+- **[<code>GET</code> auth/status](auth/GET_auth_status.md)**
+- **[<code>POST</code> auth/logout](auth/POST_auth_logout.md)**
+- **[<code>POST</code> auth/newuser](auth/POST_auth_newuser.md)**
+- **[<code>POST</code> auth/deactivate](auth/POST_auth_deactivate.md)**
+- **[<code>POST</code> auth/activate](auth/POST_auth_activate.md)**
+- **[<code>POST</code> auth/hash](auth/POST_auth_hash.md)**
+- **[<code>GET</code> auth/users](auth/POST_auth_users.md)**
 
 ### System functions
 
