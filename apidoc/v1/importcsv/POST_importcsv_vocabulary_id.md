@@ -1,4 +1,4 @@
-# Authentification
+# Import CSV
 
     POST importcsv/vocabulary/:id
 

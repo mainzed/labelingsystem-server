@@ -213,7 +213,7 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 
 #### CSV upload
 
-- **[<code>POST</code> importcsv/vocabulary/:id](POST_importcsv_vocabulary_id.md)**
+- **[<code>POST</code> importcsv/vocabulary/:id](importcsv/POST_importcsv_vocabulary_id.md)**
 
 ***
 

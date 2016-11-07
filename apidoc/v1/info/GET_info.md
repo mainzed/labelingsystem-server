@@ -1,4 +1,4 @@
-# Authentification
+# Information
 
     GET info
 

@@ -1,4 +1,4 @@
-# Authentification
+# Dump
 
     GET dump/repository/:id
 
