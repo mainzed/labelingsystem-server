@@ -204,17 +204,16 @@ Currently, return format for all endpoints is [JSON](http://json.org/ "JSON").
 
 #### information
 
-- **[<code>GET</code> info](GET_info)**
+- **[<code>GET</code> info](info/GET_info.md)**
 
 #### dump
 
-- **[<code>GET</code> dump](GET_dump)**
-- **[<code>GET</code> dump/repository/id](GET_dump_repository_id)**
+- **[<code>GET</code> dump](dump/GET_dump.md)**
+- **[<code>GET</code> dump/repository/:id](dump/GET_dump_repository_id.md)**
 
 #### CSV upload
 
-- **[<code>POST</code> importcsv/mode/start/creator/:creator/vocabulary/:vocabID/validator/:validator](POST_importcsv)**
-- **[<code>GET</code> importcsv/mode/:mode](GET_importcsv)**
+- **[<code>POST</code> importcsv/vocabulary/:id](POST_importcsv_vocabulary_id.md)**
 
 ***
 
