@@ -1,12 +1,7 @@
 package v1.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import exceptions.AccessDeniedException;
 import exceptions.Logging;
-import exceptions.ResourceNotAvailableException;
 import java.util.List;
 import v1.utils.crypt.Crypt;
 import v1.utils.db.SQlite;
@@ -19,7 +14,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.eclipse.rdf4j.query.BindingSet;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import rdf.RDF;
@@ -143,48 +137,6 @@ public class AuthResource {
         }
     }
 
-    @POST
-    @Path("/newuser")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response addNewUser(@FormParam("user") String user, @FormParam("pwd") String pwd) {
-        try {
-            Boolean res = SQlite.insertUser(user, pwd);
-            JSONObject jsonOut = new JSONObject();
-            return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }
-
-    @POST
-    @Path("/deactivate")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response deactivateUser(@FormParam("user") String user) {
-        try {
-            Boolean res = SQlite.deactivateUser(user);
-            JSONObject jsonOut = new JSONObject();
-            return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }
-
-    @POST
-    @Path("/activate")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response activateUser(@FormParam("user") String user) {
-        try {
-            Boolean res = SQlite.activateUser(user);
-            JSONObject jsonOut = new JSONObject();
-            return Response.status(Response.Status.CREATED).entity(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }
-
     @GET
     @Path("/hash")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -195,19 +147,6 @@ public class AuthResource {
             JSONObject jsonOut = new JSONObject();
             jsonOut.put("hash", hash);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
-                    .header("Content-Type", "application/json;charset=UTF-8").build();
-        }
-    }
-
-    @GET
-    @Path("/users")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public Response getUserList() {
-        try {
-            JSONArray users = SQlite.getUsersInfo();
-            return Response.ok(users).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.AuthResource"))
                     .header("Content-Type", "application/json;charset=UTF-8").build();

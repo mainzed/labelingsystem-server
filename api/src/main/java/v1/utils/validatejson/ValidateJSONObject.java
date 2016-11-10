@@ -46,6 +46,15 @@ public class ValidateJSONObject {
 		if (jsonObject.containsKey("title")) {
 			jsonObject.remove("title");
 		}
+		if (jsonObject.containsKey("pwd")) {
+			jsonObject.remove("pwd");
+		}
+		if (jsonObject.containsKey("status")) {
+			jsonObject.remove("status");
+		}
+		if (jsonObject.containsKey("role")) {
+			jsonObject.remove("role");
+		}
 		if (!jsonObject.isEmpty()) {
 			throw new ValidateJSONObjectException("found unsupported key");
 		}

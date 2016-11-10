@@ -564,6 +564,9 @@ public class Transformer {
 		agentObject.remove("lastName");
 		agentObject.remove("affiliation");
 		agentObject.remove("orcid");
+		agentObject.remove("role");
+		agentObject.remove("status");
+		agentObject.remove("pwd");
 		// add object
 		rdfObject.put(rdf.getPrefixItem("ls_age" + ":" + id), agentObject);
 		return rdfObject.toJSONString();

@@ -127,6 +127,30 @@ public class SQlite {
 			throw new AccessDeniedException(e.toString());
 		}
 	}
+	
+	public static JSONObject getUserInfo(String user_name) throws SQLException, ClassNotFoundException, AccessDeniedException, IOException {
+		JSONObject userObject = new JSONObject();
+		Class.forName(DBDRIVER);
+		try (Connection c = DriverManager.getConnection("jdbc:sqlite:" + ConfigProperties.getPropertyParam("sqlite"))) {
+			try (Statement stmt = c.createStatement()) {
+				String sql = "SELECT * FROM users WHERE user_name = '" + user_name + "';";
+				try (ResultSet rs = stmt.executeQuery(sql)) {
+					while (rs.next()) {
+						userObject.put("username", rs.getString("user_name"));
+						userObject.put("role", rs.getString("role"));
+						if (rs.getString("activation_token").equals("-1")) {
+							userObject.put("status", "active");
+						} else {
+							userObject.put("status", "inactive");
+						}
+					}
+				}
+			}
+			return userObject;
+		} catch (Exception e) {
+			throw new AccessDeniedException(e.toString());
+		}
+	}
 
 	// LOGIN
 	public static boolean setLogin(String user, String role) throws ClassNotFoundException, IOException, NoSuchAlgorithmException {
