@@ -541,7 +541,7 @@ public class Transformer {
 			agentObject.remove("orcid");
 			JSONArray orcidArrayNew = new JSONArray();
 			JSONObject orcidObject = new JSONObject();
-			orcidObject.put("type", "literal");
+			orcidObject.put("type", "uri");
 			orcidObject.put("value", orcidString);
 			orcidArrayNew.add(orcidObject);
 			agentObject.put(rdf.getPrefixItem("dct:publisher"), orcidArrayNew);
@@ -552,7 +552,7 @@ public class Transformer {
 			agentObject.remove("affiliation");
 			JSONArray affiliationArrayNew = new JSONArray();
 			JSONObject affiliationObject = new JSONObject();
-			affiliationObject.put("type", "literal");
+			affiliationObject.put("type", "uri");
 			affiliationObject.put("value", affiliationString);
 			affiliationArrayNew.add(affiliationObject);
 			agentObject.put(rdf.getPrefixItem("dct:isPartOf"), affiliationArrayNew);
