@@ -709,6 +709,8 @@ public class LabelsResource {
 			// input triples
 			RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
+            // trigger for create statistics
+            Transformer.writeVocabularyStatisticsToDatabase(vocabID);
 			// get result als json
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -794,6 +796,8 @@ public class LabelsResource {
 			// general label action
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteItemsSPARQLUPDATE(label));
 			RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
+            // trigger for create statistics
+            Transformer.writeVocabularyStatisticsToDatabase(vocabID);
 			// get result als json
 			rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			query = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -826,9 +830,19 @@ public class LabelsResource {
 			if (resultExist.size() < 1) {
 				throw new ResourceNotAvailableException("resource " + label + " is not available");
 			}
+            // get vocabulary id
+			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            String query = rdf.getPREFIXSPARQL();
+			query += "SELECT ?vid WHERE { ?l dc:identifier ?id. ?l skos:inScheme ?v . ?v dc:identifier ?vid . FILTER (?id = \"" + label + "\") }";
+			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
+			List<String> vidList = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "vid");
+			String vid = vidList.get(0);
 			// delete data
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), deleteLabelSPARQLUPDATE(label));
-			String out = Transformer.empty_JSON("label").toJSONString();
+            // trigger for create statistics
+            Transformer.writeVocabularyStatisticsToDatabase(vid);
+            // get result as json
+   			String out = Transformer.empty_JSON("label").toJSONString();
 			return Response.status(Response.Status.CREATED).entity(out).build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.LabelsResource"))

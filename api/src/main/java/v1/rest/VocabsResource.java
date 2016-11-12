@@ -606,6 +606,8 @@ public class VocabsResource {
             // input triples
             RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
             RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
+            // trigger for create statistics
+            Transformer.writeVocabularyStatisticsToDatabase(itemID);
             // get result als json
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             String query = GeneralFunctions.getAllElementsForItemID(item, itemID);

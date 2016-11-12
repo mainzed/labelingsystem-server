@@ -1,6 +1,5 @@
 package servlet;
 
-import exceptions.Logging;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -9,7 +8,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 import v1.rest.InfoResource;
 import v1.utils.config.ConfigProperties;
@@ -24,7 +22,7 @@ public class Main extends HttpServlet {
             JSONObject versionObject = new JSONObject();
             versionObject.put("1.0", ConfigProperties.getPropertyParam("api") + "/v1");
             outObject.put("versions", versionObject);
-            outObject.put("wiki", "https://github.com/labelingsystem/server");
+            outObject.put("wiki", "https://github.com/mainzed/labelingsystem-server");
             // get last build data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
