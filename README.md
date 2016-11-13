@@ -4,13 +4,17 @@ The Labeling System consists of several components: the frontend web-app, the se
 
 # Getting Started
 
+## Data Model
+
+https://github.com/mainzed/labelingsystem-ontology
+
 ## Server Components
 
 ### api
 
 RESTful API for Labeling System applications.
 
-API Documentation (Version 1): https://github.com/labelingsystem/server/tree/rdf4j/apidoc/v1
+API Documentation (Version 1): https://github.com/mainzed/labelingsystem-server/tree/rdf4j/apidoc/v1
 
 ### item
 
@@ -70,20 +74,13 @@ nginx and Tomcat
 7. set **SQLite** database into db folder and set full r/w rights
 8. deploy war files for triplestore (**rdf4j-server.war**, **rdf4j-workbench.war**)
 9. create **labelingsystem** repository in RDF4J
+10. fill **labelingsystem** repository with predefined values
 10. configure API and ITEM in their WAR packages using **config.properties**
 11. deploy war files for ls backend (**api.war**, **item.war**)
 12. configure frontend app and set host for API
 13. deploy Labeling System frontend app
-
-## Ontology
-
-- https://github.com/labelingsystem-showcase/ls-core
-- https://github.com/labelingsystem-showcase/ls-reference
-
-## API usage examples
-
-- https://github.com/labelingsystem-showcase/js-examples
-- https://github.com/labelingsystem-showcase/sparqlsearch
+14. copy dump script
+15. start dump cron job
 
 ## Development Hints
 
