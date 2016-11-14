@@ -1,0 +1,87 @@
+@prefix ls-reference: <http://labeling.link/docs/ls/reference#>.
+@prefix ls: <http://labeling.link/docs/ls/core#>.
+@prefix ls_voc: <http://143.93.114.135/item/vocabulary/>.
+@prefix ls_lab: <http://143.93.114.135/item/label/>.
+@prefix ls_age: <http://143.93.114.135/item/agent/>.
+@prefix ls_rev: <http://143.93.114.135/item/revision/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix prov: <http://www.w3.org/ns/prov#>.
+@prefix dc: <http://purl.org/dc/elements/1.1/>.
+
+ls_age:admin a foaf:Agent, ls:Agent;
+	dc:identifier "admin";
+	foaf:firstName "Florian";
+	foaf:lastName "Thiery";
+	dct:publisher <http://orcid.org/0000-0002-3246-3531>;
+	dct:isPartOf <http://d-nb.info/gnd/1063654211>.
+
+ls-reference: a owl:Ontology;
+	rdfs:label "Labeling System Ontology"@en;
+	dct:created "2016-11-03"^^xsd:date;
+	dct:description "A RDF ontology describing the Labeling System"@en;
+	owl:versionInfo "Alperton Edition";
+	dct:creator "Florian Thiery M.Sc., Mainz Centre for Digitality in the Humanities and Cultural Studies";
+	dct:licence <http://creativecommons.org/licenses/by/4.0/>;
+	rdfs:seeAlso <http://labeling.link/docs/ls/reference/>.
+ls:Agent a owl:Class;
+	rdfs:label "Acting Agent"@en;
+	owl:equivalentClass foaf:Agent;
+	dc:identifier rdfs:Literal;
+	foaf:title rdfs:Literal;
+	foaf:firstName rdfs:Literal;
+	foaf:lastName rdfs:Literal;
+	dct:publisher rdfs:Resource;
+	dct:isPartOf rdfs:Resource.
+ls:Vocabulary a owl:Class;
+	rdfs:label "Controlled Vocabulary"@en;
+	owl:equivalentClass skos:ConceptScheme;
+	dc:identifier rdfs:Literal;
+	dct:creator ls:Agent;
+	dc:creator rdfs:Literal;
+	# textual description
+	dc:title rdfs:Literal;
+	dc:description rdfs:Literal;
+	dc:language rdfs:Literal;
+	dc:created rdfs:Literal;
+	dct:license rdfs:Resource;
+	dc:modified rdfs:Literal;
+	ls:released rdfs:Literal;
+	ls:hasReleaseType ls:ReleaseType.
+ls:Label a owl:Class;
+	rdfs:label "Labeling System Label"@en;
+	owl:equivalentClass skos:Concept;
+	dc:identifier rdfs:Literal;
+	dct:creator rdfs:Resource;
+	dc:creator rdfs:Literal;
+	skos:inScheme skos:ConceptScheme;
+	ls:thumbnail rdfs:Literal;
+	dc:language rdfs:Literal;
+	skos:scopeNote rdfs:Literal;
+	skos:prefLabel rdfs:Literal;
+	skos:broader skos:Concept;
+	skos:narrower skos:Concept;
+	skos:related skos:Concept;
+	skos:broadMatch skos:Concept;
+	skos:narrowMatch skos:Concept;
+	skos:relatedMatch skos:Concept;
+	skos:closeMatch skos:Concept;
+	skos:exactMatch skos:Concept;
+	rdfs:seeAlso rdfs:Resource;
+	dc:created rdfs:Literal;
+	dc:modified rdfs:Literal;
+	skos:changeNote ls:Revision.
+ls:Revision a owl:Class;
+	rdfs:label "Labeling System Revision"@en;
+	owl:equivalentClass prov:Activity;
+	dc:identifier rdfs:Literal;
+	ls:action rdfs:Literal;
+	ls:objectType rdfs:Literal;
+	ls:valueBefore rdfs:Literal;
+	ls:valueAfter rdfs:Literal;
+	prov:startedAtTime rdfs:Literal.
