@@ -32,6 +32,7 @@ contains the list of reference thesauri (comma seperated) for each vocabulary.
 
 | vocabulary | retcat |
 | ---------- | ------ |
+|            |        |
 
 ### retcatlist table
 
@@ -39,6 +40,7 @@ contains the vocabulary id for each vocabulary for list search.
 
 | vocabulary | retcat |
 | ---------- | ------ |
+|            |        |
 
 ## TODO
 
