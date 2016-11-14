@@ -574,7 +574,7 @@ public class VocabsResource {
                 }
             }
             String RDFoutput = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + rdf.getModel("RDF/XML");
-            return Response.ok(RDFoutput).build();
+            return Response.ok(RDFoutput).header("Content-Disposition", "attachment; filename=\""+ vocabulary + ".rdf\"").build();
         } catch (Exception e) {
             if (e.toString().contains("ResourceNotAvailableException")) {
                 return Response.status(Response.Status.NOT_FOUND).entity(Logging.getMessageJSON(e, "v1.rest.VocabsResource"))
