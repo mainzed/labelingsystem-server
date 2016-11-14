@@ -65,22 +65,24 @@ nginx and Tomcat
 
 ### How to set-up the server?
 
-1. install **CentOS**
-2. install **nginx**
-3. install **OpenJDK**
-4. install **Tomcat**
-5. configure nginx (Port 80) and Tomcat (Port 8080)
-6. create folders and set r/w rights for Tomcat role
-7. set **SQLite** database into db folder and set full r/w rights
-8. deploy war files for triplestore (**rdf4j-server.war**, **rdf4j-workbench.war**)
-9. create **labelingsystem** repository in RDF4J
-10. fill **labelingsystem** repository with predefined values
-10. configure API and ITEM in their WAR packages using **config.properties**
-11. deploy war files for ls backend (**api.war**, **item.war**)
-12. configure frontend app and set host for API
-13. deploy Labeling System frontend app
-14. copy dump script
-15. start dump cron job
+* install **CentOS**
+* install **nginx**
+* install **OpenJDK**
+* install **Tomcat**
+* configure nginx (Port 80) and Tomcat (Port 8080)
+* create folders and set r/w rights for Tomcat role
+* copy dump script to /opt folder (if data is not in opt folder, change paths in shell script)
+* start dump cron job
+* get hashed admin pwd via /hash and write it to sqlite database
+* copy **SQLite** database into db folder and set full r/w rights (chmod 777)
+* deploy war files for triplestore (**rdf4j-server.war**, **rdf4j-workbench.war**)
+* create **labelingsystem** repository in RDF4J
+* modify **default triples**
+* fill **labelingsystem** repository with default triples
+* configure API and ITEM in their WAR packages using **config.properties**
+* deploy war files for ls backend (**api.war**, **item.war**)
+* configure frontend app and set host for API
+* deploy Labeling System frontend app
 
 ## Development Hints
 
