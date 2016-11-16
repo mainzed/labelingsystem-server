@@ -138,8 +138,6 @@ public class LabelsResource {
 			List<String> s = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "s");
 			List<String> p = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
 			List<String> o = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "o");
-			System.out.print("querytime: ");
-			System.out.println(System.currentTimeMillis() - ctm_start);
 			if (result.size() < 1) {
 				throw new ResourceNotAvailableException("resource is not available");
 			}
@@ -167,8 +165,6 @@ public class LabelsResource {
 					outArray.add(tmp);
 				}
 			}
-			System.out.print("finaltime: ");
-			System.out.println(System.currentTimeMillis() - ctm_start);
 			if (acceptHeader.contains("application/json")) {
 				if (pretty) {
 					JsonParser parser = new JsonParser();
