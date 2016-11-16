@@ -21,6 +21,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import v1.utils.transformer.Transformer;
 
 @Path("/importcsv")
 public class ImportcsvResource {
@@ -93,7 +94,7 @@ public class ImportcsvResource {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response csvUploadDirectResponse(@FormDataParam("fileName") InputStream fileInputStream, @FormDataParam("fileName") FormDataContentDisposition contentDispositionHeader, @PathParam("vocab") String VOCAB) {
-		try {;
+		try {
 			vocab = VOCAB;
 			validator = false;
 			SHARE_WEB = ConfigProperties.getPropertyParam("share_web");
@@ -124,6 +125,9 @@ public class ImportcsvResource {
 			if (CSV.JSON_STRING.contains("errors")) {
 				return Response.status(Response.Status.BAD_REQUEST).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
 			} else {
+				// trigger for create statistics
+				Transformer.writeVocabularyStatisticsToDatabase(vocab);
+				// output
 				return Response.status(200).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		} catch (Exception e) {
