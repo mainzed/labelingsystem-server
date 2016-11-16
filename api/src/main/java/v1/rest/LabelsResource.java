@@ -80,7 +80,8 @@ public class LabelsResource {
 			@QueryParam("vocab") String vocab,
 			@QueryParam("equalConcepts") String equalConcepts,
 			@QueryParam("revisions") String revisions,
-			@QueryParam("creatorInfo") String creatorInfo)
+			@QueryParam("creatorInfo") String creatorInfo,
+			@QueryParam("draft") String draft)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
 			// QUERY STRING
@@ -93,9 +94,12 @@ public class LabelsResource {
 					+ "?s dc:identifier ?identifier . "
 					+ "OPTIONAL { ?s dc:creator ?creator . } " // because of sorting, filtering
 					+ "OPTIONAL { ?s skos:prefLabel ?prefLabel . } " // because of sorting, filtering
-					+ "OPTIONAL { ?s skos:inScheme ?vocab . } " // because of filtering
+					+ "?s skos:inScheme ?vocab . " // because of filtering
 					+ "OPTIONAL { ?s ls:hasContext ?context . } "; // because of filtering
 			// FILTERING
+			if (draft == null) {
+				query += "?vocab ls:hasReleaseType ls:Public . ";
+			}
 			if (creator != null) {
 				query += "FILTER(?creator=\"" + creator + "\") ";
 			}
