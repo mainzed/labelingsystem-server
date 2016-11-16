@@ -21,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 public class RDF {
 
     private Model model = null;
-    private final String PREFIX_LABELINGSYSTEM = "http://labeling.i3mainz.hs-mainz.de/vocab#"; // !!! CHANGE !!!
+    private final String PREFIX_LABELINGSYSTEM = "http://labeling.link/docs/ls/core#";
     private final String PREFIX_SKOS = "http://www.w3.org/2004/02/skos/core#";
     private final String PREFIX_DCTERMS = "http://purl.org/dc/terms/";
     private final String PREFIX_DCELEMENTS = "http://purl.org/dc/elements/1.1/";
@@ -37,7 +37,6 @@ public class RDF {
     private String Instance_LABEL_ITEM = "http://$host/item/label/";
     private String Instance_AGENT_ITEM = "http://$host/item/agent/";
     private String Instance_REVISION_ITEM = "http://$host/item/revision/";
-    private String Instance_RETCATS_ITEM = "http://$host/item/retcats/";
     private String PREFIXSPARQL = ""
             // ls vocabulary
             + "PREFIX ls: <" + PREFIX_LABELINGSYSTEM + "> "
@@ -46,7 +45,6 @@ public class RDF {
             + "PREFIX ls_lab: <" + Instance_LABEL_ITEM + "> "
             + "PREFIX ls_age: <" + Instance_AGENT_ITEM + "> "
             + "PREFIX ls_rev: <" + Instance_REVISION_ITEM + "> "
-            + "PREFIX ls_ret: <" + Instance_RETCATS_ITEM + "> "
             // other ontologies
             + "PREFIX skos: <" + PREFIX_SKOS + "> "
             + "PREFIX rdf: <" + PREFIX_RDF + "> "
@@ -78,7 +76,6 @@ public class RDF {
         Instance_LABEL_ITEM = Instance_LABEL_ITEM.replace("$host", HOST);
         Instance_AGENT_ITEM = Instance_AGENT_ITEM.replace("$host", HOST);
         Instance_REVISION_ITEM = Instance_REVISION_ITEM.replace("$host", HOST);
-        Instance_RETCATS_ITEM = Instance_RETCATS_ITEM.replace("$host", HOST);
         PREFIXSPARQL = PREFIXSPARQL.replace("$host", HOST);
     }
 
@@ -119,8 +116,6 @@ public class RDF {
             return shortDesc.replace("ls_age:", Instance_AGENT_ITEM);
         } else if (shortDesc.startsWith("ls_rev:")) {
             return shortDesc.replace("ls_rev:", Instance_REVISION_ITEM);
-        } else if (shortDesc.startsWith("ls_ret:")) {
-            return shortDesc.replace("ls_ret:", Instance_RETCATS_ITEM);
         } else {
             return shortDesc;
         }
