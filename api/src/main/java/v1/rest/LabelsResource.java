@@ -97,7 +97,11 @@ public class LabelsResource {
 					+ "?s skos:inScheme ?vocab . " // because of filtering
 					+ "OPTIONAL { ?s ls:hasContext ?context . } "; // because of filtering
 			// FILTERING
-			if (draft == null) {
+			if (draft != null) {
+				if (draft.equals("false")) {
+					query += "?vocab ls:hasReleaseType ls:Public . ";
+				}
+			} else {
 				query += "?vocab ls:hasReleaseType ls:Public . ";
 			}
 			if (creator != null) {
