@@ -93,21 +93,24 @@ public class Retcat_GeoNames {
         }
         in.close();
         // parse xml
-        int startTagName = response.indexOf("<name>");
+        String name = "";
+		int startTagName = response.indexOf("<name>");
         int endTagName = response.indexOf("</name>");
-        String name = response.substring(startTagName, endTagName).replace("<name>", "");
+		if (startTagName != -1 && endTagName != -1) {
+			name = response.substring(startTagName, endTagName).replace("<name>", "");
+		}
         int startTagAN1 = response.indexOf("<adminName1>");
         int endTagAN1 = response.indexOf("</adminName1>");
-        String an1 = response.substring(startTagAN1, endTagAN1).replace("<adminName1>", "");
+		String an1 = "";
+		if (startTagAN1 != -1 && endTagAN1 != -1) {
+			an1 = response.substring(startTagAN1, endTagAN1).replace("<adminName1>", "");
+		}
         int startTagCN = response.indexOf("<countryName>");
         int endTagCN = response.indexOf("</countryName>");
-        String cn = response.substring(startTagCN, endTagCN).replace("<countryName>", "");
-        int startTagLAT = response.indexOf("<lat>");
-        int endTagLAT = response.indexOf("</lat>");
-        String lat = response.substring(startTagLAT, endTagLAT).replace("<lat>", "");
-        int startTagLON = response.indexOf("<lng>");
-        int endTagLON = response.indexOf("</lng>");
-        String lon = response.substring(startTagLON, endTagLON).replace("<lng>", "");
+		String cn = "";
+		if (startTagCN != -1 && endTagCN != -1) {
+			cn = response.substring(startTagCN, endTagCN).replace("<countryName>", "");
+		}
         String desc = an1 + ", " + cn;
         // output
         JSONObject jsonOut = new JSONObject();
