@@ -48,7 +48,7 @@ public class SearchResource {
                 limit = Integer.parseInt(maxhits);
             }
             String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
+            String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
                     + "SELECT ?Subject ?id ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?scheme ?altLabel WHERE { "
                     + "?Subject dc:identifier ?id . "
                     + "?Subject skos:inScheme ?scheme . "

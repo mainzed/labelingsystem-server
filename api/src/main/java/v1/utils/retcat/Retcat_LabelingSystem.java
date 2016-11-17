@@ -28,7 +28,7 @@ public class Retcat_LabelingSystem {
 
     public static Map<String, SuggestionItem> queryAll(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
                 + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?firstName ?lastName ?orcid WHERE { "
                 + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
@@ -175,7 +175,7 @@ public class Retcat_LabelingSystem {
 
     public static Map<String, SuggestionItem> queryVocab(String searchword, String vocabulary) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
                 + "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?firstName ?lastName ?orcid WHERE { "
                  + "?Subject skos:inScheme ?scheme . "
                 + "?scheme dc:title ?schemeTitle . "
@@ -321,7 +321,7 @@ public class Retcat_LabelingSystem {
     public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
         String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
-        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
+        String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
                 + "SELECT * { "
                 + "<" + url + "> ls:thumbnail ?prefLabel. "
                 + "<" + url + "> skos:inScheme ?scheme . "

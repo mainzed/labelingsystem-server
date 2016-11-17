@@ -2071,7 +2071,7 @@ public class Transformer {
         try {
             RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
             // query triplestore
-            String query = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?l ?p ?o WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?l ?p ?o. FILTER (?id = \"" + vocabulary + "\") }";
+            String query = "PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?l ?p ?o WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?l ?p ?o. FILTER (?id = \"" + vocabulary + "\") }";
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> subjects = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "l");
             List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
