@@ -62,8 +62,7 @@ import v1.utils.validatejson.ValidateJSONObject;
 @Path("/labels")
 public class LabelsResource {
 
-	private static String OUTSTRING = "";
-
+	//private static String OUTSTRING = "";
 	@GET
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
 	public Response getLabels(
@@ -84,6 +83,7 @@ public class LabelsResource {
 			@QueryParam("draft") String draft)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			// QUERY STRING
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
@@ -178,7 +178,20 @@ public class LabelsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -194,7 +207,20 @@ public class LabelsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -217,7 +243,20 @@ public class LabelsResource {
 			} else {
 				OUTSTRING = outArray.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -245,6 +284,7 @@ public class LabelsResource {
 			@HeaderParam("Accept-Encoding") String acceptEncoding)
 			throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String item = "ls_lab";
@@ -271,7 +311,20 @@ public class LabelsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -288,7 +341,20 @@ public class LabelsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -313,7 +379,20 @@ public class LabelsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -341,6 +420,7 @@ public class LabelsResource {
 			@HeaderParam("Accept-Encoding") String acceptEncoding)
 			throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
 			String item = "ls_lab";
@@ -366,7 +446,20 @@ public class LabelsResource {
 			} else {
 				OUTSTRING = out.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -387,6 +480,7 @@ public class LabelsResource {
 	@Produces("application/xml;charset=UTF-8")
 	public Response getLabel_XML(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_lab";
 			String query = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -1106,7 +1200,7 @@ public class LabelsResource {
 		return vocabList;
 	}
 
-	private static class FeedReturnStreamingOutput implements StreamingOutput {
+	/*private static class FeedReturnStreamingOutput implements StreamingOutput {
 
 		@Override
 		public void write(OutputStream output) throws IOException, WebApplicationException {
@@ -1116,8 +1210,7 @@ public class LabelsResource {
 				System.out.println(e.toString());
 			}
 		}
-	}
-
+	}*/
 	private static OutputStream GZIP(String input, OutputStream baos) throws IOException {
 		try (GZIPOutputStream gzos = new GZIPOutputStream(baos)) {
 			gzos.write(input.getBytes("UTF-8"));
