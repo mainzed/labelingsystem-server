@@ -41,8 +41,6 @@ import org.json.simple.parser.JSONParser;
 @Path("/revisions")
 public class RevisionsResource {
 
-	private static String OUTSTRING = "";
-
 	@GET
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
 	public Response getRevisions(
@@ -51,6 +49,7 @@ public class RevisionsResource {
 			@QueryParam("pretty") boolean pretty)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			// QUERY STRING
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = rdf.getPREFIXSPARQL();
@@ -98,7 +97,20 @@ public class RevisionsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -114,7 +126,20 @@ public class RevisionsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -137,7 +162,20 @@ public class RevisionsResource {
 			} else {
 				OUTSTRING = outArray.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -158,6 +196,7 @@ public class RevisionsResource {
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
 	public Response getRevision(@PathParam("revision") String revision, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
@@ -180,7 +219,20 @@ public class RevisionsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -197,7 +249,20 @@ public class RevisionsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -222,7 +287,20 @@ public class RevisionsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -244,6 +322,7 @@ public class RevisionsResource {
 	@Produces("application/json;charset=UTF-8")
 	public Response getRevision_JSON(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
@@ -265,7 +344,20 @@ public class RevisionsResource {
 			} else {
 				OUTSTRING = out.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -469,18 +561,6 @@ public class RevisionsResource {
 			} else {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RevisionsResource"))
 						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
-		}
-	}
-
-	private static class FeedReturnStreamingOutput implements StreamingOutput {
-
-		@Override
-		public void write(OutputStream output) throws IOException, WebApplicationException {
-			try {
-				output = GZIP(OUTSTRING, output);
-			} catch (Exception e) {
-				System.out.println(e.toString());
 			}
 		}
 	}

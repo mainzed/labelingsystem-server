@@ -55,8 +55,6 @@ import v1.utils.validatejson.ValidateJSONObject;
 @Path("/agents")
 public class AgentsResource {
 
-	private static String OUTSTRING = "";
-
 	@GET
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
 	public Response getAgents(
@@ -66,6 +64,7 @@ public class AgentsResource {
 			@QueryParam("sort") String sort)
 			throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			// QUERY STRING
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String query = rdf.getPREFIXSPARQL();
@@ -143,7 +142,20 @@ public class AgentsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -159,7 +171,20 @@ public class AgentsResource {
 				} else {
 					OUTSTRING = outArray.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -182,7 +207,20 @@ public class AgentsResource {
 			} else {
 				OUTSTRING = outArray.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -203,6 +241,7 @@ public class AgentsResource {
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/rdf+xml;charset=UTF-8", "text/turtle;charset=UTF-8", "text/n3;charset=UTF-8", "application/ld+json;charset=UTF-8", "application/rdf+json;charset=UTF-8"})
 	public Response getAgent(@PathParam("agent") String agent, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
@@ -230,7 +269,20 @@ public class AgentsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -252,7 +304,20 @@ public class AgentsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -282,7 +347,20 @@ public class AgentsResource {
 				} else {
 					OUTSTRING = out.toString();
 					if (acceptEncoding.contains("gzip")) {
-						return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+						// set outputstream
+						final String OUTSTRING_FINAL = OUTSTRING;
+						StreamingOutput stream;
+						stream = new StreamingOutput() {
+							@Override
+							public void write(OutputStream output) throws IOException, WebApplicationException {
+								try {
+									output = GZIP(OUTSTRING_FINAL, output);
+								} catch (Exception e) {
+									System.out.println(e.toString());
+								}
+							}
+						};
+						return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 					} else {
 						return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 					}
@@ -304,6 +382,7 @@ public class AgentsResource {
 	@Produces("application/json;charset=UTF-8")
 	public Response getAgent_JSON(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
+			String OUTSTRING = "";
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
@@ -317,11 +396,11 @@ public class AgentsResource {
 				rdf.setModelTriple(item + ":" + agent, predicates.get(i), objects.get(i));
 			}
 			JSONObject agentObject = Transformer.agent_GET(rdf.getModel("RDF/JSON"), agent);
-				// get database properties and add to triplestore data
-				JSONObject user = SQlite.getUserInfo(agent);
-				agentObject.put("role", user.get("role"));
-				agentObject.put("status", user.get("status"));
-				String out = agentObject.toJSONString();
+			// get database properties and add to triplestore data
+			JSONObject user = SQlite.getUserInfo(agent);
+			agentObject.put("role", user.get("role"));
+			agentObject.put("status", user.get("status"));
+			String out = agentObject.toJSONString();
 			if (pretty) {
 				JsonParser parser = new JsonParser();
 				JsonObject json = parser.parse(out).getAsJsonObject();
@@ -330,7 +409,20 @@ public class AgentsResource {
 			} else {
 				OUTSTRING = out.toString();
 				if (acceptEncoding.contains("gzip")) {
-					return Response.ok(new FeedReturnStreamingOutput()).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
+					// set outputstream
+					final String OUTSTRING_FINAL = OUTSTRING;
+					StreamingOutput stream;
+					stream = new StreamingOutput() {
+						@Override
+						public void write(OutputStream output) throws IOException, WebApplicationException {
+							try {
+								output = GZIP(OUTSTRING_FINAL, output);
+							} catch (Exception e) {
+								System.out.println(e.toString());
+							}
+						}
+					};
+					return Response.ok(stream).header("Content-Type", "application/json;charset=UTF-8").header("Content-Encoding", "gzip").build();
 				} else {
 					return Response.ok(OUTSTRING).header("Content-Type", "application/json;charset=UTF-8").build();
 				}
@@ -699,18 +791,6 @@ public class AgentsResource {
 				+ "}";
 		update = update.replace("$identifier", id);
 		return update;
-	}
-
-	private static class FeedReturnStreamingOutput implements StreamingOutput {
-
-		@Override
-		public void write(OutputStream output) throws IOException, WebApplicationException {
-			try {
-				output = GZIP(OUTSTRING, output);
-			} catch (Exception e) {
-				System.out.println(e.toString());
-			}
-		}
 	}
 
 	private static OutputStream GZIP(String input, OutputStream baos) throws IOException {

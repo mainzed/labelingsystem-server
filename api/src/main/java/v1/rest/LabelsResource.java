@@ -1200,17 +1200,6 @@ public class LabelsResource {
 		return vocabList;
 	}
 
-	/*private static class FeedReturnStreamingOutput implements StreamingOutput {
-
-		@Override
-		public void write(OutputStream output) throws IOException, WebApplicationException {
-			try {
-				output = GZIP(OUTSTRING, output);
-			} catch (Exception e) {
-				System.out.println(e.toString());
-			}
-		}
-	}*/
 	private static OutputStream GZIP(String input, OutputStream baos) throws IOException {
 		try (GZIPOutputStream gzos = new GZIPOutputStream(baos)) {
 			gzos.write(input.getBytes("UTF-8"));
