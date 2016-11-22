@@ -48,28 +48,27 @@ public class SearchResource {
 			}
 			String url = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
 			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
-					+ "SELECT ?Subject ?id ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?scheme ?altLabel WHERE { "
+					+ "SELECT ?Subject ?id ?prefLabels ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle ?scheme WHERE { "
+					//+ "SELECT ?Subject ?id ?prefLabel WHERE { "
 					+ "?Subject dc:identifier ?id . "
 					+ "?Subject skos:inScheme ?scheme . "
 					+ "?scheme dc:title ?schemeTitle . "
 					+ "?Subject skos:prefLabel ?prefLabel . "
+					+ "?Subject skos:prefLabel ?prefLabels . "
 					+ "?Subject ls:thumbnail ?preferredLabel . "
 					+ "OPTIONAL { ?Subject skos:scopeNote ?scopeNote . } "
-					+ "OPTIONAL { ?Subject skos:altLabel ?altLabel . } "
 					+ "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
 					+ "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} ";
 			if (fields != null) {
 				if (fields.contains("prefLabel")) {
 					sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i')) ";
-				} else if (fields.contains("altLabel")) {
-					sparql += "FILTER(regex(?altLabel, '" + searchword + "', 'i')) ";
 				} else if (fields.contains("scopeNote")) {
 					sparql += "FILTER(regex(?scopeNote, '" + searchword + "', 'i')) ";
 				} else {
-					sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) ";
+					sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) ";
 				}
 			} else {
-				sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i') || regex(?altLabel, '" + searchword + "', 'i')) ";
+				sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) ";
 			}
 			if (vocabulary != null) {
 				sparql += "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) ";
@@ -124,17 +123,10 @@ public class SearchResource {
 				String idValue = (String) idObject.get("value");
 				tmpAutosuggest.setId(idValue);
 				// get Label
-				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabels");
 				String labelValue = (String) labelObject.get("value");
 				String labelLang = (String) labelObject.get("xml:lang");
 				tmpAutosuggest.setLabel(labelValue + "@" + labelLang);
-				// get altLabel
-				JSONObject altLabelObject = (JSONObject) tmpElement.get("altLabel");
-				if (altLabelObject != null) {
-					String altLabelValue = (String) altLabelObject.get("value");
-					String altLabelLang = (String) altLabelObject.get("xml:lang");
-					tmpAutosuggest.setAltLabel(altLabelValue + "@" + altLabelLang);
-				}
 				// get Scheme
 				JSONObject schemeObject = (JSONObject) tmpElement.get("schemeTitle");
 				String schemeValue = (String) schemeObject.get("value");
