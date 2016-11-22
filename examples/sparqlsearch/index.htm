@@ -96,7 +96,8 @@
             type: 'GET',
             url: SEARCHAPI,
             data: {
-                query: encodeURIComponent($("#searchstring").val())
+                query: encodeURIComponent($("#searchstring").val()),
+				maxhits: 50
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#result').html(errorThrown);
