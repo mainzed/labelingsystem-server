@@ -96,7 +96,7 @@
             type: 'GET',
             url: SEARCHAPI,
             data: {
-                query: $("#searchstring").val()
+                query: encodeURIComponent($("#searchstring").val())
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 $('#result').html(errorThrown);
