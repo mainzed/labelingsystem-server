@@ -121,7 +121,7 @@
                     } else {
                         html_str += "<tr width='"+size+"%' class='bg'>";
                     }
-                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"'>" + output[item]["uri"].replace(host+"/item/label/","ls_lab:") + "</a></td>";
+                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"' target='_blank'>" + output[item]["uri"].replace(host+"/item/label/","ls_lab:") + "</a></td>";
                 	html_str += "<td width='"+size+"%'>";
 					for (var prefLabel in output[item].prefLabels) {
 						html_str += output[item].prefLabels[prefLabel]["label"] + "@" + output[item].prefLabels[prefLabel]["lang"]+ "<br>";
