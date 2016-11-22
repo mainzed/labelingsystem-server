@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -193,6 +194,8 @@ public class Retcat_LabelingSystem {
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/sparql-results+json");
         String urlParameters = "query=" + sparql;
+		byte[] bytes = urlParameters.getBytes(StandardCharsets.UTF_8);
+		urlParameters = new String(bytes, StandardCharsets.ISO_8859_1);
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
         wr.writeBytes(urlParameters);
@@ -337,6 +340,8 @@ public class Retcat_LabelingSystem {
         con.setRequestMethod("POST");
         con.setRequestProperty("Accept", "application/sparql-results+json");
         String urlParameters = "query=" + sparql;
+		byte[] bytes = urlParameters.getBytes(StandardCharsets.UTF_8);
+		urlParameters = new String(bytes, StandardCharsets.ISO_8859_1);
         con.setDoOutput(true);
         DataOutputStream wr = new DataOutputStream(con.getOutputStream());
         wr.writeBytes(urlParameters);

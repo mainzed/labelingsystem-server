@@ -105,7 +105,7 @@ public class SparqlResource {
 
 	@POST
 	@Produces({"application/json;charset=UTF-8", "application/xml;charset=UTF-8", "application/sparql-results+json;charset=UTF-8", "application/sparql-results+xml;charset=UTF-8", "text/plain;charset=UTF-8", "text/csv;charset=UTF-8", "text/tsv;charset=UTF-8"})
-	public Response getSPARQLresultsGET2(@HeaderParam("Accept") String acceptHeader, @FormParam("query") String query, @FormParam("out") String out) {
+	public Response getSPARQLresultsPOST(@HeaderParam("Accept") String acceptHeader, @FormParam("query") String query, @FormParam("out") String out) {
 		String QUERY = "SELECT * WHERE { ?s ?p ?o } LIMIT 10";
 		String FORMAT = "xml";
 		String CONTENT_TYPE = "application/sparql-results+xml";
