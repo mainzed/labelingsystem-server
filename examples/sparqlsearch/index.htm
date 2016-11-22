@@ -25,11 +25,16 @@
 </html>
 
 <script>
-    var editor;
-    var SPARQLAPI = "http://143.93.114.135/api/v1/sparql";
-    var SEARCHAPI = "http://143.93.114.135/api/v1/search";
-    var PREFIXES = "PREFIX ls: <http://labeling.i3mainz.hs-mainz.de/vocab#>\n" +
+    var host = "http://143.93.114.135";
+	var editor;
+    var SPARQLAPI = host + "/api/v1/sparql";
+    var SEARCHAPI = host + "/api/v1/search";
+    var PREFIXES = "PREFIX ls: <http://labeling.link/docs/ls/core#>\n" +
         "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
+		"PREFIX ls_lab: <"+host+"/item/label/>\n" +
+		"PREFIX ls_voc: <"+host+"/item/vocabulary/>\n" +
+		"PREFIX ls_rev: <"+host+"/item/revision/>\n" +
+		"PREFIX ls_age: <"+host+"/item/agent/>\n" +
         "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
         "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
@@ -39,11 +44,14 @@
         "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
         "PREFIX prov: <http://www.w3.org/ns/prov#>\n" +
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n\n";
-    var QUERY_RESET = "SELECT * WHERE {\n" +
-        "  ?label a ls:Label.\n" +
-        "  ?label dc:creator ?creator.\n" +
-        "  ?label ls:preferredLabel ?prefLabel .\n" +
-        "} ORDER BY ASC(?prefLabel) \n" +
+    var QUERY_RESET = "SELECT ?concept ?label ?creator ?vocab ?vocabtitle WHERE {\n" +
+        "  ?concept a ls:Label.\n" +
+        "  ?concept dc:creator ?creator.\n" +
+		"  ?concept ls:thumbnail ?label .\n" +
+		"  ?concept skos:inScheme ?vocab.\n" +
+		"  ?vocab ls:hasReleaseType ls:Public.\n" +
+		"  ?vocab dc:title ?vocabtitle.\n" +
+        "} ORDER BY ASC(?label) \n" +
         "LIMIT 50";
 
     // set sparql field and load default
@@ -113,7 +121,7 @@
                     } else {
                         html_str += "<tr width='"+size+"%' class='bg'>";
                     }
-                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"'>" + output[item]["uri"].replace("http://143.93.114.135/item/label/","ls_lab:") + "</a></td>";
+                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"'>" + output[item]["uri"].replace(host+"/item/label/","ls_lab:") + "</a></td>";
                 	html_str += "<td width='"+size+"%'>";
 					for (var prefLabel in output[item].prefLabels) {
 						html_str += output[item].prefLabels[prefLabel]["label"] + "@" + output[item].prefLabels[prefLabel]["lang"]+ "<br>";
@@ -190,12 +198,12 @@
                     	if (bindings[item][vars[varstr]].type==="uri") {
                     		var val = bindings[item][vars[varstr]].value;
                     		// instances
-                    		val = val.replace("http://143.93.114.135/item/label/","ls_lab:");
-                    		val = val.replace("http://143.93.114.135/item/vocabulary/","ls_voc:");
-                    		val = val.replace("http://143.93.114.135/item/agent/","ls_age:");
-                    		val = val.replace("http://143.93.114.135/item/revision/","ls_rev:");
+                    		val = val.replace(host+"/item/label/","ls_lab:");
+                    		val = val.replace(host+"/item/vocabulary/","ls_voc:");
+                    		val = val.replace(host+"/item/agent/","ls_age:");
+                    		val = val.replace(host+"/item/revision/","ls_rev:");
                     		// prefixes
-                    		val = val.replace("http://labeling.i3mainz.hs-mainz.de/vocab#","ls:");
+                    		val = val.replace("http://labeling.link/docs/ls/core#","ls:");
                     		val = val.replace("http://www.w3.org/2004/02/skos/core#","skos:");
                     		val = val.replace("http://www.w3.org/1999/02/22-rdf-syntax-ns#","rdf:");
                     		val = val.replace("http://www.w3.org/2000/01/rdf-schema#","rdfs:");
@@ -206,7 +214,7 @@
                     		val = val.replace("http://xmlns.com/foaf/0.1/","foaf:");
                     		val = val.replace("http://www.w3.org/2003/01/geo/wgs84_pos#","geo:");
                     		val = val.replace("http://www.w3.org/ns/prov#","prov:");
-                    		tblTxt = "<a href='"+bindings[item][vars[varstr]].value+"'>"+val+"</a>";
+                    		tblTxt = "<a href='"+bindings[item][vars[varstr]].value+"' target='_blank'>"+val+"</a>";
                     	} else if (bindings[item][vars[varstr]]["xml:lang"]) {
                     		tblTxt = bindings[item][vars[varstr]].value + "@" + bindings[item][vars[varstr]]["xml:lang"];
                     	} else {
