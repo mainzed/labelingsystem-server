@@ -16,6 +16,7 @@
 
 ls_age:admin a foaf:Agent, ls:Agent;
 	dc:identifier "admin";
+	foaf:title "";
 	foaf:firstName "Florian";
 	foaf:lastName "Thiery";
 	dct:publisher <http://orcid.org/0000-0002-3246-3531>;
