@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,7 +40,8 @@ public class SearchResource {
 			@QueryParam("query") String searchword,
 			@QueryParam("vocab") String vocabulary,
 			@QueryParam("lookup") String fields,
-			@QueryParam("maxhits") String maxhits) {
+			@QueryParam("maxhits") String maxhits,
+			@QueryParam("draft") String draft) {
 		try {
 			String OUTSTRING = "";
 			int limit = 20;
@@ -73,12 +75,17 @@ public class SearchResource {
 			if (vocabulary != null) {
 				sparql += "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) ";
 			}
+			if (draft == null) {
+				sparql += "?scheme ls:hasReleaseType ls:Public . ";
+			}
 			sparql += "} ORDER BY ASC(?preferredLabel)";
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 			con.setRequestMethod("GET");
 			con.setRequestProperty("Accept", "application/sparql-results+json");
 			String urlParameters = "query=" + sparql;
+			//byte[] bytes = urlParameters.getBytes(StandardCharsets.UTF_8);
+			//urlParameters = new String(bytes, StandardCharsets.ISO_8859_1);
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(urlParameters);
