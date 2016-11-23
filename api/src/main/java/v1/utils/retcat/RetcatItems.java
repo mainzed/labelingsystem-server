@@ -17,7 +17,7 @@ public class RetcatItems {
         // LOCAL LABELING SYSTEM
         retcatList.add(new RetcatItem("Local Labeling System",
                 "The local Labeling System vocabularies.",
-                "/v1/retcat/query/labelingsystem", "/v1/retcat/info/labelingsystem", "//" + ConfigProperties.getPropertyParam("host"), "common reference thesauri (CH)", "ls", "div", "high", true));
+                "/v1/retcat/query/labelingsystem", "/v1/retcat/info/labelingsystem", "//" + ConfigProperties.getPropertyParam("host") + "/item", "common reference thesauri (CH)", "ls", "div", "high", true));
         // SKOS CONCEPTS
         // GETTY
         retcatList.add(new RetcatItem("Getty AAT",
@@ -69,7 +69,7 @@ public class RetcatItems {
 		// PERSON-DB FOR REFERENCING
 		retcatList.add(new RetcatItem("Local Person Database",
                 "Local Person Database for referencing persons in group works",
-                "/v1/retcat/query/persondb", "/v1/retcat/info/persondb", "/persondb/", "additional information", "persondb", "en", "low", false));
+                "/v1/retcat/query/persondb", "/v1/retcat/info/persondb", "//143.93.114.135/persondb", "additional information", "persondb", "en", "low", false));
         return retcatList;
     }
 
