@@ -1,8 +1,10 @@
-# SQlite database
+# SQlite databases
 
-## Structure
+## labeling system database
 
-### users table
+### Structure
+
+#### users table
 
 manages users within the system.
 
@@ -10,7 +12,7 @@ manages users within the system.
 | ---------- | --------- | --- | ---------------- | ---- |
 | serial id  |           |     | -1 or date       |      |
 
-### login table
+#### login table
 
 manages login and logout.
 
@@ -18,7 +20,7 @@ manages login and logout.
 | --------- | ---- | ---- |
 |           |      |      |
 
-### statistics table
+#### statistics table
 
 contains statistics about a vocabulary
 
@@ -26,7 +28,7 @@ contains statistics about a vocabulary
 | ---------- | ---------------- | ------- | ------------ | ------------ | ------------- | ------------- | ---------- | ---------- |
 |            |                  |         |              |              |               |               |            |            |
 
-### retcat table
+#### retcat table
 
 contains the list of reference thesauri (comma seperated) for each vocabulary.
 
@@ -34,15 +36,23 @@ contains the list of reference thesauri (comma seperated) for each vocabulary.
 | ---------- | ------ |
 |            |        |
 
-### retcatlist table
+#### retcatlist table
 
 contains the vocabulary id for each vocabulary for list search.
 
 | vocabulary | retcat |
-| ---------- | ------ |
-|            |        |
+| - | - |
+| | |
 
-## TODO
+### TODO
 
 * change admin password using /auth/hash
 * change demo password using /auth/hash
+
+## persons database
+
+### Structure
+
+| lastName | affilliation | firstName | id |
+| - | - | - | - |-|
+| | | | |
