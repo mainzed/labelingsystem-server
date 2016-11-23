@@ -41,8 +41,8 @@ contains the list of reference thesauri (comma seperated) for each vocabulary.
 contains the vocabulary id for each vocabulary for list search.
 
 | vocabulary | retcat |
-| - | - |
-| | |
+| ---------- | ------ |
+|            |        |
 
 ### TODO
 
@@ -54,5 +54,5 @@ contains the vocabulary id for each vocabulary for list search.
 ### Structure
 
 | lastName | affilliation | firstName | id |
-| - | - | - | - |-|
-| | | | |
+| -------- | ------------ | --------- | -- |
+|          |              |           |    |
