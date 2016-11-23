@@ -53,6 +53,7 @@ contains the vocabulary id for each vocabulary for list search.
 
 ### Structure
 
-| lastName | affilliation | firstName | id |
-| -------- | ------------ | --------- | -- |
-|          |              |           |    |
+| id | firstname | lastname | affilliation | 
+| ---------- | ---------------- | ------- | ------------ | 
+|            |                  |         |              | 
+
