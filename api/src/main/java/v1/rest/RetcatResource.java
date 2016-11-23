@@ -39,6 +39,7 @@ import v1.utils.retcat.Retcat_Getty;
 import v1.utils.retcat.Retcat_HTML;
 import v1.utils.retcat.Retcat_HeritageData;
 import v1.utils.retcat.Retcat_LabelingSystem;
+import v1.utils.retcat.Retcat_PersonDB;
 import v1.utils.retcat.Retcat_Pleiades;
 import v1.utils.retcat.Retcat_Unesco;
 
@@ -776,6 +777,34 @@ public class RetcatResource {
     public Response getInfoGeoNames(@QueryParam("uri") String uri) {
         try {
             JSONObject jsonOut = Retcat_GeoNames.info(uri);
+            return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+	
+	 @GET
+    @Path("/query/persondb")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getQueryResultsPERSONDB(@QueryParam("query") String searchword) {
+        try {
+            Map<String, SuggestionItem> autosuggests = Retcat_PersonDB.query(searchword);
+            JSONArray outArray = new JSONArray();
+            outArray = fillOutputJSONforQuery(autosuggests);
+            return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+                    .header("Content-Type", "application/json;charset=UTF-8").build();
+        }
+    }
+
+    @GET
+    @Path("/info/persondb")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public Response getInfoPersonDB(@QueryParam("uri") String uri) {
+        try {
+            JSONObject jsonOut = Retcat_PersonDB.info(uri);
             return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))

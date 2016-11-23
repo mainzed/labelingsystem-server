@@ -66,6 +66,10 @@ public class RetcatItems {
         retcatList.add(new RetcatItem("GeoNames",
                 "GeoNames is a geographical database available and accessible through various web services, under a Creative Commons attribution license.",
                 "/v1/retcat/query/geonames", "/v1/retcat/info/geonames", "//sws.geonames.org", "additional information", "geonames", "en", "low", false));
+		// PERSON-DB FOR REFERENCING
+		retcatList.add(new RetcatItem("Local Person Database",
+                "Local Person Database for referencing persons in group works",
+                "/v1/retcat/query/persondb", "/v1/retcat/info/persondb", "/persondb/", "additional information", "persondb", "en", "low", false));
         return retcatList;
     }
 
