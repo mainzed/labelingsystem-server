@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Labeling System - jstree example</title>
+  <link rel="stylesheet" href="jstree/themes/default/style.min.css" />
+  <script src="jquery/1.12.1/jquery.min.js"></script>
+  <script src="jstree/jstree.min.js"></script>
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,100italic,900italic,900,700italic,700,500italic,500,400italic,300italic,300,100);
+    * {
+    	font-family: "Roboto",sans-serif !important;
+    	font-weight: 400;
+    	list-style: outside none none;
+    	text-decoration: none;
+    	margin: 0;
+    	padding: 0;
+    }
+    h1,p,hr {
+        margin: 25px;
+    }
+  </style>
+  <script>
+        $(document).ready(function() {
+            var host = "http://143.93.114.135";
+            var vocabid = "b54d3167-5f86-42f0-90f0-35ef2a49c806";
+            var dataarray = [];
+            var query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb WHERE { ?l skos:inScheme ?v . ?l skos:narrower ?n . ?n ls:thumbnail ?nthumb . ?l ls:thumbnail ?thumb . FILTER NOT EXISTS { ?l skos:broader ?b. } FILTER (?v = <"+host+"/item/vocabulary/"+vocabid+">) } ORDER BY ASC(?thumb)";
+            query = encodeURIComponent(query);
+            $.ajax({
+                type: 'GET',
+                url: host+"/api/v1/sparql",
+                dataType: "text",
+                async: false,
+                data: {
+                    query: query,
+                    out: "json"
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(errorThrown);
+                },
+                success: function(output) {
+                    try {
+                      output = JSON.parse(output);
+                    } catch(e) {}
+            		var bindings = output.results.bindings;
+                    var toplevel = {};
+                    for (item in bindings) {
+                      toplevel[bindings[item].thumb.value] = bindings[item].thumb.value;
+                    }
+                    for (item in toplevel) {
+                        var obj = {};
+                        obj.id = toplevel[item];
+                        obj.parent = "#";
+                        obj.text = toplevel[item];
+                        dataarray.push(obj);
+                        for (element in bindings) {
+                            if (bindings[element].thumb.value === toplevel[item]) {
+                                var obj = {};
+                                obj.id = bindings[element].nthumb.value;
+                                obj.parent =  toplevel[item];
+                                obj.text = bindings[element].nthumb.value;
+                                // fill tree
+                                dataarray.push(obj);
+                                // query for narrower
+                                getNarrower(bindings[element].n.value);
+                            }
+                        }
+                    }
+                    console.info("dataarray",dataarray.length);
+                    initTree(dataarray);
+                }// end success
+            }); // end ajax
+            function getNarrower(labeluri,message) {
+                var da = dataarray;
+                var query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb ?nn WHERE { ?l skos:narrower ?n . ?n ls:thumbnail ?nthumb . ?l ls:thumbnail ?thumb . OPTIONAL { ?n skos:narrower ?nn } FILTER (?l = <"+labeluri+">) } ORDER BY ASC(?thumb)";
+                query = encodeURIComponent(query);
+                $.ajax({
+                    type: 'GET',
+                    url: host+"/api/v1/sparql",
+                    dataType: "text",
+                    async: false,
+                    data: {
+                        query: query,
+                        out: "json"
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(errorThrown);
+                    },
+                    success: function(output) {
+                        try {
+                            output = JSON.parse(output);
+                        } catch(e) {}
+                        var bindings = output.results.bindings;
+                        if (bindings.length > 0) {
+                            for (element in bindings) {
+                                var obj = {};
+                                obj.id = bindings[element].nthumb.value;
+                                obj.parent = bindings[element].thumb.value;
+                                obj.text = bindings[element].nthumb.value;
+                                var exists = 0;
+                                for (treeelement in da) {
+                                    if (da[treeelement].id === bindings[element].nthumb.value) {
+                                        exists++;
+                                    }
+                                }
+                                if (exists === 0) {
+                                    dataarray.push(obj);
+                                    if("nn" in bindings[element]) {
+                                        getNarrower(bindings[element].n.value, "nn");
+                                    }
+                                }
+                            }
+                        }
+                    } // end success
+                }); // end ajax
+            }
+            function initTree(dataarray) {
+                console.log("init tree");
+                $("#jstree").jstree({
+                    "core" : {
+                        "data": dataarray
+                    },
+                    "plugins" : ["wholerow"]
+                });
+                $("#jstree").on("click", "a", function() {
+        			/*var link = this.href;
+        			link = link.replace("##node##",tree_id);
+        			document.location.href = link;*/
+        		});
+                // open or close tree by change event
+        		$('#jstree').on('changed.jstree', function (e, data) {
+        			var obj = data.instance.get_node(data.selected);
+        			tree_id = obj.id;
+        			var state = obj.state.opened; // is opened?
+        			if (!state) {
+        				$("#jstree").jstree("open_node", data.selected);
+        			} else {
+        				$("#jstree").jstree("close_node", data.selected);
+        			}
+        			e.preventDefault();
+        			return false;
+        		});
+            }
+        }); // end $
+  </script>
+</head>
+<body>
+    <h1>Tomba Objekttypologie</h1>
+    <p><a href="http://143.93.114.135/item/vocabulary/b54d3167-5f86-42f0-90f0-35ef2a49c806" target="_blank">http://143.93.114.135/item/vocabulary/b54d3167-5f86-42f0-90f0-35ef2a49c806</a></p>
+    <hr />
+    <div id="jstree">loading...</div>
+    <hr />
+    <p>using <a href="https://www.jstree.com">jstree</a> and data from the Labeling System</p>
+    <p>2016 - CC BY Florian Thiery M.Sc.</p>
+</body>
+</html>
