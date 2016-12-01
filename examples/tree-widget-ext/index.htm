@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Labeling System - jstree example</title>
+  <link rel="stylesheet" href="jstree/themes/default/style.min.css" />
+  <script src="jquery/1.12.1/jquery.min.js"></script>
+  <script src="jstree/jstree.min.js"></script>
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto:400,100italic,900italic,900,700italic,700,500italic,500,400italic,300italic,300,100);
+    * {
+    	font-family: "Roboto",sans-serif !important;
+    	font-weight: 400;
+    	list-style: outside none none;
+    	text-decoration: none;
+    	margin: 0;
+    	padding: 0;
+    }
+    h1,p,hr {
+        margin: 25px;
+    }
+    div {
+        margin-left: 25px;
+    }
+    .button {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        height: 50px;
+        width: 100px;
+        margin-left: 25px;
+    }
+    select {
+        height: 50px;
+        font-size: 16px;
+        margin-left: 25px;
+    }
+  </style>
+  <script>
+        $(document).ready(function() {
+            var treeInit = false;
+            var host = "http://143.93.114.135";
+            //var vocabid = "ca73dc4f-8db9-4612-b58e-7bd7776e9bc9";
+            var vocabid = "";
+            var dataarray = [];
+            var imghierarchy = "images/file.png";
+            var imgwithouthierarchy = "images/file.png";
+            $("#loading").hide();
+            // get public vocabs
+            var vocabs = "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT * WHERE { ?v dc:title ?title . ?v ls:hasReleaseType ls:Public. ?v dc:identifier ?id. } ORDER BY ASC(?title)";
+            vocabs = encodeURIComponent(vocabs);
+            $.ajax({
+                type: 'GET',
+                url: host+"/api/v1/sparql",
+                dataType: "text",
+                async: false,
+                data: {
+                    query: vocabs,
+                    out: "json"
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(errorThrown);
+                },
+                success: function(output) {
+                    try {
+                      output = JSON.parse(output);
+                    } catch(e) {}
+            		var bindings = output.results.bindings;
+                    for (item in bindings) {
+                        $("#vocabs").append("<option value='"+bindings[item].id.value+"'>"+bindings[item].title.value+"</option>")
+                    }
+                }// end success
+            }); // end ajax
+            // get labels with hierarchy property
+            function getLabelsHierarchy() {
+                var hierarchyquery = "";
+                if ($("#lang").val()==="default") {
+                    hierarchyquery = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb WHERE { ?l skos:inScheme ?v . ?l skos:narrower ?n . ?n ls:thumbnail ?nthumb . ?l ls:thumbnail ?thumb . FILTER NOT EXISTS { ?l skos:broader ?b. } FILTER (?v = <"+host+"/item/vocabulary/"+vocabid+">) } ORDER BY ASC(?thumb)";
+                } else {
+                    hierarchyquery = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb WHERE { ?l skos:inScheme ?v . ?l skos:narrower ?n . ?n skos:prefLabel ?nthumb . ?l skos:prefLabel ?thumb . FILTER(langMatches(lang(?thumb), '"+$("#lang").val()+"')) FILTER(langMatches(lang(?nthumb), '"+$("#lang").val()+"')) FILTER NOT EXISTS { ?l skos:broader ?b. } FILTER (?v = <"+host+"/item/vocabulary/"+vocabid+">) } ORDER BY ASC(?thumb)";
+                }
+                hierarchyquery = encodeURIComponent(hierarchyquery);
+                $.ajax({
+                    type: 'GET',
+                    url: host+"/api/v1/sparql",
+                    dataType: "text",
+                    async: false,
+                    data: {
+                        query: hierarchyquery,
+                        out: "json"
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(errorThrown);
+                    },
+                    success: function(output) {
+                        try {
+                          output = JSON.parse(output);
+                        } catch(e) {}
+                		var bindings = output.results.bindings;
+                        var toplevel = {};
+                        for (item in bindings) {
+                          toplevel[bindings[item].thumb.value] = bindings[item].thumb.value;
+                        }
+                        for (item in toplevel) {
+                            var obj = {};
+                            obj.id = toplevel[item];
+                            obj.parent = "#";
+                            obj.text = toplevel[item];
+                            obj.icon = imghierarchy;
+                            dataarray.push(obj);
+                            for (element in bindings) {
+                                if (bindings[element].thumb.value === toplevel[item]) {
+                                    var obj = {};
+                                    obj.id = bindings[element].nthumb.value;
+                                    obj.parent =  toplevel[item];
+                                    obj.text = bindings[element].nthumb.value;
+                                    obj.icon = imghierarchy;
+                                    dataarray.push(obj);
+                                    // query for narrower
+                                    getNarrower(bindings[element].n.value);
+                                }
+                            }
+                        }
+                        console.info("dataarray hierarchy",dataarray.length);
+                    }// end success
+                }); // end ajax
+            }
+            function getNarrower(labeluri,message) {
+                var da = dataarray;
+                var query = "";
+                if ($("#lang").val()==="default") {
+                    query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb ?nn WHERE { ?l skos:narrower ?n . ?n ls:thumbnail ?nthumb . ?l ls:thumbnail ?thumb . OPTIONAL { ?n skos:narrower ?nn } FILTER (?l = <"+labeluri+">) } ORDER BY ASC(?thumb)";
+                } else {
+                    query = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?n ?nthumb ?nn WHERE { ?l skos:narrower ?n . ?n skos:prefLabel ?nthumb . ?l skos:prefLabel ?thumb . FILTER(langMatches(lang(?thumb), '"+$("#lang").val()+"')) FILTER(langMatches(lang(?nthumb), '"+$("#lang").val()+"')) OPTIONAL { ?n skos:narrower ?nn } FILTER (?l = <"+labeluri+">) } ORDER BY ASC(?thumb)";
+                }
+                query = encodeURIComponent(query);
+                $.ajax({
+                    type: 'GET',
+                    url: host+"/api/v1/sparql",
+                    dataType: "text",
+                    async: false,
+                    data: {
+                        query: query,
+                        out: "json"
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(errorThrown);
+                    },
+                    success: function(output) {
+                        try {
+                            output = JSON.parse(output);
+                        } catch(e) {}
+                        var bindings = output.results.bindings;
+                        if (bindings.length > 0) {
+                            for (element in bindings) {
+                                var obj = {};
+                                obj.id = bindings[element].nthumb.value;
+                                obj.parent = bindings[element].thumb.value;
+                                obj.text = bindings[element].nthumb.value;
+                                if("nn" in bindings[element]) {
+                                    obj.icon = imghierarchy;
+                                } else {
+                                    obj.icon = imgwithouthierarchy;
+                                }
+                                var exists = 0;
+                                for (treeelement in da) {
+                                    if (da[treeelement].id === bindings[element].nthumb.value) {
+                                        exists++;
+                                    }
+                                }
+                                if (exists === 0) {
+                                    dataarray.push(obj);
+                                    if("nn" in bindings[element]) {
+                                        getNarrower(bindings[element].n.value, "nn");
+                                    }
+                                }
+                            }
+                        }
+                    } // end success
+                }); // end ajax
+            }
+            function getLabelsWithoutHierarchy() {
+                // get labels without hierarchy properties
+                var withouthierarchyquery = "";
+                if ($("#lang").val()==="default") {
+                    withouthierarchyquery = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?l WHERE { ?l skos:inScheme ?v . ?l ls:thumbnail ?thumb . FILTER NOT EXISTS { ?l skos:broader ?b. } FILTER NOT EXISTS { ?l skos:narrower ?n. } FILTER (?v = <"+host+"/item/vocabulary/"+vocabid+">) } ORDER BY ASC(?thumb)";
+                } else {
+                    withouthierarchyquery = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> SELECT DISTINCT ?thumb ?l WHERE { ?l skos:inScheme ?v . ?l skos:prefLabel ?thumb . FILTER(langMatches(lang(?thumb), '"+$("#lang").val()+"')) FILTER NOT EXISTS { ?l skos:broader ?b. } FILTER NOT EXISTS { ?l skos:narrower ?n. } FILTER (?v = <"+host+"/item/vocabulary/"+vocabid+">) } ORDER BY ASC(?thumb)";
+                }
+                withouthierarchyquery = encodeURIComponent(withouthierarchyquery);
+                $.ajax({
+                    type: 'GET',
+                    url: host+"/api/v1/sparql",
+                    dataType: "text",
+                    async: false,
+                    data: {
+                        query: withouthierarchyquery,
+                        out: "json"
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error(errorThrown);
+                    },
+                    success: function(output) {
+                        try {
+                          output = JSON.parse(output);
+                        } catch(e) {}
+                		var bindings = output.results.bindings;
+                        for (item in bindings) {
+                            var obj = {};
+                            obj.id = bindings[item].thumb.value;
+                            obj.parent = "#";
+                            obj.text = bindings[item].thumb.value;
+                            obj.icon = imgwithouthierarchy;
+                            dataarray.push(obj);
+                        }
+                        console.info("dataarray without hierarchy",dataarray.length);
+                        initTree(dataarray);
+                    }// end success
+                }); // end ajax
+            }
+            function initTree(dataarray) {
+                if (!treeInit) {
+                    //console.log("init tree");
+                    $("#jstree").jstree({
+                        "core" : {
+                            "data": dataarray
+                        },
+                        "plugins" : ["wholerow"]
+                    });
+                    $("#jstree").on("click", "a", function() {
+            			//var link = this.href;
+            			//link = link.replace("##node##",tree_id);
+            			//document.location.href = link;
+            		});
+                    // open or close tree by change event
+            		$('#jstree').on('changed.jstree', function (e, data) {
+            			var obj = data.instance.get_node(data.selected);
+            			tree_id = obj.id;
+                        if (obj.state) {
+                            var state = obj.state.opened; // is opened?
+                			if (!state) {
+                				$("#jstree").jstree("open_node", data.selected);
+                			} else {
+                				$("#jstree").jstree("close_node", data.selected);
+                			}
+                			e.preventDefault();
+                        }
+            			return false;
+            		});
+                    treeInit = true;
+                } else {
+                    console.log("refresh tree");
+                    $('#jstree').jstree(true).settings.core.data = dataarray;
+                    $('#jstree').jstree(true).refresh();
+                }
+                $("#loading").hide();
+            }
+            $('#visbutton').click(function() {
+                $("#loading").show();
+                dataarray = [];
+                vocabid = $("#vocabs").val();
+                getLabelsHierarchy();
+                getLabelsWithoutHierarchy();
+    		});
+        }); // end $
+  </script>
+</head>
+<body>
+    <h1>Tree Visualizer</h1>
+    <select id="vocabs"></select>
+    <select id="lang">
+        <option value="default">default</option>
+        <option value="en">english</option>
+        <option value="de">deutsch</option>
+        <option value="da">dänisch</option>
+        <option value="fr">französisch</option>
+        <option value="it">italienisch</option>
+        <option value="es">spanisch</option>
+        <option value="el">griechisch</option>
+        <option value="he">hebräisch</option>
+        <option value="pl">polnisch</option>
+        <option value="nl">niederländisch</option>
+    </select>
+    <button type="button" class="button" id="visbutton">visualize</button>
+    <span id="loading">loading</span>
+    <hr />
+    <div id="jstree">please choose a vocabulary</div>
+    <hr />
+    <p>using <a href="https://www.jstree.com">jstree</a> and data from the Labeling System</p>
+    <p>2016 - CC BY Florian Thiery M.Sc.</p>
+</body>
+</html>
