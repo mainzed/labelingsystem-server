@@ -157,10 +157,12 @@ public class CSV implements Runnable {
 			// translation check
 			for (int i = 1; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
-				if (tokens[2].split(";").length % 2 != 0) {
-					errorArray.add("error: language or deliminiter error for translations in line " + (i + 1));
-					error = true;
-					errors++;
+				if (tokens[2].contains(";")) {
+					if (tokens[2].split(";").length % 2 != 0) {
+						errorArray.add("error: language or deliminiter error for translations in line " + (i + 1));
+						error = true;
+						errors++;
+					}
 				}
 			}
 			// language check for translations (same as thumbnail)
