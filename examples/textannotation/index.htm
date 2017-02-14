@@ -1,0 +1,130 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1"/>
+<title>Labeling System Text Annotation Example</title>
+<script src="http://143.93.114.135/widgets/tree-widget/jquery/1.12.1/jquery.min.js"></script>
+
+<script>
+	$(document).ready(function() {
+
+		getLabelInfo("http://143.93.114.135/item/label/d0a8d88a-a8a3-4c57-b35e-b675370bc1ae");
+		getLabelInfo("http://143.93.114.135/item/label/91b5fe3f-b4fb-4f9a-af84-9822fd25169f");
+		getLabelInfo("http://143.93.114.135/item/label/fbdba581-ec11-4ea9-a719-06cd1f45bbe7");
+		getLabelInfo("http://143.93.114.135/item/label/2ebd5c81-fa4b-4f6c-8e12-e4893fdf3a33");
+		getLabelInfo("http://143.93.114.135/item/label/5b6b7a9a-dd2a-43e7-8a8d-73fee55ff574");
+
+		function getLabelInfo(url) {
+			$.ajax({
+				type: 'GET',
+				url: url,
+				headers: { "Accept": "application/json" },
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error(errorThrown);
+				},
+				success: function(output) {
+					try {
+					  output = JSON.parse(output);
+					} catch(e) {}
+					console.info(output.description);
+					console.info(output.id,url);
+					$("." + output.id ).attr("title",output.description);
+				}
+			});
+		}
+
+
+		// Tooltip only Text
+			$('a').hover(function(){
+			        // Hover over code
+			        var title = $(this).attr('title');
+			        var myclass = $(this).attr('class');
+			        $("." + myclass).closest("p").css("background", "yellow");
+			        $(this).data('tipText', title).removeAttr('title');
+			        $('<p class="tooltip"></p>')
+			        .text(title)
+			        .appendTo('body')
+			        .fadeIn('slow');
+			}, function() {
+			        // Hover out code
+			        $(this).attr('title', $(this).data('tipText'));
+			         $("p").css("background", "#FCFFBA");
+			        $('.tooltip').remove();
+			}).mousemove(function(e) {
+			        var mousex = e.pageX + 20; //Get X coordinates
+			        var mousey = e.pageY + 10; //Get Y coordinates
+			        $('.tooltip')
+			        .css({ top: mousey, left: mousex })
+			});
+	}); // end $
+
+
+</script>
+<style>
+	* {
+		font-size: 24px; margin: 0; padding: 0; font-family: Arial,sans-serif;
+	}
+	body {	padding: 100px;}
+	.tooltip {
+		display:none;
+		position:absolute;
+		background-color:lightblue;
+		border-radius:5px;
+		padding:10px;
+		font-size:20px;
+	}
+	.text {
+		float: left; width: 30%;
+	}
+	.tags {float: right; width: 50%;}
+
+	p {	margin-bottom: 40px; background: #FCFFBA; padding: 20px;}
+
+</style>
+
+</head>
+
+<body>
+	<div class="tags">
+		<span>Textannotationen</span>
+		<ul>
+			<li>
+				<a href="http://143.93.114.135/item/label/d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" class="d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" target="_blank">Gold</a>
+			</li>
+			<li>
+				<a href="http://143.93.114.135/item/label/91b5fe3f-b4fb-4f9a-af84-9822fd25169f" class="91b5fe3f-b4fb-4f9a-af84-9822fd25169f"  target="_blank">Gold</a>		
+			</li>
+			<li>
+				<a href="http://143.93.114.135/item/label/fbdba581-ec11-4ea9-a719-06cd1f45bbe7" class="fbdba581-ec11-4ea9-a719-06cd1f45bbe7" target="_blank">Gold</a>
+			</li>
+			<li>
+				<a href="http://143.93.114.135/item/label/2ebd5c81-fa4b-4f6c-8e12-e4893fdf3a33" class="2ebd5c81-fa4b-4f6c-8e12-e4893fdf3a33" target="_blank">Fu&szlig;ball</a>
+			</li>
+			<li>
+				<a href="http://143.93.114.135/item/label/5b6b7a9a-dd2a-43e7-8a8d-73fee55ff574" class="5b6b7a9a-dd2a-43e7-8a8d-73fee55ff574" target="_blank">Fu&szlig;ball</a>
+			</li>
+		</ul>
+	</div>
+	<div class="text">
+		<p>
+			Gestern bin ich zur Bank gegangen und habe einen Barren <a href="http://143.93.114.135/item/label/d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" class="d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" target="_blank">Gold</a> gekauft.
+		</p>
+		<p>
+			Heute habe ich das <a href="http://143.93.114.135/item/label/91b5fe3f-b4fb-4f9a-af84-9822fd25169f" class="91b5fe3f-b4fb-4f9a-af84-9822fd25169f"  target="_blank">Gold</a> mit Schwefels&auml;ure reagieren lassen. 
+		</p>
+		<p>
+			Als ich vorhin den Fernseher eingeschalten habe, erfuhr ich, dass die deutsche Nationalmannschaft der Frauen im <a href="http://143.93.114.135/item/label/2ebd5c81-fa4b-4f6c-8e12-e4893fdf3a33" class="2ebd5c81-fa4b-4f6c-8e12-e4893fdf3a33" target="_blank">Fu&szlig;ball</a> bei Olympia <a href="http://143.93.114.135/item/label/fbdba581-ec11-4ea9-a719-06cd1f45bbe7" class="fbdba581-ec11-4ea9-a719-06cd1f45bbe7"  target="_blank">Gold</a> gewonnen hat.
+		</p>
+		<p>
+			Ich habe dann sp&auml;ter mit einem Freund über Wertanlagen diskutiert und erw&auml;hnt, dass <a href="http://143.93.114.135/item/label/d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" class="d0a8d88a-a8a3-4c57-b35e-b675370bc1ae" target="_blank">Gold</a> immer noch
+			eine sehr gute Wertanlage ist.
+		</p>
+		<p>
+			Heute habe ich mit meinen Bro's auf der Stra&szlig;e <a href="http://143.93.114.135/item/label/5b6b7a9a-dd2a-43e7-8a8d-73fee55ff574" class="5b6b7a9a-dd2a-43e7-8a8d-73fee55ff574" target="_blank">Fu&szlig;ball</a> gezockt.
+		</p>
+
+	</div>
+
+</body>
+
+</html>
