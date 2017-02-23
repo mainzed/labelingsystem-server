@@ -28,13 +28,13 @@ RDF4J triplestore and SQlite
 
 nginx and Tomcat
 
-## Set-Up Server
+## set up labeling system server
 
 ### required
 
 * Java 8
 * Tomcat
-* RDF4J 2.0
+* RDF4J 2.0 (server, opt. workbench)
 * Labeling System API / ITEM / FRONTEND
 
 ### recommended
@@ -87,10 +87,6 @@ nginx and Tomcat
 ## Development Hints
 
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
-
-# FAQ
-
-## How to add a retcat item?
 
 ## Credits
 
