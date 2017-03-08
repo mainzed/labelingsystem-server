@@ -21,7 +21,6 @@ public class RestResource {
             JSONObject outObject = new JSONObject();
             outObject.put("title", "Labeling System API Version 1.0");
             outObject.put("version", "1.0");
-            outObject.put("wiki", "https://github.com/mainzed/labelingsystem-server");
             outObject.put("info", ConfigProperties.getPropertyParam("api") + "/v1/info");
             // get last modified data
             File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
