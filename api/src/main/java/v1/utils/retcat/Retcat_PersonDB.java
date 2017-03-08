@@ -21,8 +21,8 @@ import v1.utils.generalfuncs.GeneralFunctions;
 
 public class Retcat_PersonDB {
 
-    private static final String PERSONDBHOST = "http://143.93.114.135/persondb";
-	
+    private static final String PERSONDBHOST = "http://"+ ConfigProperties.getPropertyParam("host") +"/persondb";
+
 	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
         searchword = GeneralFunctions.encodeURIComponent(searchword);
         String url_string = PERSONDBHOST + "/search?query=" + searchword;

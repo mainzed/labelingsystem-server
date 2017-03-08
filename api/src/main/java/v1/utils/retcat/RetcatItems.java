@@ -69,7 +69,7 @@ public class RetcatItems {
 		// PERSON-DB FOR REFERENCING
 		retcatList.add(new RetcatItem("Local Person Database",
                 "Local Person Database for referencing persons in group works",
-                "/v1/retcat/query/persondb", "/v1/retcat/info/persondb", "//143.93.114.135/persondb", "additional information", "persondb", "en", "low", false));
+                "/v1/retcat/query/persondb", "/v1/retcat/info/persondb", "//"+ConfigProperties.getPropertyParam("host")+"/persondb", "additional information", "persondb", "en", "low", false));
         return retcatList;
     }
 
