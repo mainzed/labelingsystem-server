@@ -73,7 +73,7 @@ public class SearchResource {
 				sparql += "FILTER(regex(?prefLabel, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i')) ";
 			}
 			if (vocabulary != null) {
-				sparql += "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) ";
+				sparql += "FILTER(?scheme=<http://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) ";
 			}
 			if (draft == null) {
 				sparql += "?scheme ls:hasReleaseType ls:Public . ";
@@ -123,7 +123,7 @@ public class SearchResource {
 				// get Subject
 				JSONObject subject = (JSONObject) tmpElement.get("Subject");
 				String subjectValue = (String) subject.get("value");
-				// for every subject value get object from list and write values in it 
+				// for every subject value get object from list and write values in it
 				SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
 				// get id
 				JSONObject idObject = (JSONObject) tmpElement.get("id");
@@ -149,7 +149,7 @@ public class SearchResource {
 					String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
 					tmpAutosuggest.setDescription(scopeNoteValue + "@" + scopeNoteLang);
 				}
-				// get broader 
+				// get broader
 				String broaderVL = "";
 				String broaderURI = "";
 				JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
@@ -167,7 +167,7 @@ public class SearchResource {
 					hstmpBroader.put(broaderURI, broaderVL);
 					tmpAutosuggest.setBroaderTerm(hstmpBroader);
 				}
-				// get narrower 
+				// get narrower
 				String narrowerVL = "";
 				String narrowerURI = "";
 				JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");

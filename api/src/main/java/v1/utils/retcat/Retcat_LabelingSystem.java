@@ -85,7 +85,7 @@ public class Retcat_LabelingSystem {
             // get Subject
             JSONObject subject = (JSONObject) tmpElement.get("Subject");
             String subjectValue = (String) subject.get("value");
-            // for every subject value get object from list and write values in it 
+            // for every subject value get object from list and write values in it
             SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
             // get Label
 			JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
@@ -121,7 +121,7 @@ public class Retcat_LabelingSystem {
                 String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
                 tmpAutosuggest.setDescription(scopeNoteValue);
             }
-            // get broader 
+            // get broader
             String broaderVL = "";
             String broaderURI = "";
             JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
@@ -139,7 +139,7 @@ public class Retcat_LabelingSystem {
                 hstmpBroader.put(broaderURI, broaderVL);
                 tmpAutosuggest.setBroaderTerm(hstmpBroader);
             }
-            // get narrower 
+            // get narrower
             String narrowerVL = "";
             String narrowerURI = "";
             JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
@@ -187,7 +187,7 @@ public class Retcat_LabelingSystem {
                 + "OPTIONAL {?Subject skos:broader ?BroaderPreferred . ?BroaderPreferred ls:thumbnail ?BroaderPreferredTerm.} "
                 + "OPTIONAL {?Subject skos:narrower ?NarrowerPreferred . ?NarrowerPreferred ls:thumbnail ?NarrowerPreferredTerm .} "
                 + "FILTER(regex(?pl, '" + searchword + "', 'i') || regex(?scopeNote, '" + searchword + "', 'i') || regex(?prefLabel, '" + searchword + "', 'i')) "
-                + "FILTER(?scheme=<" + ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
+                + "FILTER(?scheme=<http://" + ConfigProperties.getPropertyParam("host") + "/item/vocabulary/" + vocabulary + ">) "
                 + "}";
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -234,7 +234,7 @@ public class Retcat_LabelingSystem {
             // get Subject
             JSONObject subject = (JSONObject) tmpElement.get("Subject");
             String subjectValue = (String) subject.get("value");
-            // for every subject value get object from list and write values in it 
+            // for every subject value get object from list and write values in it
             SuggestionItem tmpAutosuggest = autosuggests.get(subjectValue);
             // get Label
             JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
@@ -268,7 +268,7 @@ public class Retcat_LabelingSystem {
                 String scopeNoteLang = (String) scopeNoteObject.get("xml:lang");
                 tmpAutosuggest.setDescription(scopeNoteValue);
             }
-            // get broader 
+            // get broader
             String broaderVL = "";
             String broaderURI = "";
             JSONObject broaderObject = (JSONObject) tmpElement.get("BroaderPreferredTerm");
@@ -286,7 +286,7 @@ public class Retcat_LabelingSystem {
                 hstmpBroader.put(broaderURI, broaderVL);
                 tmpAutosuggest.setBroaderTerm(hstmpBroader);
             }
-            // get narrower 
+            // get narrower
             String narrowerVL = "";
             String narrowerURI = "";
             JSONObject narrowerObject = (JSONObject) tmpElement.get("NarrowerPreferredTerm");
@@ -411,7 +411,7 @@ public class Retcat_LabelingSystem {
 					firstNameValue = (String) firstName.get("value");
 				}
             }
-			
+
 			for (Object element : bindingsArray) {
                 JSONObject tmpElement = (JSONObject) element;
                 JSONObject lastName = (JSONObject) tmpElement.get("lastName");

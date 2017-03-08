@@ -59,7 +59,7 @@ public class TestsResource {
                 + "}";
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), update);
 			// load rdf
-            String fileURL = ConfigProperties.getPropertyParam("http_protocol") + "://" + ConfigProperties.getPropertyParam("host") + "/tests/test.rdf";
+      String fileURL = "http://" + ConfigProperties.getPropertyParam("host") + "/tests/test.rdf";
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"),ConfigProperties.getPropertyParam("ts_server"), "LOAD <" + fileURL + ">");
 			// delete from sqlite db
 			SQlite.deleteRetcatEntryForList("2420a664-7b1c-4da6-aba3-d0694221ee8a");
