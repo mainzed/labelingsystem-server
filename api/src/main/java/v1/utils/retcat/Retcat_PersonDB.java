@@ -17,14 +17,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import v1.utils.config.ConfigProperties;
 import v1.utils.generalfuncs.GeneralFunctions;
 
 public class Retcat_PersonDB {
 
-    private static final String PERSONDBHOST = "http://"+ ConfigProperties.getPropertyParam("host") +"/persondb";
-
 	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
-        searchword = GeneralFunctions.encodeURIComponent(searchword);
+		searchword = GeneralFunctions.encodeURIComponent(searchword);
+		String PERSONDBHOST = "http://"+ ConfigProperties.getPropertyParam("host") +"/persondb";
         String url_string = PERSONDBHOST + "/search?query=" + searchword;
         URL url = new URL(url_string);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
