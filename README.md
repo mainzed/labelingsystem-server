@@ -1,12 +1,12 @@
 # Introduction
 
-The Labeling System consists of several components: the frontend web-app, the server api and resource service, a RDF4J triplestore and a SQLite database. The [datamodel](https://github.com/labelingsystem-ontology) is represented in an ontology using linked data vocabularies.
+The Labeling System consists of three components: the server, the [client wep-app](https://github.com/mainzed/labelingsystem-client) and the [datahub](https://github.com/mainzed/labelingsystem-datahub).
+
+The [datamodel](https://github.com/mainzed/labelingsystem-ontology) is represented in an ontology using linked data vocabularies.
+
+This repository represents the server component of the Labeling System.
 
 # Getting Started
-
-## Data Model
-
-https://github.com/mainzed/labelingsystem-ontology
 
 ## Server Components
 
@@ -44,8 +44,8 @@ nginx and Tomcat
 
 * Java 8
 * Tomcat
-* RDF4J 2.0 (server, opt. workbench)
-* Labeling System API / ITEM / FRONTEND
+* RDF4J 2.0 (server, workbench (opt.))
+* Labeling System war-files
 
 ### recommended
 
@@ -64,21 +64,21 @@ nginx and Tomcat
 
 #### required foldes and files with r/w rights for Tomcat
 
-* /[...]/`db`/
-* /[tomcat]/webapps/`share`/
-* /[tomcat]/webapps/`dump`/
-* /[tomcat]/webapps/`ROOT`
+* /`[...]`/`db`/
+* /`[tomcat]`/webapps/`share`/
+* /`[tomcat]`/webapps/`dump`/
+* /`[tomcat]`/webapps/`ROOT`/
 
 #### required files
 
-* /[tomcat]/webapps/`api.war`
-* /[tomcat]/webapps/`item.war`
-* /[tomcat]/webapps/`persondb.war`
-* /[tomcat]/webapps/`datahub.war`
-* /[tomcat]/webapps/`rdf4j-server.war`
-* /[tomcat]/webapps/`rdf4j-workbench.war` (optional)
-* /[...]/db/`ls.sqlite` (db with r/w rights for Tomcat)
-* /[...]/db/`persondb.sqlite` (db with r/w rights for Tomcat)
+* /`[tomcat]`/webapps/`api.war`
+* /`[tomcat]`/webapps/`item.war`
+* /`[tomcat]`/webapps/`persondb.war`
+* /`[tomcat]`/webapps/`datahub.war`
+* /`[tomcat]`/webapps/`rdf4j-server.war`
+* /`[tomcat]`/webapps/`rdf4j-workbench.war` (optional)
+* /`[...]`/db/`ls.sqlite` (db with r/w rights for Tomcat)
+* /`[...]`/db/`persondb.sqlite` (db with r/w rights for Tomcat)
 
 ### How to set-up the server?
 
