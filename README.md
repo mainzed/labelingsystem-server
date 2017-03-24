@@ -10,19 +10,29 @@ https://github.com/mainzed/labelingsystem-ontology
 
 ## Server Components
 
-### api
+### war-files
+
+#### api.war
 
 RESTful API for Labeling System applications.
 
 API Documentation (Version 1): https://github.com/mainzed/labelingsystem-server/tree/rdf4j/apidoc/v1
 
-### item
+#### item.war
 
 RESTful API to provide cool URIs for Labeling System items.
 
+#### persondb.war
+
+Servlet providing persons for linking.
+
+#### datahub.war
+
+RESTful API for the Labeling Explorer.
+
 ### databases
 
-RDF4J triplestore and SQlite
+RDF4J triplestore and SQlite databases
 
 ### web server
 
