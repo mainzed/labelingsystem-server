@@ -12,7 +12,7 @@ The Labeling System consists of three components: the [server](https://github.co
 
 RESTful API for Labeling System applications.
 
-API Documentation (Version 1): https://github.com/mainzed/labelingsystem-server/tree/rdf4j/apidoc/v1
+API Documentation (Version 1): [APIdoc](https://github.com/mainzed/labelingsystem-server/tree/rdf4j/apidoc/v1)
 
 #### item.war
 
@@ -63,6 +63,7 @@ nginx and Tomcat
 * /`[...]`/`db`/
 * /`[tomcat]`/webapps/`share`/
 * /`[tomcat]`/webapps/`dump`/
+* /`[tomcat]`/webapps/`dump-dh`/
 * /`[tomcat]`/webapps/`ROOT`/
 
 #### required files
@@ -92,10 +93,11 @@ nginx and Tomcat
 * create `labelingsystem` and `datahub` repository in RDF4J
 * modify `default triples`
 * fill `labelingsystem` repository with default triples
-* configure API and ITEM in their WAR packages using `config[XXX].properties`
+* configure application in their WAR packages using `config[XXX].properties`
 * deploy war files for ls backend (`api.war`, `item.war`, `persondb.war`, `datahub.war`)
 * configure frontend app and set host for API
 * deploy Labeling System frontend app
+* deploy Label Explorer
 
 ## Development Hints
 
