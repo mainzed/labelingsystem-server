@@ -1,4 +1,6 @@
-# Introduction
+# Labeling System Server
+
+## Introduction
 
 The Labeling System consists of three components: the [server](https://github.com/mainzed/labelingsystem-server), the [client wep-app](https://github.com/mainzed/labelingsystem-client) and the [datahub](https://github.com/mainzed/labelingsystem-datahub).
 
@@ -6,48 +8,48 @@ The [datamodel](https://github.com/mainzed/labelingsystem-ontology) used in the 
 
 This repository represents the server component of the Labeling System.
 
-# Getting Started
+## Getting Started
 
-## Server Components
+### Server Components
 
-### war-files
+#### war-files
 
-#### api.war
+##### api.war
 
 RESTful API for Labeling System applications.
 
 API Documentation (Version 1): https://github.com/mainzed/labelingsystem-server/tree/rdf4j/apidoc/v1
 
-#### item.war
+##### item.war
 
 RESTful API to provide cool URIs for Labeling System items.
 
-#### persondb.war
+##### persondb.war
 
 Servlet providing persons for linking.
 
-#### datahub.war
+##### datahub.war
 
 RESTful API for the Labeling Explorer.
 
-### databases
+#### databases
 
 RDF4J triplestore and SQlite databases
 
-### web server
+#### web server
 
 nginx and Tomcat
 
-## set up labeling system server
+### set up labeling system server
 
-### required
+#### required
 
 * Java 8
 * Tomcat
 * RDF4J 2.0 (server, workbench (opt.))
 * Labeling System war-files
 
-### recommended
+#### recommended
 
 * CentOS (Linux release 7.2.1511 (Core))
 * nginx (nginx/1.6.3) (Port 80)
@@ -56,20 +58,20 @@ nginx and Tomcat
 * RDF4J (server and workbench 2.0)
 * SQlite support
 
-### folder structure
+#### folder structure
 
 * recommended
     * `[...]` = `/opt`
     * `[tomcat]` = `/opt/tomcat`
 
-#### required foldes and files with r/w rights for Tomcat
+##### required foldes and files with r/w rights for Tomcat
 
 * /`[...]`/`db`/
 * /`[tomcat]`/webapps/`share`/
 * /`[tomcat]`/webapps/`dump`/
 * /`[tomcat]`/webapps/`ROOT`/
 
-#### required files
+##### required files
 
 * /`[tomcat]`/webapps/`api.war`
 * /`[tomcat]`/webapps/`item.war`
@@ -80,7 +82,7 @@ nginx and Tomcat
 * /`[...]`/db/`ls.sqlite` (db with r/w rights for Tomcat)
 * /`[...]`/db/`persondb.sqlite` (db with r/w rights for Tomcat)
 
-### How to set-up the server?
+#### How to set-up the server?
 
 * install `CentOS`
 * install `nginx`
@@ -101,11 +103,11 @@ nginx and Tomcat
 * configure frontend app and set host for API
 * deploy Labeling System frontend app
 
-## Development Hints
+### Development Hints
 
 The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Maven 4.0.
 
-## Credits
+### Credits
 
 Software Developers:
 
@@ -114,7 +116,7 @@ Software Developers:
     * Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
     * Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften (mainzed)
 
-## License
+### License
 
 MIT License
 
