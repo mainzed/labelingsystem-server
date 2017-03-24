@@ -273,7 +273,7 @@ public class CSV implements Runnable {
 	}
 
 	private static String createLabelTriples(String[] tokens, String creator) throws IOException, UniqueIdentifierException, CsvLabelImportException, exceptions.ConfigException, exceptions.SesameSparqlException {
-		String uuid = UniqueIdentifier.getUUID();
+		String uuid = UniqueIdentifier.getHashID();
 		try {
 			// thumbnail[0];description[1];translations[2];END[3]
 			String thumbnail = tokens[0];

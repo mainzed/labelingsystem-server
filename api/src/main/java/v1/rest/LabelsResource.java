@@ -796,7 +796,7 @@ public class LabelsResource {
             // validate
             ValidateJSONObject.validateLabel(json);
             // set uuid
-            String itemID = UniqueIdentifier.getUUID();
+            String itemID = UniqueIdentifier.getHashID();
             // parse data
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             String creator = (String) jsonObject.get("creator");
@@ -989,9 +989,9 @@ public class LabelsResource {
         Date date = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String dateiso = formatter.format(date);
-        String revID = UniqueIdentifier.getUUID();
-        String revID2 = UniqueIdentifier.getUUID();
-        String revID3 = UniqueIdentifier.getUUID();
+        String revID = UniqueIdentifier.getHashID();
+        String revID2 = UniqueIdentifier.getHashID();
+        String revID3 = UniqueIdentifier.getHashID();
         triples += item + ":" + itemid + " dc:modified \"" + dateiso + "\"" + " . ";
         if (!revisions.isEmpty()) {
             triples += item + ":" + itemid + " skos:changeNote ls_rev:" + revID + " . ";

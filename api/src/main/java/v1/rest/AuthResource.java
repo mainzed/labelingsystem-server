@@ -34,7 +34,7 @@ public class AuthResource {
         JSONObject jsonStatus = new JSONObject();
         JSONObject jsonUser = new JSONObject();
         try {
-            String secretToken = UniqueIdentifier.getUUID();
+            String secretToken = UniqueIdentifier.getHashID();
             String role = SQlite.getUserInfoAndCheckPassword(user, pwd);
             boolean login = SQlite.setLogin(user + ";" + secretToken, role);
             if (login) {

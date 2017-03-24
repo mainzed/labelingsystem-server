@@ -682,7 +682,7 @@ public class VocabsResource {
 			// validate
 			ValidateJSONObject.validateVocabulary(json);
 			// set uuid
-			String itemID = UniqueIdentifier.getUUID();
+			String itemID = UniqueIdentifier.getHashID();
 			// parse creator
 			JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
 			String creator = (String) jsonObject.get("creator");
