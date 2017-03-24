@@ -58,12 +58,16 @@ nginx and Tomcat
 
 ### folder structure
 
+* recommended
+    * `[...]` = `/opt`
+    * `[tomcat]` = `/opt/tomcat`
+
 #### required foldes and files with r/w rights for Tomcat
 
-* /[..]/db/
-* /[tomcat]/webapps/share/
-* /[tomcat]/webapps/dump/
-* /[tomcat]/webapps/{name of frontend app}
+* /[...]/`db`/
+* /[tomcat]/webapps/`share`/
+* /[tomcat]/webapps/`dump`/
+* /[tomcat]/webapps/`ROOT`
 
 #### required files
 
@@ -73,8 +77,8 @@ nginx and Tomcat
 * /[tomcat]/webapps/`datahub.war`
 * /[tomcat]/webapps/`rdf4j-server.war`
 * /[tomcat]/webapps/`rdf4j-workbench.war` (optional)
-* /[..]/db/`ls.sqlite` (db with r/w rights for Tomcat)
-* /[..]/db/`persondb.sqlite` (db with r/w rights for Tomcat)
+* /[...]/db/`ls.sqlite` (db with r/w rights for Tomcat)
+* /[...]/db/`persondb.sqlite` (db with r/w rights for Tomcat)
 
 ### How to set-up the server?
 
