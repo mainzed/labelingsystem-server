@@ -95,10 +95,10 @@ The code was developed in NetBeans IDE 8.1, using Java EE 7 Web, JDK 1.8 and Mav
 
 Software Developers:
 
-- Florian Thiery M.Sc.
- - Institut für Raumbezogene Informations- und Messtechnik (i3mainz)
- - Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
- - Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften (mainzed)
+* Florian Thiery M.Sc.
+    * Institut für Raumbezogene Informations- und Messtechnik (i3mainz)
+    * Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
+    * Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften (mainzed)
 
 ## License
 
