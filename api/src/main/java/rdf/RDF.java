@@ -10,6 +10,7 @@ import exceptions.RdfException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import v1.utils.config.ConfigProperties;
 
 /**
  * CLASS for set up a RDF graph and export it
@@ -33,10 +34,10 @@ public class RDF {
     private final String PREFIX_XSD = "http://www.w3.org/2001/XMLSchema#";
     private final String PREFIX_GEO = "http://www.w3.org/2003/01/geo/wgs84_pos#";
     private final String PREFIX_DCAT = "http://www.w3.org/ns/dcat#";
-    private String Instance_VOCABULARY_ITEM = "http://$host/item/vocabulary/";
-    private String Instance_LABEL_ITEM = "http://$host/item/label/";
-    private String Instance_AGENT_ITEM = "http://$host/item/agent/";
-    private String Instance_REVISION_ITEM = "http://$host/item/revision/";
+    private String Instance_VOCABULARY_ITEM = "http://$host/$item/$vocabulary/";
+    private String Instance_LABEL_ITEM = "http://$host/$item/$label/";
+    private String Instance_AGENT_ITEM = "http://$host/$item/$agent/";
+    private String Instance_REVISION_ITEM = "http://$host/$item/$revision/";
     private String PREFIXSPARQL = ""
             // ls vocabulary
             + "PREFIX ls: <" + PREFIX_LABELINGSYSTEM + "> "
@@ -72,11 +73,11 @@ public class RDF {
         model.setNsPrefix("xsd", PREFIX_XSD);
         model.setNsPrefix("geo", PREFIX_GEO);
         model.setNsPrefix("dcat", PREFIX_DCAT);
-        Instance_VOCABULARY_ITEM = Instance_VOCABULARY_ITEM.replace("$host", HOST);
-        Instance_LABEL_ITEM = Instance_LABEL_ITEM.replace("$host", HOST);
-        Instance_AGENT_ITEM = Instance_AGENT_ITEM.replace("$host", HOST);
-        Instance_REVISION_ITEM = Instance_REVISION_ITEM.replace("$host", HOST);
-        PREFIXSPARQL = PREFIXSPARQL.replace("$host", HOST);
+        Instance_VOCABULARY_ITEM = Instance_VOCABULARY_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$vocabulary", ConfigProperties.getPropertyParam("vocabulary"));
+        Instance_LABEL_ITEM = Instance_LABEL_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$label", ConfigProperties.getPropertyParam("label"));
+        Instance_AGENT_ITEM = Instance_AGENT_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$agent", ConfigProperties.getPropertyParam("agent"));
+        Instance_REVISION_ITEM = Instance_REVISION_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$revision", ConfigProperties.getPropertyParam("revision"));
+        PREFIXSPARQL = PREFIXSPARQL.replace("$host", ConfigProperties.getPropertyParam("host"));
     }
 
     public Model getModelObject() {
