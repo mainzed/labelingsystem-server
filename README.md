@@ -57,30 +57,33 @@ nginx and Tomcat
 
 #### required files
 
-* /[tomcat]/webapps/**api.war**
-* /[tomcat]/webapps/**item.war**
-* /[tomcat]/webapps/**rdf4j-server.war**
-* /[tomcat]/webapps/**rdf4j-workbench.war** (optional)
-* /[..]/db/**ls.sqlite** (db with r/w rights for Tomcat)
+* /[tomcat]/webapps/`api.war`
+* /[tomcat]/webapps/`item.war`
+* /[tomcat]/webapps/`persondb.war`
+* /[tomcat]/webapps/`datahub.war`
+* /[tomcat]/webapps/`rdf4j-server.war`
+* /[tomcat]/webapps/`rdf4j-workbench.war` (optional)
+* /[..]/db/`ls.sqlite` (db with r/w rights for Tomcat)
+* /[..]/db/`persondb.sqlite` (db with r/w rights for Tomcat)
 
 ### How to set-up the server?
 
-* install **CentOS**
-* install **nginx**
-* install **OpenJDK**
-* install **Tomcat**
+* install `CentOS`
+* install `nginx`
+* install `OpenJDK`
+* install `Tomcat`
 * configure nginx (Port 80) and Tomcat (Port 8080)
 * create folders and set r/w rights for Tomcat role
 * copy dump script to /opt folder (if data is not in opt folder, change paths in shell script)
 * start dump cron job
 * get hashed admin pwd via /hash and write it to sqlite database
-* copy **SQLite** database into db folder and set full r/w rights (chmod 777)
-* deploy war files for triplestore (**rdf4j-server.war**, **rdf4j-workbench.war**)
-* create **labelingsystem** repository in RDF4J
-* modify **default triples**
-* fill **labelingsystem** repository with default triples
-* configure API and ITEM in their WAR packages using **config.properties**
-* deploy war files for ls backend (**api.war**, **item.war**)
+* copy `SQLite` and `Person` database into db folder and set full r/w rights (chmod 777)
+* deploy war files for triplestore (`rdf4j-server.war`, `rdf4j-workbench.war`)
+* create `labelingsystem` and `datahub` repository in RDF4J
+* modify `default triples`
+* fill `labelingsystem` repository with default triples
+* configure API and ITEM in their WAR packages using `config[XXX].properties`
+* deploy war files for ls backend (`api.war`, `item.war`, `persondb.war`, `datahub.war`)
 * configure frontend app and set host for API
 * deploy Labeling System frontend app
 
@@ -95,12 +98,13 @@ Software Developers:
 - Florian Thiery M.Sc.
  - Institut für Raumbezogene Informations- und Messtechnik (i3mainz)
  - Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
+ - Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften (mainzed)
 
 ## License
 
 MIT License
 
-Copyright (c) 2016 Florian Thiery M.Sc., i3mainz, RGZM
+Copyright (c) 2014-2017 Florian Thiery M.Sc., i3mainz, RGZM, mainzed
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
