@@ -2,8 +2,12 @@
 
 ## Change Items Prefix Host
 
-Change host for `ls_voc`, `ls_lab`, `ls_rev` and `ls_age`.
+Modify host for `ls_voc`, `ls_lab`, `ls_rev` and `ls_age`.
+
+## Change Items war file name
+
+Change`items.war` context path (default: item).
 
 ## Change Admin Information
 
-Change `dc:identifier`, `foaf:title`, `foaf:firstName`, `foaf:lastName`, `dct:publisher` and `dct:isPartOf`.
+Modify `dc:identifier`, `foaf:title`, `foaf:firstName`, `foaf:lastName`, `dct:publisher` and `dct:isPartOf`.
