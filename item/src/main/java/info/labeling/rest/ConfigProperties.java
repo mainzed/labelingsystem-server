@@ -12,7 +12,7 @@ import java.util.Properties;
 public class ConfigProperties {
 
 	private static final Properties prop = new Properties();
-	private static final String fileName = "config.properties";
+	private static final String fileName = "configDevServer.properties";
 
 	/**
 	 * load property file
