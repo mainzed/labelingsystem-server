@@ -61,6 +61,10 @@ public class RetcatItems {
 		retcatList.add(new RetcatItem("iDAI.vocab",
                 "Thesaurus of Deutsches Archäologisches Institut, called archwort. ",
                 "/v1/retcat/query/archwort", "/v1/retcat/info/archwort", "//archwort.dainst.org", "other reference thesauri", "archwort", "de", "low", false));
+		// MORE
+		retcatList.add(new RetcatItem("British Geological Survey",
+                "The British Geological Survey (BGS) is the United Kingdom's premier centre for earth science information and expertise.",
+                "/v1/retcat/query/bgs", "/v1/retcat/info/bgs", "//data.bgs.ac.uk", "other reference thesauri", "bgs", "en", "low", false));
         // INTERPRET AS SKOS CONCEPT
         // DBPEDIA
         retcatList.add(new RetcatItem("DBpedia",
