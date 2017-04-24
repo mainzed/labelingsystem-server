@@ -23,7 +23,7 @@ public class RestResource {
             outObject.put("version", "1.0");
             outObject.put("info", ConfigProperties.getPropertyParam("api") + "/v1/info");
             // get last modified data
-            File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
+            File file = new File(InfoResource.class.getClassLoader().getResource("configLabelingLink.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             outObject.put("last build", sdf.format(file.lastModified()));
             return Response.ok(outObject).header("Content-Type", "application/json;charset=UTF-8").build();

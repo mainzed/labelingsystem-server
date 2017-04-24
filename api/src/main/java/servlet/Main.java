@@ -23,7 +23,7 @@ public class Main extends HttpServlet {
             versionObject.put("1.0", ConfigProperties.getPropertyParam("api") + "/v1");
             outObject.put("versions", versionObject);
             // get last build data
-            File file = new File(InfoResource.class.getClassLoader().getResource("config.properties").getFile());
+            File file = new File(InfoResource.class.getClassLoader().getResource("configLabelingLink.properties").getFile());
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             outObject.put("last build", sdf.format(file.lastModified()));
             out.print(outObject);

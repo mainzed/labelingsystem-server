@@ -477,9 +477,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsGettyAAT(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryAAT(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryAAT(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -492,9 +496,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsGettyTGN(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryTGN(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryTGN(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -507,9 +515,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsGettyULAN(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryULAN(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryULAN(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
