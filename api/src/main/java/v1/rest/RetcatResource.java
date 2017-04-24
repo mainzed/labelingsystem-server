@@ -434,9 +434,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsLabelingSystem(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryAll(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_LabelingSystem.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryAll(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -449,9 +453,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsLabelingSystemVocabulary(@QueryParam("query") String searchword, @PathParam("vocabulary") String vocabulary) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryVocab(searchword, vocabulary);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_LabelingSystem.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryVocab(searchword, vocabulary);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -617,9 +625,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsCHRONONTOLOGY(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_ChronOntology.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_ChronOntology.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_ChronOntology.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -645,9 +657,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsPELAGIOS(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Pleiades.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Pleiades.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Pleiades.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -669,6 +685,25 @@ public class RetcatResource {
 	}
 
 	@GET
+	@Path("/query/skosmos/finto")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getQueryResultsSkosmosFINTO(@QueryParam("query") String searchword) {
+		try {
+			JSONArray outArray = new JSONArray();
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Finto.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Finto.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
 	@Path("/info/skosmos/finto")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getInfoSkosmosFinto(@QueryParam("uri") String uri) {
@@ -682,28 +717,17 @@ public class RetcatResource {
 	}
 
 	@GET
-	@Path("/query/skosmos/finto")
-	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-	public Response getQueryResultsSkosmosFINTO(@QueryParam("query") String searchword) {
-		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Finto.query(searchword);
-			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
-			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
-		} catch (Exception e) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
-					.header("Content-Type", "application/json;charset=UTF-8").build();
-		}
-	}
-
-	@GET
 	@Path("/query/skosmos/fao")
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsSkosmosFAO(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Fao.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Fao.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Fao.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -729,9 +753,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsSkosmosUNESCO(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Unesco.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Unesco.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Unesco.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -757,9 +785,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsDBPEDIA(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_Dbpedia.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Dbpedia.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Dbpedia.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -785,9 +817,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsGEONAMES(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_GeoNames.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_GeoNames.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_GeoNames.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
