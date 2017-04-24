@@ -882,9 +882,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsPERSONDB(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_PersonDB.query(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_PersonDB.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_PersonDB.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
