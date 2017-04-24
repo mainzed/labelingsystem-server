@@ -547,9 +547,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsHeritagedataHE(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryHE(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryHE(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -562,9 +566,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsHeritagedataRCAHMS(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMS(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMS(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
@@ -577,9 +585,13 @@ public class RetcatResource {
 	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
 	public Response getQueryResultsHeritagedataRCAHMW(@QueryParam("query") String searchword) {
 		try {
-			Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMW(searchword);
 			JSONArray outArray = new JSONArray();
-			outArray = fillOutputJSONforQuery(autosuggests);
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMW(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
 			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
