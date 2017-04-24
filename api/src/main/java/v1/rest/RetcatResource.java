@@ -30,6 +30,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import v1.utils.retcat.RetcatItem;
+import v1.utils.retcat.Retcat_Archwort;
 import v1.utils.retcat.Retcat_ChronOntology;
 import v1.utils.retcat.Retcat_Dbpedia;
 import v1.utils.retcat.Retcat_Fao;
@@ -773,6 +774,38 @@ public class RetcatResource {
 	public Response getInfoSkosmosUnesco(@QueryParam("uri") String uri) {
 		try {
 			JSONObject jsonOut = Retcat_Unesco.info(uri);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/query/archwort")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getQueryResultsARCHWORT(@QueryParam("query") String searchword) {
+		try {
+			JSONArray outArray = new JSONArray();
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Archwort.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Archwort.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/info/archwort")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getInfoArchwort(@QueryParam("uri") String uri) {
+		try {
+			JSONObject jsonOut = Retcat_Archwort.info(uri);
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))

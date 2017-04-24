@@ -57,6 +57,10 @@ public class RetcatItems {
         retcatList.add(new RetcatItem("UNESCO Thesaurus",
                 "The UNESCO Thesaurus is a controlled and structured list of terms used in subject analysis and retrieval of documents and publications in the fields of education, culture, natural sciences, social and human sciences, communication and information. Continuously enriched and updated, its multidisciplinary terminology reflects the evolution of UNESCO's programmes and activities.",
                 "/v1/retcat/query/skosmos/unesco", "/v1/retcat/info/skosmos/unesco", "//vocabularies.unesco.org", "other reference thesauri", "unesco", "en", "high", false));
+		// TEMATRES
+		retcatList.add(new RetcatItem("iDAI.vocab",
+                "Thesaurus of Deutsches Archäologisches Institut, called archwort. ",
+                "/v1/retcat/query/archwort", "/v1/retcat/info/archwort", "//archwort.dainst.org", "other reference thesauri", "archwort", "de", "low", false));
         // INTERPRET AS SKOS CONCEPT
         // DBPEDIA
         retcatList.add(new RetcatItem("DBpedia",
