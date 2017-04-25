@@ -44,6 +44,7 @@ import v1.utils.retcat.Retcat_LabelingSystem;
 import v1.utils.retcat.Retcat_PersonDB;
 import v1.utils.retcat.Retcat_Pleiades;
 import v1.utils.retcat.Retcat_Unesco;
+import v1.utils.retcat.Retcat_Wikidata;
 
 @Path("/retcat")
 public class RetcatResource {
@@ -871,6 +872,38 @@ public class RetcatResource {
 	public Response getInfoDBpedia(@QueryParam("uri") String uri) {
 		try {
 			JSONObject jsonOut = Retcat_Dbpedia.info(uri);
+			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/query/wikidata")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getQueryResultsWIKIDATA(@QueryParam("query") String searchword) {
+		try {
+			JSONArray outArray = new JSONArray();
+			if (searchword.startsWith("uri:")) {
+				outArray.add(Retcat_Wikidata.info(searchword.replace("uri:", "")));
+			} else {
+				Map<String, SuggestionItem> autosuggests = Retcat_Wikidata.query(searchword);
+				outArray = fillOutputJSONforQuery(autosuggests);
+			}
+			return Response.ok(outArray).header("Content-Type", "application/json;charset=UTF-8").build();
+		} catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
+		}
+	}
+	
+	@GET
+	@Path("/info/wikidata")
+	@Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+	public Response getInfoWikidata(@QueryParam("uri") String uri) {
+		try {
+			JSONObject jsonOut = Retcat_Wikidata.info(uri);
 			return Response.ok(jsonOut).header("Content-Type", "application/json;charset=UTF-8").build();
 		} catch (Exception e) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.RetcatResource"))
