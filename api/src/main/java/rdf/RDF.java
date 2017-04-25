@@ -77,7 +77,13 @@ public class RDF {
         Instance_LABEL_ITEM = Instance_LABEL_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$label", ConfigProperties.getPropertyParam("label"));
         Instance_AGENT_ITEM = Instance_AGENT_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$agent", ConfigProperties.getPropertyParam("agent"));
         Instance_REVISION_ITEM = Instance_REVISION_ITEM.replace("$host", ConfigProperties.getPropertyParam("host")).replace("$item", ConfigProperties.getPropertyParam("item")).replace("$revision", ConfigProperties.getPropertyParam("revision"));
-        PREFIXSPARQL = PREFIXSPARQL.replace("$host", ConfigProperties.getPropertyParam("host"));
+        PREFIXSPARQL = PREFIXSPARQL
+				.replace("$host", ConfigProperties.getPropertyParam("host"))
+				.replace("$item", ConfigProperties.getPropertyParam("item"))
+				.replace("$vocabulary", ConfigProperties.getPropertyParam("vocabulary"))
+				.replace("$label", ConfigProperties.getPropertyParam("label"))
+				.replace("$agent", ConfigProperties.getPropertyParam("agent"))
+				.replace("$revision", ConfigProperties.getPropertyParam("revision"));
     }
 
     public Model getModelObject() {
