@@ -944,8 +944,8 @@ public class Transformer {
                     JSONObject obj = (JSONObject) element;
                     String value = (String) obj.get("value");
                     String arrayNew;
-                    if (value.contains("vocabulary/")) {
-                        arrayNew = value.split("vocabulary/")[1];
+                    if (value.contains(ConfigProperties.getPropertyParam("vocabulary")+"/")) {
+                        arrayNew = value.split(ConfigProperties.getPropertyParam("vocabulary")+"/")[1];
                     } else {
                         arrayNew = value;
                     }
