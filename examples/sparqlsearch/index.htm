@@ -25,16 +25,21 @@
 </html>
 
 <script>
-    var host = "http://labeling.link";
+    var host = "http://labeling.link"; // http://labeling.link || http://143.93.114.135
+    var itemAPI = "item";
+    var itemV = "vocab"; // vocab || vocabulary
+    var itemC = "concept"; // concept || label
+    var itemA = "revision"; // revision || revision
+    var itemR = "agent"; // agent || agent
 	var editor;
     var SPARQLAPI = host + "/api/v1/sparql";
     var SEARCHAPI = host + "/api/v1/search";
     var PREFIXES = "PREFIX ls: <http://labeling.link/docs/ls/core#>\n" +
         "PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n" +
-		"PREFIX ls_lab: <"+host+"/item/label/>\n" +
-		"PREFIX ls_voc: <"+host+"/item/vocabulary/>\n" +
-		"PREFIX ls_rev: <"+host+"/item/revision/>\n" +
-		"PREFIX ls_age: <"+host+"/item/agent/>\n" +
+		"PREFIX ls_lab: <"+host+"/"+itemAPI+"/"+itemC+"/>\n" +
+		"PREFIX ls_voc: <"+host+"/"+itemAPI+"/"+itemV+"/>\n" +
+		"PREFIX ls_rev: <"+host+"/"+itemAPI+"/"+itemR+"/>\n" +
+		"PREFIX ls_age: <"+host+"/"+itemAPI+"/"+itemA+"/>\n" +
         "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
         "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
@@ -122,7 +127,7 @@
                     } else {
                         html_str += "<tr width='"+size+"%' class='bg'>";
                     }
-                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"' target='_blank'>" + output[item]["uri"].replace(host+"/item/label/","ls_lab:") + "</a></td>";
+                	html_str += "<td width='"+size+"%'><a href='"+output[item]["uri"]+"' target='_blank'>" + output[item]["uri"].replace(host+"/"+itemAPI+"/"+itemC+"/","ls_lab:") + "</a></td>";
                 	html_str += "<td width='"+size+"%'>";
 					for (var prefLabel in output[item].prefLabels) {
 						html_str += output[item].prefLabels[prefLabel]["label"] + "@" + output[item].prefLabels[prefLabel]["lang"]+ "<br>";
@@ -199,10 +204,10 @@
                     	if (bindings[item][vars[varstr]].type==="uri") {
                     		var val = bindings[item][vars[varstr]].value;
                     		// instances
-                    		val = val.replace(host+"/item/label/","ls_lab:");
-                    		val = val.replace(host+"/item/vocabulary/","ls_voc:");
-                    		val = val.replace(host+"/item/agent/","ls_age:");
-                    		val = val.replace(host+"/item/revision/","ls_rev:");
+                    		val = val.replace(host+"/"+itemAPI+"/"+itemC+"/","ls_lab:");
+                    		val = val.replace(host+"/"+itemAPI+"/"+itemV+"/","ls_voc:");
+                    		val = val.replace(host+"/"+itemAPI+"/"+itemA+"/","ls_age:");
+                    		val = val.replace(host+"/"+itemAPI+"/"+itemR+"/","ls_rev:");
                     		// prefixes
                     		val = val.replace("http://labeling.link/docs/ls/core#","ls:");
                     		val = val.replace("http://www.w3.org/2004/02/skos/core#","skos:");
