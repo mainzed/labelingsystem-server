@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -95,7 +96,7 @@ public class Retcat_Finto {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         String outputUrl = url;
         String vocab = url.split("/")[4];
         url = GeneralFunctions.encodeURIComponent(url);
@@ -186,7 +187,11 @@ public class Retcat_Finto {
         }
         jsonOut.put("broaderTerms", broaderTerms);
         jsonOut.put("narrowerTerms", narrowerTerms);
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }

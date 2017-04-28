@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class Retcat_Pleiades {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         String outputUrl = url;
         url = GeneralFunctions.encodeURIComponent(url);
         url = "http://pelagios.org/peripleo/places/" + url;
@@ -112,7 +113,11 @@ public class Retcat_Pleiades {
         jsonOut.put("broaderTerms", broader);
         jsonOut.put("narrowerTerms", narrower);
         jsonOut.put("description", description);
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }

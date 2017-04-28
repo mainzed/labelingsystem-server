@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -107,7 +108,7 @@ public class Retcat_Wikidata {
 		return autosuggests;
 	}
 
-	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
 		String sparqlendpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
 		String sparql = "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
 				+ "SELECT DISTINCT ?prefLabel ?desc { "
@@ -172,7 +173,11 @@ public class Retcat_Wikidata {
 		jsonOut.put("scheme", "wikidata");
 		jsonOut.put("broaderTerms", new JSONArray());
 		jsonOut.put("narrowerTerms", new JSONArray());
-		return jsonOut;
+		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
 	}
 
 }

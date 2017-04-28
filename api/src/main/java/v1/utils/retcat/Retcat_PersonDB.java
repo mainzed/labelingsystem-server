@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -69,7 +70,7 @@ public class Retcat_PersonDB {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         // query for json
         URL obj = new URL(url);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -113,7 +114,11 @@ public class Retcat_PersonDB {
         jsonOut.put("broaderTerms", broader);
         jsonOut.put("narrowerTerms", narrower);
         jsonOut.put("description", jsonObject.get("affilliation"));
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }

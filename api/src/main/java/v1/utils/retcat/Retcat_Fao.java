@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -118,7 +119,7 @@ public class Retcat_Fao {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         String outputUrl = url;
         url = GeneralFunctions.encodeURIComponent(url);
         url = "http://oek1.fao.org/skosmos/rest/v1/agrovoc/label?lang=en&uri=" + url;
@@ -208,7 +209,11 @@ public class Retcat_Fao {
         }
         jsonOut.put("broaderTerms", broaderTerms);
         jsonOut.put("narrowerTerms", narrowerTerms);
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }

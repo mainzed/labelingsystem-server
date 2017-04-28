@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class Retcat_BGSLinkedData {
 		return new HashMap<>();
 	}
 	
-	public static JSONObject info(String url) throws MalformedURLException, IOException, ParseException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
+	public static JSONObject info(String url) throws MalformedURLException, IOException, ParseException, ParseException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, RetcatException {
 		String dataURL = url.replace("/id/", "/doc/");
 		dataURL += ".JSON";
 		URL obj = new URL(dataURL);
@@ -78,7 +79,11 @@ public class Retcat_BGSLinkedData {
 		// broader and narrower (not yet available)
 		jsonOut.put("broaderTerms", new JSONArray());
 		jsonOut.put("narrowerTerms", new JSONArray());
-		return jsonOut;
+		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
 	}
 	
 }

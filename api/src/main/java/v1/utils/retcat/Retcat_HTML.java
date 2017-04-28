@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.IOException;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class Retcat_HTML {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         String outputUrl = url;
         url = GeneralFunctions.encodeURIUmlaut(url);
         Document doc = Jsoup.connect(url).get();
@@ -52,7 +53,11 @@ public class Retcat_HTML {
         jsonOut.put("narrowerTerms", narrower);
         jsonOut.put("description", "");
         jsonOut.put("scheme", "");
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -81,7 +82,7 @@ public class Retcat_ChronOntology {
 		return autosuggests;
 	}
 
-	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
 		String outputUrl = url;
 		url = url.replace("/period", "/data/period");
 		// query for json
@@ -135,7 +136,11 @@ public class Retcat_ChronOntology {
 		jsonOut.put("scheme", "ChronOntology");
 		jsonOut.put("broaderTerms", new JSONArray());
 		jsonOut.put("narrowerTerms", new JSONArray());
-		return jsonOut;
+		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
 	}
 
 }

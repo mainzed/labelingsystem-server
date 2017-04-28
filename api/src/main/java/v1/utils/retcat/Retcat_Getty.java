@@ -1,6 +1,7 @@
 package v1.utils.retcat;
 
 import exceptions.ResourceNotAvailableException;
+import exceptions.RetcatException;
 import exceptions.SesameSparqlException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -406,7 +407,7 @@ public class Retcat_Getty {
         return autosuggests;
     }
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
         String sparqlendpoint = "http://vocab.getty.edu/sparql";
         String sparql = "SELECT * { "
                 + "<" + url + "> gvp:prefLabelGVP [xl:literalForm ?prefLabel]. "
@@ -525,7 +526,11 @@ public class Retcat_Getty {
         jsonOut.put("quality", quality);
         jsonOut.put("group", group);
         jsonOut.put("uri", url);
-        return jsonOut;
+        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+            return jsonOut;
+        } else {
+            throw new RetcatException("no label for this uri available");
+        }
     }
 
 }
