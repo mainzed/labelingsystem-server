@@ -440,6 +440,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_LabelingSystem.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryAll(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -459,6 +460,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_LabelingSystem.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_LabelingSystem.queryVocab(searchword, vocabulary);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -491,6 +493,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryAAT(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -510,6 +513,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryTGN(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -529,6 +533,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Getty.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Getty.queryULAN(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -561,6 +566,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryHE(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -580,6 +586,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMS(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -599,6 +606,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_HeritageData.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_HeritageData.queryRCAHMW(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -631,6 +639,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_ChronOntology.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_ChronOntology.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -663,6 +672,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Pleiades.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Pleiades.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -695,6 +705,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Finto.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Finto.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -727,6 +738,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Fao.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Fao.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -759,6 +771,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Unesco.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Unesco.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -791,6 +804,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Archwort.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Archwort.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -823,6 +837,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_BGSLinkedData.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_BGSLinkedData.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -855,6 +870,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Dbpedia.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Dbpedia.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -887,6 +903,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_Wikidata.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_Wikidata.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -919,6 +936,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_GeoNames.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_GeoNames.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);
@@ -951,6 +969,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			if (searchword.startsWith("uri:")) {
 				outArray.add(Retcat_PersonDB.info(searchword.replace("uri:", "")));
+				outArray.remove(new JSONObject());
 			} else {
 				Map<String, SuggestionItem> autosuggests = Retcat_PersonDB.query(searchword);
 				outArray = fillOutputJSONforQuery(autosuggests);

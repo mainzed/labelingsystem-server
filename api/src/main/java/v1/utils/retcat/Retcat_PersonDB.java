@@ -120,7 +120,7 @@ public class Retcat_PersonDB {
 				throw new RetcatException("no label for this uri available");
 			}
 		} catch (Exception e) {
-			throw new RetcatException(e.toString());
+			return new JSONObject();
 		}
 	}
 
