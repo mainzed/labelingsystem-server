@@ -109,75 +109,79 @@ public class Retcat_Wikidata {
 	}
 
 	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
-		String sparqlendpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
-		String sparql = "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
-				+ "SELECT DISTINCT ?prefLabel ?desc { "
-				+ "<" + url + "> rdfs:label ?prefLabel . "
-				+ "<" + url + "> schema:description ?desc . "
-				+ "FILTER(langMatches(lang(?prefLabel), \"EN\")) "
-				+ "FILTER(langMatches(lang(?desc), \"EN\")) "
-				+ "} LIMIT 1";
-		URL obj = new URL(sparqlendpoint);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Accept", "application/sparql-results+json");
-		String urlParameters = "query=" + sparql;
-		con.setDoOutput(true);
-		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(wr, "UTF-8"));
-		writer.write(urlParameters);
-		writer.close();
-		wr.close();
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-		String inputLine;
-		StringBuilder response = new StringBuilder();
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		// parse SPARQL results json
-		JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-		JSONObject resultsObject = (JSONObject) jsonObject.get("results");
-		JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
-		// output
-		JSONObject jsonOut = new JSONObject();
-		for (Object element : bindingsArray) {
-			JSONObject tmpElement = (JSONObject) element;
-			// get Label
-			JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
-			String labelValue = (String) labelObject.get("value");
-			String labelLang = (String) labelObject.get("xml:lang");
-			jsonOut.put("label", labelValue);
-			jsonOut.put("lang", labelLang);
-			// get description
-			JSONObject descriptionObject = (JSONObject) tmpElement.get("desc");
-			if (descriptionObject != null) {
-				String descriptionValue = (String) descriptionObject.get("value");
-				jsonOut.put("description", descriptionValue);
+		try {
+			String sparqlendpoint = "https://query.wikidata.org/bigdata/namespace/wdq/sparql";
+			String sparql = "PREFIX schema: <http://schema.org/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
+					+ "SELECT DISTINCT ?prefLabel ?desc { "
+					+ "<" + url + "> rdfs:label ?prefLabel . "
+					+ "<" + url + "> schema:description ?desc . "
+					+ "FILTER(langMatches(lang(?prefLabel), \"EN\")) "
+					+ "FILTER(langMatches(lang(?desc), \"EN\")) "
+					+ "} LIMIT 1";
+			URL obj = new URL(sparqlendpoint);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Accept", "application/sparql-results+json");
+			String urlParameters = "query=" + sparql;
+			con.setDoOutput(true);
+			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(wr, "UTF-8"));
+			writer.write(urlParameters);
+			writer.close();
+			wr.close();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
 			}
-		}
-		jsonOut.put("uri", url);
-		// get retcat info
-		String type = "wikidata";
-		String quality = "";
-		String group = "";
-		for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-			if (item.getType().equals(type)) {
-				quality = item.getQuality();
-				group = item.getGroup();
+			in.close();
+			// parse SPARQL results json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resultsObject = (JSONObject) jsonObject.get("results");
+			JSONArray bindingsArray = (JSONArray) resultsObject.get("bindings");
+			// output
+			JSONObject jsonOut = new JSONObject();
+			for (Object element : bindingsArray) {
+				JSONObject tmpElement = (JSONObject) element;
+				// get Label
+				JSONObject labelObject = (JSONObject) tmpElement.get("prefLabel");
+				String labelValue = (String) labelObject.get("value");
+				String labelLang = (String) labelObject.get("xml:lang");
+				jsonOut.put("label", labelValue);
+				jsonOut.put("lang", labelLang);
+				// get description
+				JSONObject descriptionObject = (JSONObject) tmpElement.get("desc");
+				if (descriptionObject != null) {
+					String descriptionValue = (String) descriptionObject.get("value");
+					jsonOut.put("description", descriptionValue);
+				}
 			}
+			jsonOut.put("uri", url);
+			// get retcat info
+			String type = "wikidata";
+			String quality = "";
+			String group = "";
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				if (item.getType().equals(type)) {
+					quality = item.getQuality();
+					group = item.getGroup();
+				}
+			}
+			jsonOut.put("type", type);
+			jsonOut.put("quality", quality);
+			jsonOut.put("group", group);
+			jsonOut.put("scheme", "wikidata");
+			jsonOut.put("broaderTerms", new JSONArray());
+			jsonOut.put("narrowerTerms", new JSONArray());
+			if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+				return jsonOut;
+			} else {
+				throw new RetcatException("no label for this uri available");
+			}
+		} catch (Exception e) {
+			throw new RetcatException(e.toString());
 		}
-		jsonOut.put("type", type);
-		jsonOut.put("quality", quality);
-		jsonOut.put("group", group);
-		jsonOut.put("scheme", "wikidata");
-		jsonOut.put("broaderTerms", new JSONArray());
-		jsonOut.put("narrowerTerms", new JSONArray());
-		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
-            return jsonOut;
-        } else {
-            throw new RetcatException("no label for this uri available");
-        }
 	}
 
 }

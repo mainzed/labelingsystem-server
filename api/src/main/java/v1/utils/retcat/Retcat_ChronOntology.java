@@ -83,26 +83,27 @@ public class Retcat_ChronOntology {
 	}
 
 	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
-		String outputUrl = url;
-		url = url.replace("/period", "/data/period");
-		// query for json
-		URL obj = new URL(url);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestMethod("GET");
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-		String inputLine;
-		StringBuilder response = new StringBuilder();
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		// parse json
-		JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-		JSONObject resourceObject = (JSONObject) jsonObject.get("resource");
-		JSONArray names = (JSONArray) resourceObject.get("names");
-		String labelValue = null;
-		String labelLang = null;
-		for (Object item : names) {
+		try {
+			String outputUrl = url;
+			url = url.replace("/period", "/data/period");
+			// query for json
+			URL obj = new URL(url);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
+			// parse json
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			JSONObject resourceObject = (JSONObject) jsonObject.get("resource");
+			JSONArray names = (JSONArray) resourceObject.get("names");
+			String labelValue = null;
+			String labelLang = null;
+			for (Object item : names) {
 				JSONObject tmp = (JSONObject) item;
 				if (tmp.get("lang").equals("en")) {
 					labelLang = (String) tmp.get("lang");
@@ -110,37 +111,40 @@ public class Retcat_ChronOntology {
 					labelValue = (String) content.get(0);
 				}
 			}
-		String descValue = "";
-		if (resourceObject.get("description") != null) {
-			descValue = resourceObject.get("description").toString();
-		}
-		// output
-		JSONObject jsonOut = new JSONObject();
-		jsonOut.put("label", labelValue);
-		jsonOut.put("lang", labelLang);
-		// get retcat info
-		String type = "chronontology";
-		String quality = "";
-		String group = "";
-		for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-			if (item.getType().equals(type)) {
-				quality = item.getQuality();
-				group = item.getGroup();
+			String descValue = "";
+			if (resourceObject.get("description") != null) {
+				descValue = resourceObject.get("description").toString();
 			}
+			// output
+			JSONObject jsonOut = new JSONObject();
+			jsonOut.put("label", labelValue);
+			jsonOut.put("lang", labelLang);
+			// get retcat info
+			String type = "chronontology";
+			String quality = "";
+			String group = "";
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				if (item.getType().equals(type)) {
+					quality = item.getQuality();
+					group = item.getGroup();
+				}
+			}
+			jsonOut.put("type", type);
+			jsonOut.put("quality", quality);
+			jsonOut.put("group", group);
+			jsonOut.put("description", descValue);
+			jsonOut.put("uri", outputUrl);
+			jsonOut.put("scheme", "ChronOntology");
+			jsonOut.put("broaderTerms", new JSONArray());
+			jsonOut.put("narrowerTerms", new JSONArray());
+			if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+				return jsonOut;
+			} else {
+				throw new RetcatException("no label for this uri available");
+			}
+		} catch (Exception e) {
+			throw new RetcatException(e.toString());
 		}
-		jsonOut.put("type", type);
-		jsonOut.put("quality", quality);
-		jsonOut.put("group", group);
-		jsonOut.put("description", descValue);
-		jsonOut.put("uri", outputUrl);
-		jsonOut.put("scheme", "ChronOntology");
-		jsonOut.put("broaderTerms", new JSONArray());
-		jsonOut.put("narrowerTerms", new JSONArray());
-		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
-            return jsonOut;
-        } else {
-            throw new RetcatException("no label for this uri available");
-        }
 	}
 
 }

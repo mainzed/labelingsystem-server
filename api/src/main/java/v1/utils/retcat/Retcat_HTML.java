@@ -19,45 +19,49 @@ import v1.utils.generalfuncs.GeneralFunctions;
 
 public class Retcat_HTML {
 
-    public static Map<String, SuggestionItem> query(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
-        Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
-        SuggestionItem tmpAutosuggest = new SuggestionItem(url);
-        String urlEncoded = GeneralFunctions.encodeURIUmlaut(url);
-        Document doc = Jsoup.connect(urlEncoded).get();
-        Elements titleTag = doc.select("title");
-        String titleStr = titleTag.text();
-        tmpAutosuggest.setLabel(titleStr);
-        tmpAutosuggest.setGroup("wayback");
-        tmpAutosuggest.setQuality("low");
-        tmpAutosuggest.setType("wayback");
-        autosuggests.put(url, tmpAutosuggest);
-        return autosuggests;
-    }
+	public static Map<String, SuggestionItem> query(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+		Map<String, SuggestionItem> autosuggests = new HashMap<String, SuggestionItem>();
+		SuggestionItem tmpAutosuggest = new SuggestionItem(url);
+		String urlEncoded = GeneralFunctions.encodeURIUmlaut(url);
+		Document doc = Jsoup.connect(urlEncoded).get();
+		Elements titleTag = doc.select("title");
+		String titleStr = titleTag.text();
+		tmpAutosuggest.setLabel(titleStr);
+		tmpAutosuggest.setGroup("wayback");
+		tmpAutosuggest.setQuality("low");
+		tmpAutosuggest.setType("wayback");
+		autosuggests.put(url, tmpAutosuggest);
+		return autosuggests;
+	}
 
-    public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
-        String outputUrl = url;
-        url = GeneralFunctions.encodeURIUmlaut(url);
-        Document doc = Jsoup.connect(url).get();
-        Elements titleTag = doc.select("title");
-        JSONObject jsonOut = new JSONObject();
-        String out = titleTag.text();
-        jsonOut.put("label", out);
-        jsonOut.put("lang", "");
-        jsonOut.put("type", "wayback");
-        jsonOut.put("quality", "low");
-        jsonOut.put("group", "wayback");
-        jsonOut.put("uri", outputUrl);
-        JSONArray broader = new JSONArray();
-        JSONArray narrower = new JSONArray();
-        jsonOut.put("broaderTerms", broader);
-        jsonOut.put("narrowerTerms", narrower);
-        jsonOut.put("description", "");
-        jsonOut.put("scheme", "");
-        if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
-            return jsonOut;
-        } else {
-            throw new RetcatException("no label for this uri available");
-        }
-    }
+	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
+		try {
+			String outputUrl = url;
+			url = GeneralFunctions.encodeURIUmlaut(url);
+			Document doc = Jsoup.connect(url).get();
+			Elements titleTag = doc.select("title");
+			JSONObject jsonOut = new JSONObject();
+			String out = titleTag.text();
+			jsonOut.put("label", out);
+			jsonOut.put("lang", "");
+			jsonOut.put("type", "html");
+			jsonOut.put("quality", "low");
+			jsonOut.put("group", "html");
+			jsonOut.put("uri", outputUrl);
+			JSONArray broader = new JSONArray();
+			JSONArray narrower = new JSONArray();
+			jsonOut.put("broaderTerms", broader);
+			jsonOut.put("narrowerTerms", narrower);
+			jsonOut.put("description", "");
+			jsonOut.put("scheme", "");
+			if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+				return jsonOut;
+			} else {
+				throw new RetcatException("no label for this uri available");
+			}
+		} catch (Exception e) {
+			throw new RetcatException(e.toString());
+		}
+	}
 
 }

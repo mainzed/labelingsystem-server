@@ -149,112 +149,116 @@ public class Retcat_Archwort {
 	}
 
 	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
-		String[] id = url.split("/");
-		String newURL = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + id[id.length - 1];
-		URL obj = new URL(newURL);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestMethod("GET");
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
-		String inputLine;
-		StringBuilder response = new StringBuilder();
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		// parse json
-		JSONObject jsonOut = new JSONObject();
-		JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
-		// output
-		JSONObject prefLabel = (JSONObject) jsonObject.get("skos:prefLabel");
-		String lang = (String) prefLabel.get("@language");
-		prefLabel.remove("@language");
-		String label = prefLabel.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
-		jsonOut.put("label", label);
-		jsonOut.put("lang", lang);
-		jsonOut.put("description", "");
-		jsonOut.put("uri", url);
-		// get retcat info
-		String type = "archwort";
-		String quality = "";
-		String group = "";
-		for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
-			if (item.getType().equals(type)) {
-				quality = item.getQuality();
-				group = item.getGroup();
+		try {
+			String[] id = url.split("/");
+			String newURL = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + id[id.length - 1];
+			URL obj = new URL(newURL);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+			con.setRequestMethod("GET");
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
 			}
-		}
-		jsonOut.put("type", type);
-		jsonOut.put("quality", quality);
-		jsonOut.put("group", group);
-		jsonOut.put("scheme", "archwort");
-		// broader and narrower
-		JSONArray broaderTerms = new JSONArray();
-		JSONArray narrowerTerms = new JSONArray();
-		JSONArray broader = (JSONArray) jsonObject.get("skos:broader");
-		JSONArray narrower = (JSONArray) jsonObject.get("skos:narrower");
-		// broader
-		if (broader != null) {
-			for (Object broaderItem : broader) {
-				String tmp = (String) broaderItem;
-				String[] tmpArray = tmp.split("/");
-				String broaderurl = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + tmpArray[tmpArray.length - 1];
-				URL obj2 = new URL(broaderurl);
-				HttpURLConnection con2 = (HttpURLConnection) obj2.openConnection();
-				con2.setRequestMethod("GET");
-				BufferedReader in2 = new BufferedReader(new InputStreamReader(con2.getInputStream(), "UTF8"));
-				String inputLine2;
-				StringBuilder response2 = new StringBuilder();
-				while ((inputLine2 = in2.readLine()) != null) {
-					response2.append(inputLine2);
+			in.close();
+			// parse json
+			JSONObject jsonOut = new JSONObject();
+			JSONObject jsonObject = (JSONObject) new JSONParser().parse(response.toString());
+			// output
+			JSONObject prefLabel = (JSONObject) jsonObject.get("skos:prefLabel");
+			String lang = (String) prefLabel.get("@language");
+			prefLabel.remove("@language");
+			String label = prefLabel.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
+			jsonOut.put("label", label);
+			jsonOut.put("lang", lang);
+			jsonOut.put("description", "");
+			jsonOut.put("uri", url);
+			// get retcat info
+			String type = "archwort";
+			String quality = "";
+			String group = "";
+			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				if (item.getType().equals(type)) {
+					quality = item.getQuality();
+					group = item.getGroup();
 				}
-				in.close();
-				// parse json
-				JSONObject broaderTmp = new JSONObject();
-				JSONObject jsonObject2 = (JSONObject) new JSONParser().parse(response2.toString());
-				JSONObject prefLabel2 = (JSONObject) jsonObject2.get("skos:prefLabel");
-				prefLabel2.remove("@language");
-				String label2 = prefLabel2.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
-				broaderTmp.put("label", label2);
-				tmp = tmp.replace("http://archwort.dainst.org/thesaurus/de/vocab/?tema=", "http://archwort.dainst.org/de/term/");
-				broaderTmp.put("uri", tmp);
-				broaderTerms.add(broaderTmp);
 			}
-		}
-		// narrower
-		if (narrower != null) {
-			for (Object narrowerItem : narrower) {
-				String tmp = (String) narrowerItem;
-				String[] tmpArray = tmp.split("/");
-				String narrowerurl = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + tmpArray[tmpArray.length - 1];
-				URL obj2 = new URL(narrowerurl);
-				HttpURLConnection con2 = (HttpURLConnection) obj2.openConnection();
-				con2.setRequestMethod("GET");
-				BufferedReader in2 = new BufferedReader(new InputStreamReader(con2.getInputStream(), "UTF8"));
-				String inputLine2;
-				StringBuilder response2 = new StringBuilder();
-				while ((inputLine2 = in2.readLine()) != null) {
-					response2.append(inputLine2);
+			jsonOut.put("type", type);
+			jsonOut.put("quality", quality);
+			jsonOut.put("group", group);
+			jsonOut.put("scheme", "archwort");
+			// broader and narrower
+			JSONArray broaderTerms = new JSONArray();
+			JSONArray narrowerTerms = new JSONArray();
+			JSONArray broader = (JSONArray) jsonObject.get("skos:broader");
+			JSONArray narrower = (JSONArray) jsonObject.get("skos:narrower");
+			// broader
+			if (broader != null) {
+				for (Object broaderItem : broader) {
+					String tmp = (String) broaderItem;
+					String[] tmpArray = tmp.split("/");
+					String broaderurl = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + tmpArray[tmpArray.length - 1];
+					URL obj2 = new URL(broaderurl);
+					HttpURLConnection con2 = (HttpURLConnection) obj2.openConnection();
+					con2.setRequestMethod("GET");
+					BufferedReader in2 = new BufferedReader(new InputStreamReader(con2.getInputStream(), "UTF8"));
+					String inputLine2;
+					StringBuilder response2 = new StringBuilder();
+					while ((inputLine2 = in2.readLine()) != null) {
+						response2.append(inputLine2);
+					}
+					in.close();
+					// parse json
+					JSONObject broaderTmp = new JSONObject();
+					JSONObject jsonObject2 = (JSONObject) new JSONParser().parse(response2.toString());
+					JSONObject prefLabel2 = (JSONObject) jsonObject2.get("skos:prefLabel");
+					prefLabel2.remove("@language");
+					String label2 = prefLabel2.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
+					broaderTmp.put("label", label2);
+					tmp = tmp.replace("http://archwort.dainst.org/thesaurus/de/vocab/?tema=", "http://archwort.dainst.org/de/term/");
+					broaderTmp.put("uri", tmp);
+					broaderTerms.add(broaderTmp);
 				}
-				in.close();
-				// parse json
-				JSONObject narrowerTmp = new JSONObject();
-				JSONObject jsonObject2 = (JSONObject) new JSONParser().parse(response2.toString());
-				JSONObject prefLabel2 = (JSONObject) jsonObject2.get("skos:prefLabel");
-				prefLabel2.remove("@language");
-				String label2 = prefLabel2.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
-				narrowerTmp.put("label", label2);
-				tmp = tmp.replace("http://archwort.dainst.org/thesaurus/de/vocab/?tema=", "http://archwort.dainst.org/de/term/");
-				narrowerTmp.put("uri", tmp);
-				narrowerTerms.add(narrowerTmp);
 			}
+			// narrower
+			if (narrower != null) {
+				for (Object narrowerItem : narrower) {
+					String tmp = (String) narrowerItem;
+					String[] tmpArray = tmp.split("/");
+					String narrowerurl = "http://archwort.dainst.org/de/term/xml.php?jsonldTema=" + tmpArray[tmpArray.length - 1];
+					URL obj2 = new URL(narrowerurl);
+					HttpURLConnection con2 = (HttpURLConnection) obj2.openConnection();
+					con2.setRequestMethod("GET");
+					BufferedReader in2 = new BufferedReader(new InputStreamReader(con2.getInputStream(), "UTF8"));
+					String inputLine2;
+					StringBuilder response2 = new StringBuilder();
+					while ((inputLine2 = in2.readLine()) != null) {
+						response2.append(inputLine2);
+					}
+					in.close();
+					// parse json
+					JSONObject narrowerTmp = new JSONObject();
+					JSONObject jsonObject2 = (JSONObject) new JSONParser().parse(response2.toString());
+					JSONObject prefLabel2 = (JSONObject) jsonObject2.get("skos:prefLabel");
+					prefLabel2.remove("@language");
+					String label2 = prefLabel2.toJSONString().replace("{\"@value=\":\"", "").replace("\"}", "");
+					narrowerTmp.put("label", label2);
+					tmp = tmp.replace("http://archwort.dainst.org/thesaurus/de/vocab/?tema=", "http://archwort.dainst.org/de/term/");
+					narrowerTmp.put("uri", tmp);
+					narrowerTerms.add(narrowerTmp);
+				}
+			}
+			jsonOut.put("broaderTerms", broaderTerms);
+			jsonOut.put("narrowerTerms", narrowerTerms);
+			if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
+				return jsonOut;
+			} else {
+				throw new RetcatException("no label for this uri available");
+			}
+		} catch (Exception e) {
+			throw new RetcatException(e.toString());
 		}
-		jsonOut.put("broaderTerms", broaderTerms);
-		jsonOut.put("narrowerTerms", narrowerTerms);
-		if (jsonOut.get("label") != null && !jsonOut.get("label").equals("")) {
-            return jsonOut;
-        } else {
-            throw new RetcatException("no label for this uri available");
-        }
 	}
 
 }
