@@ -44,9 +44,9 @@ public class Retcat_HTML {
 			String out = titleTag.text();
 			jsonOut.put("label", out);
 			jsonOut.put("lang", "");
-			jsonOut.put("type", "html");
+			jsonOut.put("type", "wayback");
 			jsonOut.put("quality", "low");
-			jsonOut.put("group", "html");
+			jsonOut.put("group", "wayback");
 			jsonOut.put("uri", outputUrl);
 			JSONArray broader = new JSONArray();
 			JSONArray narrower = new JSONArray();
