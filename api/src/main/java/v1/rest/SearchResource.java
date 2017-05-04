@@ -11,9 +11,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
@@ -29,6 +32,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import v1.utils.similarity.Similarity;
 
 @Path("/search")
 public class SearchResource {
@@ -190,6 +194,7 @@ public class SearchResource {
 			int i = 0;
 			for (Map.Entry<String, SuggestionItem> entry : autosuggests.entrySet()) {
 				if (i < limit) {
+					JSONObject similarityObject = new JSONObject();
 					SuggestionItem tmpAS = entry.getValue();
 					JSONObject suggestionObject = new JSONObject();
 					// url
@@ -197,24 +202,17 @@ public class SearchResource {
 					suggestionObject.put("id", tmpAS.getId());
 					// prefLabels
 					JSONArray prefLabelArray = new JSONArray();
+					List<Double> prefLabelSimilarity = new ArrayList();
 					for (String item : tmpAS.getLabels()) {
 						String[] splitItem = item.split("@");
 						JSONObject jo = new JSONObject();
 						jo.put("label", splitItem[0]);
 						jo.put("lang", splitItem[1]);
 						prefLabelArray.add(jo);
+						prefLabelSimilarity.add(Similarity.NormalizedLevenshtein(searchword, splitItem[0]));
 					}
 					suggestionObject.put("prefLabels", prefLabelArray);
-					// altLabels
-					JSONArray altLabelArray = new JSONArray();
-					for (String item : tmpAS.getAltLabels()) {
-						String[] splitItem = item.split("@");
-						JSONObject jo = new JSONObject();
-						jo.put("label", splitItem[0]);
-						jo.put("lang", splitItem[1]);
-						altLabelArray.add(jo);
-					}
-					suggestionObject.put("altLabels", altLabelArray);
+					similarityObject.put("label", Collections.min(prefLabelSimilarity));
 					// scheme
 					String[] splitVocabItem = tmpAS.getSchemeTitle().split("@");
 					if (splitVocabItem.length > 1) {
@@ -231,6 +229,7 @@ public class SearchResource {
 						jo.put("note", splitItem[0]);
 						jo.put("lang", splitItem[1]);
 						suggestionObject.put("scopeNote", jo);
+						similarityObject.put("scopeNote", Similarity.NormalizedLevenshtein(searchword, splitItem[0]));
 					}
 					// broader
 					Set broaderTerms = tmpAS.getBroaderTerms();
@@ -270,6 +269,8 @@ public class SearchResource {
 						}
 					}
 					suggestionObject.put("narrowerTerms", narrowerArrayNew);
+					// add similarity
+					suggestionObject.put("similarityNormalizedLevenshtein", similarityObject);
 					// add information to output
 					outArray.add(suggestionObject);
 				}
