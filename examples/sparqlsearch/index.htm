@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Labeling System SPARQL and fulltext search</title>
+        <title>Labeling System Search</title>
 		<link rel="stylesheet" href="style.css">
 		<script src="http://code.jquery.com/jquery-latest.js"></script>
 		<!--CodeMirror-->
@@ -12,10 +12,9 @@
 		<script src="cm-sparql.js"></script>
     </head>
     <body>
-		<h1>Labeling System SPARQL and fulltext search</h1>
-        <input type="text" id="searchstring" value="">
-        <br>
-        <input type="button" class="btn btn-default" value="RUN FULLTEXT QUERY" id="sendfulltextquery">
+		<h1>Labeling System Search</h1>
+        <input type="text" id="searchstring" value="" placeholder="search string">
+        <input type="button" class="btn btn-default disabled" value="SUBMIT FULLTEXT QUERY" id="sendfulltextquery">
         <span id="sparqlfield"><textarea id='sparql_eingabe'></textarea></span>
     	<input type="button" class="btn btn-default" value="RUN SPARQL QUERY" id="sendsparqltextarea">
         <span id="sendlink"></span>
@@ -29,8 +28,8 @@
     var itemAPI = "item";
     var itemV = "vocab"; // vocab || vocabulary
     var itemC = "concept"; // concept || label
-    var itemA = "revision"; // revision || revision
-    var itemR = "agent"; // agent || agent
+    var itemA = "agent"; // agent || agent
+    var itemR = "revision"; // revision || revision
 	var editor;
     var SPARQLAPI = host + "/api/v1/sparql";
     var SEARCHAPI = host + "/api/v1/search";
@@ -46,12 +45,11 @@
         "PREFIX dct: <http://purl.org/dc/terms/>\n" +
         "PREFIX owl: <http://www.w3.org/2002/07/owl#>\n" +
         "PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>\n" +
-        "PREFIX geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>\n" +
         "PREFIX prov: <http://www.w3.org/ns/prov#>\n" +
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n\n";
     var QUERY_RESET = "SELECT ?concept ?label ?creator ?vocab ?vocabtitle WHERE {\n" +
         "  ?concept a ls:Label.\n" +
-        "  ?concept dc:creator ?creator.\n" +
+        "  ?concept dct:creator ?creator.\n" +
 		"  ?concept ls:thumbnail ?label .\n" +
 		"  ?concept skos:inScheme ?vocab.\n" +
 		"  ?vocab ls:hasReleaseType ls:Public.\n" +
@@ -88,6 +86,14 @@
         $('#csvlink').html(h);
     }
 
+    $('#searchstring').keyup(function() {
+        if ($('#searchstring').val().length>0) {
+            $('#sendfulltextquery').removeClass("disabled");
+        } else {
+            $('#sendfulltextquery').addClass("disabled");
+        }
+    });
+
     editor.on('keyup', function() {
         $('#result').html("");
         $('#xmllink').html("");
@@ -112,7 +118,7 @@
                 try {
 					output = JSON.parse(output);
 				} catch (e) {}
-                var vars = ["Subject","Terms","Parents","Description"];
+                var vars = ["Subject","Terms","Parents","Description","Similarity (normalized Levenshtein distance)"];
 				var size = 25;
                 var html_str = "";
                 html_str += "<span class='resultsleft'>Results for \""+$("#searchstring").val()+"\" ("+output.length+")</span>";
@@ -144,6 +150,18 @@
             		html_str += "</td>";
                 	if (output[item]["scopeNote"]) {
 						html_str += "<td width='"+size+"%'>" + output[item]["scopeNote"]["note"] + "</td>";
+					} else {
+						html_str += "<td width='"+size+"%'>" + "<i>undefined</i>" + "</td>";
+					}
+                    if (output[item]["similarityNormalizedLevenshtein"]) {
+						html_str += "<td width='"+size+"%'>";
+                        var labelDist = output[item]["similarityNormalizedLevenshtein"]["label"];
+                        var noteDist = output[item]["similarityNormalizedLevenshtein"]["scopeNote"];
+                        html_str += "best term: <b>" + Math.round(labelDist*100)/100 + "</b><br>";
+                        if (noteDist) {
+                            html_str += "description: <b>" + Math.round(noteDist*100)/100 + "</b>";
+                        }
+                        html_str += "</td>";
 					} else {
 						html_str += "<td width='"+size+"%'>" + "<i>undefined</i>" + "</td>";
 					}
@@ -218,7 +236,6 @@
                     		val = val.replace("http://www.w3.org/2002/07/owl#","owl:");
                     		val = val.replace("http://www.w3.org/2001/XMLSchema#","xsd:");
                     		val = val.replace("http://xmlns.com/foaf/0.1/","foaf:");
-                    		val = val.replace("http://www.w3.org/2003/01/geo/wgs84_pos#","geo:");
                     		val = val.replace("http://www.w3.org/ns/prov#","prov:");
                     		tblTxt = "<a href='"+bindings[item][vars[varstr]].value+"' target='_blank'>"+val+"</a>";
                     	} else if (bindings[item][vars[varstr]]["xml:lang"]) {

@@ -87,7 +87,7 @@ nginx and Tomcat
 * create folders and set r/w rights for Tomcat role
 * copy dump script to /opt folder (if data is not in opt folder, change paths in shell script)
 * start dump cron job
-* get hashed admin pwd via /hash and write it to sqlite database
+* get hashed admin and demo password via /auth/hash and write it to sqlite database
 * copy `SQLite` and `Person` database into db folder and set full r/w rights (chmod 777)
 * deploy war files for triplestore (`rdf4j-server.war`, `rdf4j-workbench.war`)
 * create `labelingsystem` and `datahub` repository in RDF4J

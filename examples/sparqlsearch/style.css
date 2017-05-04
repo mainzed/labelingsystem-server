@@ -11,7 +11,7 @@ body {
 	background-color: #4a6491;
 }
 table, th, td {
-	border: 1px solid #d0e4f2;
+	border: 1px solid #4a6491;
 	border-collapse: collapse;
 }
 table {
@@ -65,12 +65,13 @@ tr.bg {
     margin-right:10px;
     margin-bottom: 15px;
     margin-top: 15px;
+		height: 44px;
 }
 .resultsleft {
 	float:left;
 	margin:10px;
 	font-weight:500;
-	font-size:14px;
+	font-size:18px;
 }
 .resultsright {
 	float:right;
@@ -83,7 +84,7 @@ tr.bg {
 	margin-bottom: 12px;
 	font-family: monospace;
 	height: 15px;
-	width: 50%;
+	width: 200px;
 	color: black;
 	border: 1px solid #bbb;
 	border-radius: 4px;
@@ -100,3 +101,8 @@ a.grey:visited {color: #fff;text-decoration:underline}
 a.grey:hover   {color: #fff;text-decoration:none}
 a.grey.hover   {color: #fff;text-decoration:none}
 a.grey:active  {color: #fff;text-decoration:underline}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
