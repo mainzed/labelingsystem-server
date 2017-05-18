@@ -157,6 +157,11 @@ public class CSV implements Runnable {
 			// translation check
 			for (int i = 1; i < csvLines.length; i++) {
 				String[] tokens = csvLines[i].split("[\t]");
+				if (!tokens[2].equals("") && !tokens[2].contains(";")) {
+					errorArray.add("error: semocolon needed for translations in line " + (i + 1));
+					error = true;
+					errors++;
+				}
 				if (tokens[2].contains(";")) {
 					if (tokens[2].split(";").length % 2 != 0) {
 						errorArray.add("error: language or deliminiter error for translations in line " + (i + 1));
@@ -207,6 +212,14 @@ public class CSV implements Runnable {
 					}
 				}
 			}
+			// replacements
+			for (int i = 1; i < csvLines.length; i++) {
+				String[] tokens = csvLines[i].split("[\t]");
+				tokens[0] = tokens[0].replace("\"", "'");
+				tokens[1] = tokens[1].replace("\"", "'");
+				tokens[2] = tokens[2].replace("\"", "'");
+				csvLines[i] = tokens[0] + "\t" + tokens[1] + "\t" + tokens[2] + "\t" + tokens[3] + "\r\n";
+			}
 			if (!error) {
 				// create triples
 				for (int i = 1; i < csvLines.length; i++) {
@@ -245,8 +258,6 @@ public class CSV implements Runnable {
 					error = true;
 					errors++;
 				}
-			} else {
-				throw new CsvLabelImportException();
 			}
 		} catch (Exception e) {
 			error = true;
