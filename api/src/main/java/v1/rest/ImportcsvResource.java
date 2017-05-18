@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.zip.DataFormatException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
@@ -22,8 +21,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import v1.utils.transformer.Transformer;
 
 @Path("/importcsv")
@@ -105,9 +102,6 @@ public class ImportcsvResource {
 			CONTEXT = String.valueOf(System.currentTimeMillis());
 			FILENAME = CONTEXT + ".ttl";
 			FILELINK = SHARE_WEB + FILENAME;
-			if (!contentDispositionHeader.getFileName().contains(".csv")) {
-				throw new DataFormatException();
-			}
 			String filePath = SERVER_UPLOAD_LOCATION_FOLDER + contentDispositionHeader.getFileName();
 			// save the file to the server
 			saveFile(fileInputStream, filePath);
@@ -137,17 +131,8 @@ public class ImportcsvResource {
 				return Response.status(200).entity(CSV.JSON_STRING).header("Content-Type", "application/json;charset=UTF-8").build();
 			}
 		} catch (Exception e) {
-			if (e.toString().contains("DataFormatException")) {
-				JSONObject errorOutput = new JSONObject();
-				JSONArray errorArray = new JSONArray();
-				errorArray.add("error: wrong file type, must be .csv");
-				errorOutput.put("errors", 1);
-				errorOutput.put("messages", errorArray);
-				return Response.status(Response.Status.BAD_REQUEST).entity(errorOutput).header("Content-Type", "application/json;charset=UTF-8").build();
-			} else {
-				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.ImportcsvResource"))
-						.header("Content-Type", "application/json;charset=UTF-8").build();
-			}
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Logging.getMessageJSON(e, "v1.rest.ImportcsvResource"))
+					.header("Content-Type", "application/json;charset=UTF-8").build();
 		}
 	}
 
