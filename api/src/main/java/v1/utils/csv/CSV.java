@@ -77,6 +77,7 @@ public class CSV implements Runnable {
 			}
 			TRIPLE_LIST.clear();
 			// thumbnail[0];description[1];translations[2];END[3]
+			// validator
 			String[] csvLines = csvContent.split("\r\n");
 			// check if vocabulary exists
 			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
@@ -123,12 +124,28 @@ public class CSV implements Runnable {
 			}
 			// check for header names
 			String[] header = csvLines[0].split("\t");
-			if (header[0].contains("thumbnail") && header[1].contains("description") && header[2].contains("translations") && header[3].contains("end")) {
-			} else {
-				String headerStr = header[0] + "," + header[1] + "," + header[2] + "," + header[3];
-				errorArray.add("error: wrong header-names in first line -> " + headerStr);
+			if (header == null) {
+				errorArray.add("error: no header existing");
 				error = true;
 				errors++;
+				// quit import
+				throw new IllegalArgumentException();
+			} else {
+				if (header.length == 4) {
+					if (header[0].contains("thumbnail") && header[1].contains("description") && header[2].contains("translations") && header[3].contains("end")) {
+					} else {
+						String headerStr = header[0] + "," + header[1] + "," + header[2] + "," + header[3];
+						errorArray.add("error: wrong header-names in first line -> " + headerStr);
+						error = true;
+						errors++;
+					}
+				} else {
+					errorArray.add("error: wrong header-names in first line");
+					error = true;
+					errors++;
+					// quit import
+					throw new IllegalArgumentException();
+				}
 			}
 			// check for line breaks
 			if (csvLines.length < 2) {
