@@ -41,7 +41,7 @@ public class Transformer {
 
     public static String vocabulary_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
         //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         // parse json
         JSONObject rdfObject = new JSONObject();
         JSONObject vocabularyObject = (JSONObject) new JSONParser().parse(json);
@@ -149,7 +149,7 @@ public class Transformer {
         JSONObject vocabularyObject = null;
         try {
             //init
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             // parse json
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             jsonObject.put("vocab", jsonObject.remove(rdf.getPrefixItem("ls_voc" + ":" + id)));
@@ -345,7 +345,7 @@ public class Transformer {
         JSONObject revisionObject = null;
         try {
             //init
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             // parse json
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             jsonObject.put("revision", jsonObject.remove(rdf.getPrefixItem("ls_rev" + ":" + id)));
@@ -441,7 +441,7 @@ public class Transformer {
 
     public static String agent_POST(String json, String id) throws IOException, UniqueIdentifierException, ParseException {
         //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         // parse json
         JSONObject rdfObject = new JSONObject();
         JSONObject agentObject = (JSONObject) new JSONParser().parse(json);
@@ -519,7 +519,7 @@ public class Transformer {
         JSONObject agentObject = null;
         try {
             //init
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             // parse json
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             jsonObject.put("agent", jsonObject.remove(rdf.getPrefixItem("ls_age" + ":" + id)));
@@ -618,7 +618,7 @@ public class Transformer {
 
     public static String label_POST(String json, String id, String creator) throws IOException, UniqueIdentifierException, ParseException {
         //init
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         // parse json
         JSONObject rdfObject = new JSONObject();
         JSONObject labelObject = (JSONObject) new JSONParser().parse(json);
@@ -909,7 +909,7 @@ public class Transformer {
         JSONObject labelObject = null;
         try {
             //init
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             // parse json
             JSONObject jsonObject = (JSONObject) new JSONParser().parse(json);
             jsonObject.put("label", jsonObject.remove(rdf.getPrefixItem("ls_lab" + ":" + id)));
@@ -1258,7 +1258,7 @@ public class Transformer {
             labelObject.remove(rdf.getPrefixItem("skos:changeNote"));
             if (revisionsBool != null) {
                 if (revisionsBool.equals("true")) {
-                    RDF rdf2 = new RDF(ConfigProperties.getPropertyParam("host"));
+                    RDF rdf2 = new RDF();
                     String query = rdf2.getPREFIXSPARQL();
                     query += "SELECT * WHERE { "
                             + "ls_lab:" + id + " skos:changeNote ?rev. "
@@ -1293,7 +1293,7 @@ public class Transformer {
             // set equal concepts
             if (equalConceptsBool != null) {
                 // get bidirectional concepts
-                RDF rdf2 = new RDF(ConfigProperties.getPropertyParam("host"));
+                RDF rdf2 = new RDF();
                 String query = rdf2.getPREFIXSPARQL();
                 query += "SELECT * WHERE { ?em skos:exactMatch ls_lab:" + id + ". } ";
                 List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -2069,7 +2069,7 @@ public class Transformer {
 
     public static void writeVocabularyStatisticsToDatabase(String vocabulary) throws org.eclipse.rdf4j.repository.RepositoryException, org.eclipse.rdf4j.query.MalformedQueryException, org.eclipse.rdf4j.query.QueryEvaluationException, SparqlParseException, SparqlQueryException, IOException, ClassNotFoundException, SQliteException, StatisticsException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             // query triplestore
             String query = "PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?l ?p ?o WHERE { ?l skos:inScheme ?v . ?v dc:identifier ?id . ?l ?p ?o. FILTER (?id = \"" + vocabulary + "\") }";
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);

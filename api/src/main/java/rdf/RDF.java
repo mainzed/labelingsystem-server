@@ -59,7 +59,7 @@ public class RDF {
             + "PREFIX geo: <" + PREFIX_GEO + "> "
             + "PREFIX dcat: <" + PREFIX_DCAT + "> ";
 
-    public RDF(String HOST) throws IOException {
+    public RDF() throws IOException {
         model = ModelFactory.createDefaultModel();
         model.setNsPrefix("ls", PREFIX_LABELINGSYSTEM);
         model.setNsPrefix("skos", PREFIX_SKOS);

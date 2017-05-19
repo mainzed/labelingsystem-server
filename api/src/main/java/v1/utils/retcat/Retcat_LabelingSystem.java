@@ -324,7 +324,7 @@ public class Retcat_LabelingSystem {
 
 	public static JSONObject info(String url) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, RetcatException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String sparqlendpoint = ConfigProperties.getPropertyParam("api") + "/v1/sparql";
 			String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX ls: <http://labeling.link/docs/ls/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX dct: <http://purl.org/dc/terms/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> "
 					+ "SELECT * { "

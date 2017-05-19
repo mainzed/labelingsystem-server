@@ -46,7 +46,7 @@ public class AuthResource {
                 jsonStatus.put("token", secretToken);
                 jsonOut.put("status", jsonStatus);
                 // get agent object
-                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+                RDF rdf = new RDF();
                 String item = "ls_age";
                 String query = GeneralFunctions.getAllElementsForItemID(item, user);
                 List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -89,7 +89,7 @@ public class AuthResource {
                 jsonStatus.put("date", status[1]);
                 jsonOut.put("status", jsonStatus);
                 // get agent object
-                RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+                RDF rdf = new RDF();
                 String item = "ls_age";
                 String query = GeneralFunctions.getAllElementsForItemID(item, user);
                 List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);

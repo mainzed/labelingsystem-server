@@ -51,7 +51,7 @@ public class RevisionsResource {
 		try {
 			String OUTSTRING = "";
 			// QUERY STRING
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { "
 					+ "?s ?p ?o . "
@@ -197,7 +197,7 @@ public class RevisionsResource {
 	public Response getRevision(@PathParam("revision") String revision, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
 			String OUTSTRING = "";
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -323,7 +323,7 @@ public class RevisionsResource {
 	public Response getRevision_JSON(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
 			String OUTSTRING = "";
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -378,7 +378,7 @@ public class RevisionsResource {
 	@Produces("application/xml;charset=UTF-8")
 	public Response getRevision_XML(@PathParam("revision") String revision) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -408,7 +408,7 @@ public class RevisionsResource {
 	@Produces("application/rdf+xml;charset=UTF-8")
 	public Response getRevisionRDF_XML(@PathParam("revision") String revision) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -438,7 +438,7 @@ public class RevisionsResource {
 	@Produces("text/turtle;charset=UTF-8")
 	public Response getRevisionRDF_Turtle(@PathParam("revision") String revision) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -467,7 +467,7 @@ public class RevisionsResource {
 	@Produces("text/n3;charset=UTF-8")
 	public Response getRevisionRDF_N3(@PathParam("revision") String revision) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -496,7 +496,7 @@ public class RevisionsResource {
 	@Produces("application/json;charset=UTF-8")
 	public Response getRevisionRDF_JSONRDF(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -533,7 +533,7 @@ public class RevisionsResource {
 	@Produces("application/ld+json;charset=UTF-8")
 	public Response getRevisionRDF_JSONLD(@PathParam("revision") String revision, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_rev";
 			String query = GeneralFunctions.getAllElementsForItemID(item, revision);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);

@@ -85,7 +85,7 @@ public class LabelsResource {
         try {
             String OUTSTRING = "";
             // QUERY STRING
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT ?s ?p ?o WHERE { "
@@ -285,7 +285,7 @@ public class LabelsResource {
             throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
             String OUTSTRING = "";
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -421,7 +421,7 @@ public class LabelsResource {
             throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             String OUTSTRING = "";
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
@@ -481,7 +481,7 @@ public class LabelsResource {
     public Response getLabel_XML(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
             String OUTSTRING = "";
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -511,7 +511,7 @@ public class LabelsResource {
     @Produces("application/rdf+xml;charset=UTF-8")
     public Response getLabelRDF_XML(@PathParam("label") String label) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -541,7 +541,7 @@ public class LabelsResource {
     @Produces("text/turtle;charset=UTF-8")
     public Response getLabelRDF_Turtle(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -570,7 +570,7 @@ public class LabelsResource {
     @Produces("text/n3;charset=UTF-8")
     public Response getLabelRDF_N3(@PathParam("label") String label) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -599,7 +599,7 @@ public class LabelsResource {
     @Produces("application/json;charset=UTF-8")
     public Response getLabelRDF_JSONRDF(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -636,7 +636,7 @@ public class LabelsResource {
     @Produces("application/ld+json;charset=UTF-8")
     public Response getLabelRDF_JSONLD(@PathParam("label") String label, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
         try {
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -810,7 +810,7 @@ public class LabelsResource {
             // trigger for create statistics
             Transformer.writeVocabularyStatisticsToDatabase(vocabID);
             // get result als json
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
             String query = GeneralFunctions.getAllElementsForItemID(item, itemID);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -857,7 +857,7 @@ public class LabelsResource {
             String json_new = json;
             json = Transformer.label_POST(json, label, user);
             // get json old
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -897,7 +897,7 @@ public class LabelsResource {
             // trigger for create statistics
             Transformer.writeVocabularyStatisticsToDatabase(vocabID);
             // get result als json
-            rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            rdf = new RDF();
             query = GeneralFunctions.getAllElementsForItemID(item, label);
             result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -929,7 +929,7 @@ public class LabelsResource {
                 throw new ResourceNotAvailableException("resource " + label + " is not available");
             }
             // get vocabulary id
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT ?vid WHERE { ?l dc:identifier ?id. ?l skos:inScheme ?v . ?v dc:identifier ?vid . FILTER (?id = \"" + label + "\") }";
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -953,7 +953,7 @@ public class LabelsResource {
         Date d = calender.getTime();
         DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         String date = formatter.format(d);
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         triples += item + ":" + itemid + " a ls:Label . ";
@@ -969,7 +969,7 @@ public class LabelsResource {
     }
 
     private static String modifySPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         Calendar calender = Calendar.getInstance();
         Date date = calender.getTime();
@@ -982,7 +982,7 @@ public class LabelsResource {
     }
 
     private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
         Calendar calender = Calendar.getInstance();
@@ -1152,7 +1152,7 @@ public class LabelsResource {
     }
 
     private static String deleteItemsSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label . ?resource skos:related ?label . } "
@@ -1171,7 +1171,7 @@ public class LabelsResource {
     }
 
     private static String deleteLabelSPARQLUPDATE(String id) throws IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String update = prefixes
                 + "DELETE { ?label ?p ?o. ?resource skos:broader ?label . ?resource skos:narrower ?label . ?resource skos:related ?label . } "
@@ -1189,7 +1189,7 @@ public class LabelsResource {
     }
 
     private static List<InheritFromVocab> getInheritedFromVocabList() throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException {
-        RDF rdf2 = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf2 = new RDF();
         String queryRL = rdf2.getPREFIXSPARQL();
         queryRL += "SELECT * WHERE { ?scheme a ls:Vocabulary. ?scheme dc:identifier ?id. OPTIONAL { ?scheme dct:license ?license. } OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } }";
         List<BindingSet> resultRL = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), queryRL);

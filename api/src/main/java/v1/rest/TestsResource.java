@@ -22,7 +22,7 @@ public class TestsResource {
     public Response initTest() throws IOException, JDOMException, ConfigException, ParserConfigurationException, TransformerException {
         try {
             // delete "test" user's vocabs and labels
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String prefixes = rdf.getPREFIXSPARQL();
 			String update = prefixes
                 + "DELETE { ?revision ?p2 ?o. } "

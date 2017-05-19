@@ -10,7 +10,7 @@ import java.net.URLEncoder;
 public class GeneralFunctions {
 	
 	public static String getAllElementsForItemID(String item, String itemid) throws ConfigException, IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT * WHERE { ";
         query += item + ":" + itemid + " ?p ?o. } ";
@@ -19,7 +19,7 @@ public class GeneralFunctions {
     }
 
     public static String getAllLabelsForVocabulary(String itemid) throws ConfigException, IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT * WHERE { ";
         query += "?s skos:inScheme ?voc . ";
@@ -29,7 +29,7 @@ public class GeneralFunctions {
     }
 
     public static String getSPARQLqueryElementsForRetcatsItem(String itemid) throws ConfigException, IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT ?var ?query ?url WHERE { ";
         query += "?retcat dc:identifier ?identifier. ";
@@ -42,7 +42,7 @@ public class GeneralFunctions {
     }
 
     public static String getHierarchyForLabelsOneStep(String itemid) throws ConfigException, IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT ?narrowerTerm ?broaderTerm ?relatedTerm WHERE { ";
         query += "?s a ls:Label. ";
@@ -56,7 +56,7 @@ public class GeneralFunctions {
     }
 
     public static String getRelationsForLabelsByCreator(String itemid) throws ConfigException, IOException {
-        RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+        RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String query = prefixes + "SELECT ?nt ?bt ?rt ?nmt ?bmt ?rmt ?cmt ?emt WHERE { ";
         query += "?label a ls:Label. ";

@@ -66,7 +66,7 @@ public class AgentsResource {
 		try {
 			String OUTSTRING = "";
 			// QUERY STRING
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { "
 					+ "?s ?p ?o . "
@@ -242,7 +242,7 @@ public class AgentsResource {
 	public Response getAgent(@PathParam("agent") String agent, @HeaderParam("Accept") String acceptHeader, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
 			String OUTSTRING = "";
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -383,7 +383,7 @@ public class AgentsResource {
 	public Response getAgent_JSON(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty, @HeaderParam("Accept-Encoding") String acceptEncoding) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
 			String OUTSTRING = "";
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -443,7 +443,7 @@ public class AgentsResource {
 	@Produces("application/xml;charset=UTF-8")
 	public Response getAgent_XML(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -473,7 +473,7 @@ public class AgentsResource {
 	@Produces("application/rdf+xml;charset=UTF-8")
 	public Response getAgentRDF_XML(@PathParam("agent") String agent) throws IOException, JDOMException, RdfException, ParserConfigurationException, TransformerException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -503,7 +503,7 @@ public class AgentsResource {
 	@Produces("text/turtle;charset=UTF-8")
 	public Response getAgentRDF_Turtle(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -532,7 +532,7 @@ public class AgentsResource {
 	@Produces("text/n3;charset=UTF-8")
 	public Response getAgentRDF_N3(@PathParam("agent") String agent) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -561,7 +561,7 @@ public class AgentsResource {
 	@Produces("application/json;charset=UTF-8")
 	public Response getAgentRDF_JSONRDF(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -598,7 +598,7 @@ public class AgentsResource {
 	@Produces("application/ld+json;charset=UTF-8")
 	public Response getAgentRDF_JSONLD(@PathParam("agent") String agent, @QueryParam("pretty") boolean pretty) throws IOException, JDOMException, TransformerException, ParserConfigurationException {
 		try {
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String item = "ls_age";
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -651,7 +651,7 @@ public class AgentsResource {
 			RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), triples);
 			// get result als json
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String query = GeneralFunctions.getAllElementsForItemID(item, itemID);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -700,7 +700,7 @@ public class AgentsResource {
 			RDF4J_20.SPARQLupdate(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), putAgentSPARQLUPDATE(agent));
 			RDF4J_20.inputRDFfromRDFJSONString(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), json);
 			// get result als json
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String query = GeneralFunctions.getAllElementsForItemID(item, agent);
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
 			List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -754,7 +754,7 @@ public class AgentsResource {
 	}
 
 	private static String createAgentSPARQLUPDATE(String item, String itemid) throws ConfigException, IOException, UniqueIdentifierException {
-		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		RDF rdf = new RDF();
 		String prefixes = rdf.getPREFIXSPARQL();
 		String triples = prefixes + "INSERT DATA { ";
 		triples += item + ":" + itemid + " a ls:Agent . ";
@@ -765,7 +765,7 @@ public class AgentsResource {
 	}
 
 	private static String putAgentSPARQLUPDATE(String id) throws IOException {
-		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		RDF rdf = new RDF();
 		String prefixes = rdf.getPREFIXSPARQL();
 		String update = prefixes
 				+ "DELETE { ?agent ?p ?o. } "
@@ -780,7 +780,7 @@ public class AgentsResource {
 	}
 
 	private static String deleteAgentSPARQLUPDATE(String id) throws IOException {
-		RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+		RDF rdf = new RDF();
 		String prefixes = rdf.getPREFIXSPARQL();
 		String update = prefixes
 				+ "DELETE { ?agent ?p ?o. } "

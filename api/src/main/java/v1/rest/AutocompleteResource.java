@@ -34,7 +34,7 @@ public class AutocompleteResource {
 			if (substing.length() <= minLength) {
 				throw new AutocompleteLengthException();
 			} else {
-				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				RDF rdf = new RDF();
 				String query = rdf.getPREFIXSPARQL();
 				query += "SELECT * WHERE { "
 						+ "?s a ls:Label . "
@@ -82,7 +82,7 @@ public class AutocompleteResource {
 			if (substing.length() <= minLength) {
 				throw new AutocompleteLengthException();
 			} else {
-				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				RDF rdf = new RDF();
 				String query = rdf.getPREFIXSPARQL();
 				query += "SELECT * WHERE { "
 						+ "?s a ls:Label . "
@@ -138,7 +138,7 @@ public class AutocompleteResource {
 			if (substing.length() <= minLength) {
 				throw new AutocompleteLengthException();
 			} else {
-				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				RDF rdf = new RDF();
 				String query = rdf.getPREFIXSPARQL();
 				query += "SELECT * WHERE { "
 						+ "?s a ls:Agent . "
@@ -186,7 +186,7 @@ public class AutocompleteResource {
 			if (substing.length() <= minLength) {
 				throw new AutocompleteLengthException();
 			} else {
-				RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+				RDF rdf = new RDF();
 				String query = rdf.getPREFIXSPARQL();
 				query += "SELECT * WHERE { "
 						+ "?s a ls:Vocabulary . "

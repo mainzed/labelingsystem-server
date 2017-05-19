@@ -37,7 +37,7 @@ public class InfoResource {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             outObject.put("last build", sdf.format(file.lastModified()));
             // get label data
-            RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+            RDF rdf = new RDF();
             String query = "";
             List<BindingSet> result = null;
             // metadata

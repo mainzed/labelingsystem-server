@@ -80,7 +80,7 @@ public class CSV implements Runnable {
 			// validator
 			String[] csvLines = csvContent.split("\r\n");
 			// check if vocabulary exists
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { ?v a ls:Vocabulary . ?v dc:identifier \"" + vocab + "\" . }";
 			List<BindingSet> voc_result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -91,7 +91,7 @@ public class CSV implements Runnable {
 				errors++;
 			}
 			// get vocabulary language
-			rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			rdf = new RDF();
 			query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { ?vocab dc:identifier \"" + vocab + "\". ?vocab dc:language ?lang. }";
 			List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -103,7 +103,7 @@ public class CSV implements Runnable {
 				errors++;
 			}
 			// get creator
-			rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			rdf = new RDF();
 			query = rdf.getPREFIXSPARQL();
 			query += "SELECT * WHERE { ?vocab dc:identifier \"" + vocab + "\". ?vocab dc:creator ?creator. }";
 			result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -305,7 +305,7 @@ public class CSV implements Runnable {
 			String thumbnail = tokens[0];
 			String description = tokens[1];
 			String[] translations = tokens[2].split(";");
-			RDF rdf = new RDF(ConfigProperties.getPropertyParam("host"));
+			RDF rdf = new RDF();
 			String label = "";
 			// typing
 			label = "";
