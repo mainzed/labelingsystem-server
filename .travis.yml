@@ -1,0 +1,4 @@
+language: java
+script:
+  - cd spi
+  - mvn test -B
