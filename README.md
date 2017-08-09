@@ -2,7 +2,7 @@
 
 The Labeling System offers experts the possibility to create concepts with context-bound validity, to concretize, to group in containers (vocabularies) and to share them with the research community. The LS provides user-friendly web tools that allow semantic linking of terms into the Linked Open Data Cloud. Once vocabularies are published, the LS serves as a distributed repository of concepts (concept-gazetteer), which provides citable addresses on the Web (URI). Each generated concept is explicit assigned to its creator. This assured authorship yield in a clear responsibility for data maintenance.
 
-The Labeling System consists of three components: the [server](https://github.com/mainzed/labelingsystem-server), the [client wep-app](https://github.com/mainzed/labelingsystem-client) and the [datahub](https://github.com/mainzed/labelingsystem-datahub). The [datamodel](https://github.com/mainzed/labelingsystem-ontology) used in the backend is represented in an ontology using linked data vocabularies. This repository represents the server component of the Labeling System.
+The Labeling System consists of two components: the [server](https://github.com/mainzed/labelingsystem-server) and the [client wep-app](https://github.com/mainzed/labelingsystem-client). The [datamodel](https://github.com/mainzed/labelingsystem-ontology) used in the backend is represented in an ontology using linked data vocabularies. This repository represents the server component of the Labeling System.
 
 ## Server Components
 
@@ -21,10 +21,6 @@ RESTful API to provide cool URIs for Labeling System items.
 #### persondb.war
 
 Servlet providing persons for linking.
-
-#### datahub.war
-
-RESTful API for the Labeling Explorer.
 
 ### databases
 
@@ -111,27 +107,3 @@ Developers:
     * Institut für Raumbezogene Informations- und Messtechnik (i3mainz)
     * Römisch-Germanisches Zentralmuseum, Leibniz-Forschungsinstitut für Archäologie (RGZM)
     * Mainzer Zentrum für Digitalität in den Geistes- und Kulturwissenschaften (mainzed)
-
-## License
-
-MIT License
-
-Copyright (c) 2014-2017 Florian Thiery M.Sc., i3mainz, RGZM, mainzed
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
