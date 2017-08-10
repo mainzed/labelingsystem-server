@@ -8,7 +8,9 @@
             <goals>
                 <goal>clean</goal>
                 <goal>install</goal>
-                <goal>site</goal>
+                
+                
+                
             </goals>
         </action>
     </actions>
