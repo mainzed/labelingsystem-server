@@ -398,15 +398,10 @@ public class RetcatResource {
 			}
 			// get waybacklink
 			URL obj = new URL(ConfigProperties.getPropertyParam("waybackapi").replace("$url", url));
-			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-			con.setRequestMethod("GET");
-			String urlParameters = "";
-			con.setDoOutput(true);
-			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-			wr.writeBytes(urlParameters);
-			wr.flush();
-			wr.close();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Accept", "application/json");
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF8"));
 			String inputLine;
 			StringBuilder response = new StringBuilder();
 			while ((inputLine = in.readLine()) != null) {
