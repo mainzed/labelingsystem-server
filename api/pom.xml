@@ -17,6 +17,13 @@
 			</properties>
 		</profile>
 	</profiles>
+	<repositories>
+		<!-- add https://jitpack.io -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 	<build>
 		<plugins>
 			<plugin>
@@ -315,6 +322,12 @@
 			<groupId>info.debatty</groupId>
 			<artifactId>java-string-similarity</artifactId>
 			<version>RELEASE</version>
+		</dependency>
+		<!-- GitHub dependencies via https://jitpack.io - version: last commit number-->
+		<dependency>
+			<groupId>com.github.mainzed</groupId>
+			<artifactId>labelingsystem-retcat</artifactId>
+			<version>79ac5597d4</version>
 		</dependency>
 	</dependencies>
 	<reporting>
