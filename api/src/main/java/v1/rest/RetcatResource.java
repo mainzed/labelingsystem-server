@@ -5,7 +5,7 @@ import exceptions.WaybacklinkException;
 import v1.utils.config.ConfigProperties;
 import v1.utils.retcat.LocalRetcatItems;
 import v1.utils.db.SQlite;
-import v1.utils.retcat.SuggestionItem;
+import link.labeling.retcat.classes.SuggestionItem;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;

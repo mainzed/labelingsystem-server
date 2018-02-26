@@ -2,7 +2,7 @@ package v1.rest;
 
 import exceptions.Logging;
 import v1.utils.config.ConfigProperties;
-import v1.utils.retcat.SuggestionItem;
+import link.labeling.retcat.classes.SuggestionItem;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
