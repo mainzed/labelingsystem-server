@@ -327,7 +327,7 @@
 		<dependency>
 			<groupId>com.github.mainzed</groupId>
 			<artifactId>labelingsystem-retcat</artifactId>
-			<version>9e6dddf508</version>
+			<version>4e13c9b40b</version>
 		</dependency>
 	</dependencies>
 	<reporting>
