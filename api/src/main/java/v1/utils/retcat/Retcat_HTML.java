@@ -6,6 +6,7 @@ import exceptions.SesameSparqlException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import link.labeling.retcat.classes.SuggestionItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
