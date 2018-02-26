@@ -9,7 +9,7 @@ import link.labeling.retcat.items.RetcatItems;
 
 public class LocalRetcatItems {
 
-    public static List<RetcatItem> getAllRetcatItems() throws IOException, ResourceNotAvailableException  {
+    public static List<RetcatItem> getLocalCatalogue() throws IOException, ResourceNotAvailableException  {
 
         List<RetcatItem> retcatList = new ArrayList();
         retcatList.add(RetcatItems.getRetcatItemByName("This Labeling System"));

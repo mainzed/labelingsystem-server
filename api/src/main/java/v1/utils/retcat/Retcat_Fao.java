@@ -108,7 +108,7 @@ public class Retcat_Fao {
 			String type = "fao";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -147,7 +147,7 @@ public class Retcat_Fao {
 			String type = "fao";
 			String quality = "en";
 			String group = "";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

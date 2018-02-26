@@ -24,7 +24,7 @@ public class ResourceInfoResource {
     @GET
     @Produces("application/json;charset=UTF-8")
     public Response redirectToRetcat(@QueryParam("uri") String uri) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, org.eclipse.rdf4j.repository.RepositoryException, org.eclipse.rdf4j.query.MalformedQueryException, org.eclipse.rdf4j.query.QueryEvaluationException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
-        List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+        List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
         boolean match = false;
         for (RetcatItem item : retcatlist) {
             if (uri.contains(item.getPrefix())) {

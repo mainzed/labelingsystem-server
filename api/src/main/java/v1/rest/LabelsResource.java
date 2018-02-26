@@ -86,7 +86,7 @@ public class LabelsResource {
             String OUTSTRING = "";
             // QUERY STRING
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT ?s ?p ?o WHERE { "
                     + "?s ?p ?o . "
@@ -286,7 +286,7 @@ public class LabelsResource {
         try {
             String OUTSTRING = "";
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -422,7 +422,7 @@ public class LabelsResource {
         try {
             String OUTSTRING = "";
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -811,7 +811,7 @@ public class LabelsResource {
             Transformer.writeVocabularyStatisticsToDatabase(vocabID);
             // get result als json
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
             String query = GeneralFunctions.getAllElementsForItemID(item, itemID);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -868,7 +868,7 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
-            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
             // get inherited data
             List<InheritFromVocab> inheritFromVocab = getInheritedFromVocabList();
             // set result

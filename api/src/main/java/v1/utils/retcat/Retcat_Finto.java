@@ -85,7 +85,7 @@ public class Retcat_Finto {
 			String type = "finto";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -125,7 +125,7 @@ public class Retcat_Finto {
 			String type = "finto";
 			String quality = "";
 			String group = "en";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

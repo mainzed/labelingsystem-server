@@ -164,7 +164,7 @@ public class Retcat_LabelingSystem {
 			String type = "ls";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -311,7 +311,7 @@ public class Retcat_LabelingSystem {
 			String type = "ls";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -472,7 +472,7 @@ public class Retcat_LabelingSystem {
 				String type = "ls";
 				String quality = "";
 				String group = "";
-				for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
+				for (RetcatItem item : LocalRetcatItems.getLocalCatalogue()) {
 					if (item.getType().equals(type)) {
 						quality = item.getQuality();
 						group = item.getGroup();

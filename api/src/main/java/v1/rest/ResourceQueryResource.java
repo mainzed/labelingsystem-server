@@ -25,7 +25,7 @@ public class ResourceQueryResource {
     @GET
     @Produces("application/json;charset=UTF-8")
     public Response redirectToRetcat(@QueryParam("retcat") String retcat, @QueryParam("query") String query) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, org.eclipse.rdf4j.repository.RepositoryException, org.eclipse.rdf4j.query.MalformedQueryException, org.eclipse.rdf4j.query.QueryEvaluationException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
-        List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
+        List<RetcatItem> retcatlist = LocalRetcatItems.getLocalCatalogue();
         boolean match = false;
         if (retcat != null) {
             //ckeck if own vocab
