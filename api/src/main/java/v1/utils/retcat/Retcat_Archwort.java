@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -24,7 +25,7 @@ import org.json.simple.parser.ParseException;
 
 public class Retcat_Archwort {
 
-	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String url = "http://archwort.dainst.org/de/vocab/sparql.php";
 		String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX dc: <http://purl.org/dc/elements/1.1/> "
 				+ "SELECT ?Subject ?prefLabel ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
@@ -135,7 +136,7 @@ public class Retcat_Archwort {
 			String type = "archwort";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -178,7 +179,7 @@ public class Retcat_Archwort {
 			String type = "archwort";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

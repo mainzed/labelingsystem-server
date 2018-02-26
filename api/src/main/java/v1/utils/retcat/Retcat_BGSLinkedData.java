@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -68,7 +69,7 @@ public class Retcat_BGSLinkedData {
 			String type = "bgs";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

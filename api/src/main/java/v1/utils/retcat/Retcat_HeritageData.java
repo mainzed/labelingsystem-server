@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -25,7 +26,7 @@ import org.json.simple.parser.ParseException;
 
 public class Retcat_HeritageData {
 
-	public static Map<String, SuggestionItem> queryHE(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryHE(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String url = "http://heritagedata.org/live/sparql";
 		String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
 				+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
@@ -151,7 +152,7 @@ public class Retcat_HeritageData {
 			String type = "heritagedata";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -164,7 +165,7 @@ public class Retcat_HeritageData {
 		return autosuggests;
 	}
 
-	public static Map<String, SuggestionItem> queryRCAHMS(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryRCAHMS(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String url = "http://heritagedata.org/live/sparql";
 		String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
 				+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
@@ -289,7 +290,7 @@ public class Retcat_HeritageData {
 			String type = "heritagedata";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -302,7 +303,7 @@ public class Retcat_HeritageData {
 		return autosuggests;
 	}
 
-	public static Map<String, SuggestionItem> queryRCAHMW(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryRCAHMW(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String url = "http://heritagedata.org/live/sparql";
 		String sparql = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "
 				+ "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle WHERE { "
@@ -427,7 +428,7 @@ public class Retcat_HeritageData {
 			String type = "heritagedata";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -559,7 +560,7 @@ public class Retcat_HeritageData {
 			String type = "heritagedata";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

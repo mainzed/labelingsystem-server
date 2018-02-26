@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -22,7 +23,7 @@ import v1.utils.generalfuncs.GeneralFunctions;
 
 public class Retcat_Dbpedia {
 
-	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		searchword = GeneralFunctions.encodeURIComponent(searchword);
 		String url_string = "http://lookup.dbpedia.org/api/search.asmx/KeywordSearch?QueryString=" + searchword + "&MaxHits=" + RetcatResource.getLimit();
 		URL url = new URL(url_string);
@@ -55,7 +56,7 @@ public class Retcat_Dbpedia {
 			String type = "dbpedia";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -125,7 +126,7 @@ public class Retcat_Dbpedia {
 			String type = "dbpedia";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

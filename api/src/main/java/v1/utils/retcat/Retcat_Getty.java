@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.MalformedQueryException;
 import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -25,7 +26,7 @@ import org.json.simple.parser.ParseException;
 
 public class Retcat_Getty {
 
-	public static Map<String, SuggestionItem> queryAAT(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryAAT(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String lang = "en"; // language for scopeNote
 		String url = "http://vocab.getty.edu/sparql";
 		String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle { "
@@ -141,7 +142,7 @@ public class Retcat_Getty {
 			String type = "getty";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -154,7 +155,7 @@ public class Retcat_Getty {
 		return autosuggests;
 	}
 
-	public static Map<String, SuggestionItem> queryTGN(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryTGN(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String url = "http://vocab.getty.edu/sparql";
 		String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
 				+ "?Subject a skos:Concept. "
@@ -267,7 +268,7 @@ public class Retcat_Getty {
 			String type = "getty";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -280,7 +281,7 @@ public class Retcat_Getty {
 		return autosuggests;
 	}
 
-	public static Map<String, SuggestionItem> queryULAN(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException {
+	public static Map<String, SuggestionItem> queryULAN(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		String lang = "en"; // language for scopeNote
 		String url = "http://vocab.getty.edu/sparql";
 		String sparql = "SELECT ?Subject ?prefLabel ?scopeNote ?BroaderPreferredTerm ?BroaderPreferred ?NarrowerPreferredTerm ?NarrowerPreferred ?schemeTitle{ "
@@ -394,7 +395,7 @@ public class Retcat_Getty {
 			String type = "getty";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();
@@ -517,7 +518,7 @@ public class Retcat_Getty {
 			String type = "getty";
 			String quality = "";
 			String group = "";
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getType().equals(type)) {
 					quality = item.getQuality();
 					group = item.getGroup();

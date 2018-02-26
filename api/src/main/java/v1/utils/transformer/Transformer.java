@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import link.labeling.retcat.classes.RetcatItem;
 import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,7 +36,6 @@ import org.openrdf.repository.RepositoryException;
 import rdf.RDF4J_20;
 import v1.utils.db.SQlite;
 import v1.utils.inherit.InheritFromVocab;
-import v1.utils.retcat.RetcatItem;
 
 public class Transformer {
 

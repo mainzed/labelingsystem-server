@@ -16,7 +16,7 @@ import exceptions.SparqlQueryException;
 import exceptions.UniqueIdentifierException;
 import v1.utils.transformer.Transformer;
 import v1.utils.config.ConfigProperties;
-import v1.utils.retcat.RetcatItems;
+import v1.utils.retcat.LocalRetcatItems;
 import v1.utils.generalfuncs.GeneralFunctions;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,6 +47,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import link.labeling.retcat.classes.RetcatItem;
 import org.jdom.JDOMException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -56,7 +57,6 @@ import org.eclipse.rdf4j.query.QueryEvaluationException;
 import org.eclipse.rdf4j.repository.RepositoryException;
 import org.json.simple.parser.JSONParser;
 import v1.utils.inherit.InheritFromVocab;
-import v1.utils.retcat.RetcatItem;
 import v1.utils.validatejson.ValidateJSONObject;
 
 @Path("/labels")
@@ -86,7 +86,7 @@ public class LabelsResource {
             String OUTSTRING = "";
             // QUERY STRING
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
             String query = rdf.getPREFIXSPARQL();
             query += "SELECT ?s ?p ?o WHERE { "
                     + "?s ?p ?o . "
@@ -286,7 +286,7 @@ public class LabelsResource {
         try {
             String OUTSTRING = "";
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -422,7 +422,7 @@ public class LabelsResource {
         try {
             String OUTSTRING = "";
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
             String item = "ls_lab";
             String query = GeneralFunctions.getAllElementsForItemID(item, label);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
@@ -811,7 +811,7 @@ public class LabelsResource {
             Transformer.writeVocabularyStatisticsToDatabase(vocabID);
             // get result als json
             RDF rdf = new RDF();
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
             String query = GeneralFunctions.getAllElementsForItemID(item, itemID);
             List<BindingSet> result = RDF4J_20.SPARQLquery(ConfigProperties.getPropertyParam("repository"), ConfigProperties.getPropertyParam("ts_server"), query);
             List<String> predicates = RDF4J_20.getValuesFromBindingSet_ORDEREDLIST(result, "p");
@@ -868,7 +868,7 @@ public class LabelsResource {
             for (int i = 0; i < predicates.size(); i++) {
                 rdf.setModelTriple(item + ":" + label, predicates.get(i), objects.get(i));
             }
-            List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+            List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
             // get inherited data
             List<InheritFromVocab> inheritFromVocab = getInheritedFromVocabList();
             // set result

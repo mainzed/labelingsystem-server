@@ -3,7 +3,7 @@ package v1.rest;
 import exceptions.Logging;
 import exceptions.WaybacklinkException;
 import v1.utils.config.ConfigProperties;
-import v1.utils.retcat.RetcatItems;
+import v1.utils.retcat.LocalRetcatItems;
 import v1.utils.db.SQlite;
 import v1.utils.retcat.SuggestionItem;
 import java.io.BufferedReader;
@@ -26,10 +26,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import link.labeling.retcat.classes.RetcatItem;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import v1.utils.retcat.RetcatItem;
 import v1.utils.retcat.Retcat_Archwort;
 import v1.utils.retcat.Retcat_BGSLinkedData;
 import v1.utils.retcat.Retcat_ChronOntology;
@@ -57,7 +57,7 @@ public class RetcatResource {
 		try {
 			JSONArray outArray = new JSONArray();
 			// add items
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				JSONObject tmpRETCAT = new JSONObject();
 				tmpRETCAT.put("name", item.getName());
 				tmpRETCAT.put("description", item.getDescription());
@@ -84,7 +84,7 @@ public class RetcatResource {
 	public Response getRetcatDetails(@PathParam("retcat") String retcat) {
 		try {
 			JSONArray outArray = new JSONArray();
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				if (item.getName().equals(retcat)) {
 					JSONObject tmpRETCAT = new JSONObject();
 					tmpRETCAT.put("name", item.getName());
@@ -114,7 +114,7 @@ public class RetcatResource {
 		try {
 			JSONArray outArray = new JSONArray();
 			HashSet<String> qualityList = new HashSet();
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				qualityList.add(item.getQuality());
 			}
 			for (String item : qualityList) {
@@ -134,7 +134,7 @@ public class RetcatResource {
 		try {
 			JSONArray outArray = new JSONArray();
 			HashSet<String> groupList = new HashSet();
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				groupList.add(item.getGroup());
 			}
 			for (String item : groupList) {
@@ -154,7 +154,7 @@ public class RetcatResource {
 		try {
 			JSONArray outArray = new JSONArray();
 			HashSet<String> groupList = new HashSet();
-			for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+			for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 				groupList.add(item.getType());
 			}
 			for (String item : groupList) {
@@ -180,7 +180,7 @@ public class RetcatResource {
 				String[] retcatItems = newRetcatString.split(",");
 				// set data
 				for (String vocItem : retcatItems) {
-					for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+					for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 						if (item.getName().equals(vocItem)) {
 							JSONObject tmpRETCAT = new JSONObject();
 							tmpRETCAT.put("name", item.getName());
@@ -236,7 +236,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			// set data
 			for (String vocItem : retcatItems) {
-				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 					if (item.getName().equals(vocItem)) {
 						JSONObject tmpRETCAT = new JSONObject();
 						tmpRETCAT.put("name", item.getName());
@@ -289,7 +289,7 @@ public class RetcatResource {
 			JSONArray outArray = new JSONArray();
 			// set data
 			for (String vocItem : retcatItems) {
-				for (RetcatItem item : RetcatItems.getAllRetcatItems()) {
+				for (RetcatItem item : LocalRetcatItems.getAllRetcatItems()) {
 					if (item.getName().equals(vocItem)) {
 						JSONObject tmpRETCAT = new JSONObject();
 						tmpRETCAT.put("name", item.getName());
@@ -390,7 +390,7 @@ public class RetcatResource {
 	public Response getWaybackLink(@QueryParam("url") String url) {
 		try {
 			// check if url is item in retcat
-			List<RetcatItem> retcatlist = RetcatItems.getAllRetcatItems();
+			List<RetcatItem> retcatlist = LocalRetcatItems.getAllRetcatItems();
 			for (RetcatItem item : retcatlist) {
 				if (url.contains(item.getPrefix())) {
 					throw new WaybacklinkException("item match in reference thesaurus catalog");
