@@ -21,7 +21,7 @@ public class ResourceWaybackResource {
 	@GET
 	@Produces("application/json;charset=UTF-8")
 	public Response redirectToWayback(@QueryParam("url") String url) throws URISyntaxException, IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException {
-		URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/waybacklink" + "?url=" + url);
+		URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/rtc/waybacklink" + "?url=" + url);
 		return Response.temporaryRedirect(targetURIForRedirection).build();
 	}
 

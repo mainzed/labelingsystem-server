@@ -33,7 +33,7 @@ public class ResourceInfoResource {
             }
         }
         if (!match) {
-            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/info/html" + "?url=" + uri);
+            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/rtc/info/html" + "?url=" + uri);
             return Response.temporaryRedirect(targetURIForRedirection).build();
         }
         return Response.ok().build();

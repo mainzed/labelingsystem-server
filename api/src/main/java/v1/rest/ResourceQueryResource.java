@@ -32,7 +32,7 @@ public class ResourceQueryResource {
             if (retcat.contains("this.")) {
                 String vocab = retcat.split("this.")[1];
                 query = GeneralFunctions.encodeURIComponent(query);
-                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/labelingsystem/" + vocab + "?query=" + query);
+                URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/rtc/query/labelingsystem/" + vocab + "?query=" + query);
                 return Response.temporaryRedirect(targetURIForRedirection).build();
             }
             // look for other endpoints
@@ -45,7 +45,7 @@ public class ResourceQueryResource {
             }
         }
         if (!match) {
-            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/retcat/query/html" + "?url=" + query);
+            URI targetURIForRedirection = new URI(ConfigProperties.getPropertyParam("api") + "/v1/rtc/query/html" + "?url=" + query);
             return Response.temporaryRedirect(targetURIForRedirection).build();
         }
         return Response.ok().build();
