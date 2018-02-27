@@ -334,6 +334,11 @@
 			<artifactId>jena-ext</artifactId>
 			<version>c2a9de99bf</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.linkedgeodesy</groupId>
+			<artifactId>rdf4j-ext</artifactId>
+			<version>64a72d082c</version>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>
