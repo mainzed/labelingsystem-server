@@ -2,3 +2,9 @@ language: java
 script:
   - cd api
   - mvn test -B
+notifications:
+  email:
+    recipients:
+      - git@linkedgeodesy.org
+    on_success: always
+    on_failure: always
