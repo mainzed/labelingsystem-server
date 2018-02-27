@@ -1,7 +1,5 @@
 # Labeling System Server
 
-[![Build Status]
-
 [![build](https://travis-ci.org/mainzed/labelingsystem-server.svg?branch=master)](https://travis-ci.org/mainzed/labelingsystem-server) [![version](https://img.shields.io/badge/version-1.0--SNAPSHOT-green.svg)](#)  [![java](https://img.shields.io/badge/jdk-1.8-red.svg)](#)  [![maven](https://img.shields.io/badge/maven-3.5.0-orange.svg)](#) [![output](https://img.shields.io/badge/output-war-red.svg)](#)  [![docs](https://img.shields.io/badge/apidoc-xxx-blue.svg)](#)  [![license](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mainzed/labelingsystem-server/blob/master/LICENSE)
 
 The Labeling System offers experts the possibility to create concepts with context-bound validity, to concretize, to group in containers (vocabularies) and to share them with the research community. The LS provides user-friendly web tools that allow semantic linking of terms into the Linked Open Data Cloud. Once vocabularies are published, the LS serves as a distributed repository of concepts (concept-gazetteer), which provides citable addresses on the Web (URI). Each generated concept is explicit assigned to its creator. This assured authorship yield in a clear responsibility for data maintenance.
