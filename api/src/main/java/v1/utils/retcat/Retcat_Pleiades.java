@@ -26,7 +26,7 @@ public class Retcat_Pleiades {
 
 	public static Map<String, SuggestionItem> query(String searchword) throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SesameSparqlException, ResourceNotAvailableException, ParseException, link.labeling.retcat.exceptions.ResourceNotAvailableException {
 		searchword = GeneralFunctions.encodeURIComponent(searchword);
-		String url_string = "http://pelagios.org/peripleo/search?query=" + searchword + "&types=place&limit=" + RetcatResource.getLimit();
+		String url_string = "http://peripleo.pelagios.org/peripleo/search?query=" + searchword + "&types=place&limit=" + RetcatResource.getLimit();
 		URL url = new URL(url_string);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		//conn.setRequestProperty("Accept", "application/json");
@@ -76,7 +76,7 @@ public class Retcat_Pleiades {
 		try {
 			String outputUrl = url;
 			url = GeneralFunctions.encodeURIComponent(url);
-			url = "http://pelagios.org/peripleo/places/" + url;
+			url = "http://peripleo.pelagios.org/peripleo/places/" + url;
 			// query for json
 			URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
