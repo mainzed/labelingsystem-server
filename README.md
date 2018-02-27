@@ -20,10 +20,6 @@ API Documentation (Version 1): [APIdoc](https://github.com/mainzed/labelingsyste
 
 RESTful API to provide cool URIs for Labeling System items.
 
-#### persondb.war
-
-Servlet providing persons for linking.
-
 ### databases
 
 RDF4J triplestore and SQlite databases
@@ -61,7 +57,6 @@ nginx and Tomcat
 * /`[...]`/`db`/
 * /`[tomcat]`/webapps/`share`/
 * /`[tomcat]`/webapps/`dump`/
-* /`[tomcat]`/webapps/`dump-dh`/
 * /`[tomcat]`/webapps/`ROOT`/
 
 #### required files
@@ -89,7 +84,7 @@ nginx and Tomcat
 * modify `default triples`
 * fill `labelingsystem` repository with default triples
 * configure application in their WAR packages using `config[XXX].properties`
-* deploy war files for ls backend (`api.war`, `item.war`, `persondb.war`, `datahub.war`)
+* deploy war files for ls backend (`api.war`, `item.war`)
 * configure frontend app and set host for API
 * deploy Labeling System frontend app
 * deploy Label Explorer
