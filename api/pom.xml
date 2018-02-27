@@ -329,6 +329,11 @@
 			<artifactId>labelingsystem-retcat</artifactId>
 			<version>4e13c9b40b</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.linkedgeodesy</groupId>
+			<artifactId>jena-ext</artifactId>
+			<version>c2a9de99bf</version>
+		</dependency>
 	</dependencies>
 	<reporting>
 		<plugins>
