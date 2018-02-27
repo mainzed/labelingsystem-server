@@ -1,7 +1,7 @@
 package v1.utils.csv;
 
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import exceptions.CsvLabelImportException;
 import exceptions.UniqueIdentifierException;
 import java.io.BufferedReader;

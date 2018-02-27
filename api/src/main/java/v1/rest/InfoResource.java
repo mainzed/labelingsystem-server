@@ -6,7 +6,7 @@ import exceptions.SparqlParseException;
 import exceptions.SparqlQueryException;
 import java.io.File;
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import v1.utils.config.ConfigProperties;
 import java.io.IOException;
 import java.net.URISyntaxException;

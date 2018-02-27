@@ -33,7 +33,7 @@ import org.json.simple.parser.ParseException;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.repository.RepositoryException;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import v1.utils.db.SQlite;
 import v1.utils.inherit.InheritFromVocab;
 

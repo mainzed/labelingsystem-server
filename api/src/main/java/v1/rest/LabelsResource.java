@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import v1.utils.uuid.UniqueIdentifier;
 import exceptions.ConfigException;
 import exceptions.Logging;
@@ -981,7 +981,7 @@ public class LabelsResource {
         return triples;
     }
 
-    private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException {
+    private static String revisionSPARQLUPDATE(String item, String itemid, HashMap<String, String> revisions) throws ConfigException, IOException, UniqueIdentifierException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException, org.linkedgeodesy.rdf4j.exceptions.SparqlParseException, org.linkedgeodesy.rdf4j.exceptions.SparqlQueryException {
         RDF rdf = new RDF();
         String prefixes = rdf.getPREFIXSPARQL();
         String triples = prefixes + "INSERT DATA { ";
@@ -1188,7 +1188,7 @@ public class LabelsResource {
         return update;
     }
 
-    private static List<InheritFromVocab> getInheritedFromVocabList() throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException {
+    private static List<InheritFromVocab> getInheritedFromVocabList() throws IOException, RepositoryException, MalformedQueryException, QueryEvaluationException, SparqlQueryException, SparqlParseException, org.linkedgeodesy.rdf4j.exceptions.SparqlQueryException, org.linkedgeodesy.rdf4j.exceptions.SparqlParseException {
         RDF rdf2 = new RDF();
         String queryRL = rdf2.getPREFIXSPARQL();
         queryRL += "SELECT * WHERE { ?scheme a ls:Vocabulary. ?scheme dc:identifier ?id. OPTIONAL { ?scheme dct:license ?license. } OPTIONAL { ?scheme ls:released ?released } OPTIONAL { ?scheme dc:rights ?rights } }";

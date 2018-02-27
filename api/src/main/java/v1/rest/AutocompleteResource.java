@@ -3,7 +3,7 @@ package v1.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import exceptions.AutocompleteLengthException;
 import exceptions.Logging;
 import v1.utils.config.ConfigProperties;

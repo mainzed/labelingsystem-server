@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import v1.utils.uuid.UniqueIdentifier;
 import exceptions.ConfigException;
 import exceptions.Logging;

@@ -17,7 +17,7 @@ import org.eclipse.rdf4j.query.BindingSet;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import rdf.RDF;
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import v1.utils.config.ConfigProperties;
 import v1.utils.generalfuncs.GeneralFunctions;
 import v1.utils.transformer.Transformer;

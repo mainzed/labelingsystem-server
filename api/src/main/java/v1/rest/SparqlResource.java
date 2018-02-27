@@ -1,6 +1,6 @@
 package v1.rest;
 
-import rdf.RDF4J_20;
+import org.linkedgeodesy.rdf4jext.rdf4j.RDF4J_20;
 import exceptions.Logging;
 import v1.utils.config.ConfigProperties;
 import java.io.IOException;
