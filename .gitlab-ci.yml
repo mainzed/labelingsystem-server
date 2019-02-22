@@ -1,0 +1,29 @@
+image: docker:git
+
+services:
+  - docker:dind
+
+stages:
+#  - build
+  - release
+
+variables:
+#  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+before_script:
+#  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+
+release-image:
+  stage: release
+  script:
+#    - docker pull $CONTAINER_TEST_IMAGE
+#    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+#    - docker run --rm -v "$PWD":/app -w /app maven:3-jdk-8 mvn clean install
+    - docker build -t $CONTAINER_RELEASE_IMAGE .
+    - docker push $CONTAINER_RELEASE_IMAGE  
+#  tags:
+#    - docker
+  only:
+    - master
