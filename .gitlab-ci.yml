@@ -5,9 +5,9 @@ services:
 
 before_script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-  - apt-get update
-  - apt-get install doxygen -y
-  - apt-get install ttf-freefont graphviz -y
+  #- apt-get update
+  #- apt-get install doxygen -y
+  #- apt-get install ttf-freefont graphviz -y
 
   
 stages:
@@ -32,14 +32,14 @@ release-image:
   only:
     - master
     
-pages:
-  stage: deploy
-  script:
-  - cd docs
-  - doxygen Doxyfile
-  - mv html ../public 
-  artifacts:
-    paths:
-    - public
-  only:
-  - master
+#pages:
+#  stage: deploy
+#  script:
+#  - cd docs
+#  - doxygen Doxyfile
+#  - mv html ../public 
+#  artifacts:
+#    paths:
+#    - public
+#  only:
+#  - master
