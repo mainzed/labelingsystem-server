@@ -3,9 +3,16 @@ image: docker:git
 services:
   - docker:dind 
 
+ before_script:
+  - apt-get update
+  - apt-get install doxygen -y
+  - apt-get install ttf-freefont graphviz -y
+
+  
 stages:
 #  - build
   - release
+  - deploy
 
 variables:
 #  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
@@ -27,3 +34,15 @@ release-image:
 #    - docker
   only:
     - master
+    
+pages:
+  stage: deploy
+  script:
+  - cd docs
+  - doxygen Doxyfile
+  - mv html ../public 
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
