@@ -12,8 +12,8 @@ before_script:
   
 stages:
 #  - build
-  - release
   - test
+  - release
   - deploy
 
 variables:
