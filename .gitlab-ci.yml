@@ -27,8 +27,10 @@ release-image:
   script:
 #    - docker pull $CONTAINER_TEST_IMAGE
 #    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker run --rm -v "$PWD":/api -w /api maven:3-jdk-8 mvn -f /api/pom.xml clean install
-    - docker run --rm -v "$PWD":/item -w /item maven:3-jdk-8 mvn -f /item/pom.xml  clean install
+    - cd api
+    - docker run --rm -v "$PWD":/api -w /api maven:3-jdk-8 mvn clean install
+    - cd ../item
+    - docker run --rm -v "$PWD":/item -w /item maven:3-jdk-8 mvn clean install
     - docker build -t $CONTAINER_RELEASE_IMAGE .
     - docker push $CONTAINER_RELEASE_IMAGE  
 #  tags:
