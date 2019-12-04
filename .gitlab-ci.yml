@@ -44,9 +44,12 @@ pages:
     - apt-get install doxygen -y
     - apt-get install ttf-freefont graphviz -y
   script:
-  - cd docs
+  - cd api/docs
   - doxygen Doxyfile
-  - mv html ../public 
+  - mv html ../../public/docs/api 
+  - cd item/docs
+  - doxygen Doxyfile
+  - mv html ../../public/docs/item
   artifacts:
     paths:
     - public
