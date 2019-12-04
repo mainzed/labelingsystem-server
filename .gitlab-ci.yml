@@ -10,9 +10,6 @@ services:
 
 before_script:
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
-  #- apt-get update
-  #- apt-get install doxygen -y
-  #- apt-get install ttf-freefont graphviz -y
 
   
 stages:
@@ -30,7 +27,8 @@ release-image:
   script:
 #    - docker pull $CONTAINER_TEST_IMAGE
 #    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker run --rm -v "$PWD":/app -w /app maven:3-jdk-8 mvn clean install
+    - docker run --rm -v "$PWD":/api -w /api maven:3-jdk-8 mvn clean install
+    - docker run --rm -v "$PWD":/item -w /item maven:3-jdk-8 mvn clean install
     - docker build -t $CONTAINER_RELEASE_IMAGE .
     - docker push $CONTAINER_RELEASE_IMAGE  
 #  tags:
@@ -38,14 +36,19 @@ release-image:
   only:
     - master
     
-#pages:
-#  stage: deploy
-#  script:
-#  - cd docs
-#  - doxygen Doxyfile
-#  - mv html ../public 
-#  artifacts:
-#    paths:
-#    - public
+pages:
+  image: ubuntu:latest
+  stage: deploy
+  before_script:
+    - apt-get update
+    - apt-get install doxygen -y
+    - apt-get install ttf-freefont graphviz -y
+  script:
+  - cd docs
+  - doxygen Doxyfile
+  - mv html ../public 
+  artifacts:
+    paths:
+    - public
 #  only:
 #  - master
