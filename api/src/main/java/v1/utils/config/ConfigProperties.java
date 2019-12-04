@@ -7,7 +7,7 @@ import java.util.Properties;
 public class ConfigProperties {
 
 	private static final Properties prop = new Properties();
-	private static final String fileName = "config.properties";
+	private static final String fileName = "configDevServer.properties";
 
 	private static boolean loadpropertyFile(String fileName) throws IOException {
 		InputStream input = null;
