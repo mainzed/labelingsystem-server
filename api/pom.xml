@@ -18,10 +18,17 @@
 		</profile>
 	</profiles>
 	<repositories>
-		<!-- add https://jitpack.io -->
 		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
+			<id>net.rlp.gitlab-retcat-lib</id>
+			<url>https://gitlab.rlp.net/api/v4/projects/8178/packages/maven</url>
+		</repository>
+		<repository>
+			<id>net.rlp.gitlab-rdf4j-ext</id>
+			<url>https://gitlab.rlp.net/api/v4/projects/8183/packages/maven</url>
+		</repository>
+		<repository>
+			<id>net.rlp.gitlab-jena-ext</id>
+			<url>https://gitlab.rlp.net/api/v4/projects/8182/packages/maven</url>
 		</repository>
 	</repositories>
 	<build>
@@ -323,21 +330,21 @@
 			<artifactId>java-string-similarity</artifactId>
 			<version>RELEASE</version>
 		</dependency>
-		<!-- GitHub dependencies via https://jitpack.io - version: last commit number-->
+		<!-- GitLab RLP Maven dependencies -->
 		<dependency>
-			<groupId>com.github.mainzed</groupId>
-			<artifactId>labelingsystem-retcat</artifactId>
-			<version>468f70a439</version>
+			<groupId>link.labeling.retcat</groupId>
+			<artifactId>retcat</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.github.linkedgeodesy</groupId>
+			<groupId>org.linkedgeodesy.rdf4jext</groupId>
+			<artifactId>rdf4jext</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.linkedgeodesy.jenaext</groupId>
 			<artifactId>jena-ext</artifactId>
-			<version>c2a9de99bf</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.linkedgeodesy</groupId>
-			<artifactId>rdf4j-ext</artifactId>
-			<version>64a72d082c</version>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	<reporting>
