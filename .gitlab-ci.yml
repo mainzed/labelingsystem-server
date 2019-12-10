@@ -1,29 +1,59 @@
+#include:
+#  - template: SAST.gitlab-ci.yml
+#  - template: Dependency-Scanning.gitlab-ci.yml
+#  - template: License-Management.gitlab-ci.yml
+
 image: docker:git
 
 services:
   - docker:dind
 
+before_script:
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+
+
 stages:
 #  - build
+  - test
   - release
+  - deploy
 
 variables:
 #  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_BUILD_REF_NAME
   CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
-
-before_script:
-#  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
 
 release-image:
   stage: release
   script:
 #    - docker pull $CONTAINER_TEST_IMAGE
 #    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker run --rm -v "$PWD":/app -w /app maven:3-jdk-8 mvn clean install
+    - cd api
+    - docker run --rm -v "$PWD":/api -w /api maven:3-jdk-8 mvn clean install
+    - cd ../item
+    - docker run --rm -v "$PWD":/item -w /item maven:3-jdk-8 mvn clean install
     - docker build -t $CONTAINER_RELEASE_IMAGE .
-    - docker push $CONTAINER_RELEASE_IMAGE  
+    - docker push $CONTAINER_RELEASE_IMAGE
 #  tags:
 #    - docker
   only:
     - master
+
+pages:
+  image: ubuntu:latest
+  stage: deploy
+  before_script:
+    - apt-get update
+    - apt-get install doxygen -y
+    - apt-get install ttf-freefont graphviz -y
+  script:
+  - cd api/docs
+  - doxygen Doxyfile
+  - mv html ../../public/docs/api
+  - cd item/docs
+  - doxygen Doxyfile
+  - mv html ../../public/docs/item
+  artifacts:
+    paths:
+    - public
+#  only:
+#  - master
