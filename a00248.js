@@ -1,0 +1,28 @@
+var a00248 =
+[
+    [ "AccessDeniedException", "a00283.html", "a00283" ],
+    [ "AutocompleteLengthException", "a00287.html", "a00287" ],
+    [ "ConfigException", "a00291.html", "a00291" ],
+    [ "CsvExistanceException", "a00295.html", "a00295" ],
+    [ "CsvLabelImportException", "a00299.html", "a00299" ],
+    [ "CsvLanguageException", "a00303.html", "a00303" ],
+    [ "FormatException", "a00307.html", "a00307" ],
+    [ "JsonFormatException", "a00311.html", "a00311" ],
+    [ "Logging", "a00315.html", "a00315" ],
+    [ "MemoryException", "a00319.html", "a00319" ],
+    [ "NoInputException", "a00323.html", "a00323" ],
+    [ "RdfException", "a00327.html", "a00327" ],
+    [ "ResourceNotAvailableException", "a00331.html", "a00331" ],
+    [ "RetcatException", "a00335.html", "a00335" ],
+    [ "RevisionTypeException", "a00339.html", "a00339" ],
+    [ "SesameSparqlException", "a00343.html", "a00343" ],
+    [ "SparqlParseException", "a00347.html", "a00347" ],
+    [ "SparqlQueryException", "a00351.html", "a00351" ],
+    [ "SparqlUpdateException", "a00355.html", "a00355" ],
+    [ "SQliteException", "a00359.html", "a00359" ],
+    [ "StatisticsException", "a00363.html", "a00363" ],
+    [ "TransformRdfToApiJsonException", "a00367.html", "a00367" ],
+    [ "UniqueIdentifierException", "a00371.html", "a00371" ],
+    [ "ValidateJSONObjectException", "a00375.html", "a00375" ],
+    [ "WaybacklinkException", "a00379.html", "a00379" ]
+];
