@@ -1,4 +1,4 @@
-var files =
+var files_dup =
 [
     [ "AccessDeniedException.java", "a00002.html", [
       [ "AccessDeniedException", "a00283.html", "a00283" ]
@@ -18,16 +18,16 @@ var files =
     [ "ConfigException.java", "a00008.html", [
       [ "ConfigException", "a00291.html", "a00291" ]
     ] ],
-    [ "api/src/main/java/v1/utils/config/ConfigProperties.java", "a01164.html", [
+    [ "api/src/main/java/v1/utils/config/ConfigProperties.java", "a01160.html", [
       [ "ConfigProperties", "a00487.html", "a00487" ]
     ] ],
-    [ "item/src/main/java/info/labeling/rest/ConfigProperties.java", "a01167.html", [
+    [ "item/src/main/java/info/labeling/rest/ConfigProperties.java", "a01163.html", [
       [ "ConfigProperties", "a00611.html", "a00611" ]
     ] ],
-    [ "api/src/main/java/v1/restconfig/CORSFilter.java", "a01170.html", [
+    [ "api/src/main/java/v1/restconfig/CORSFilter.java", "a01166.html", [
       [ "CORSFilter", "a00471.html", "a00471" ]
     ] ],
-    [ "item/src/main/java/info/labeling/rest/CORSFilter.java", "a01173.html", [
+    [ "item/src/main/java/info/labeling/rest/CORSFilter.java", "a01169.html", [
       [ "CORSFilter", "a00615.html", "a00615" ]
     ] ],
     [ "Crypt.java", "a00158.html", [
@@ -90,10 +90,10 @@ var files =
     [ "LocalRetcatItems.java", "a00179.html", [
       [ "LocalRetcatItems", "a00519.html", "a00519" ]
     ] ],
-    [ "api/src/main/java/exceptions/Logging.java", "a01176.html", [
+    [ "api/src/main/java/exceptions/Logging.java", "a01172.html", [
       [ "Logging", "a00315.html", "a00315" ]
     ] ],
-    [ "item/src/main/java/info/labeling/exceptions/Logging.java", "a01179.html", [
+    [ "item/src/main/java/info/labeling/exceptions/Logging.java", "a01175.html", [
       [ "Logging", "a00607.html", "a00607" ]
     ] ],
     [ "LSDump.java", "a00170.html", [

@@ -8,7 +8,7 @@ var hierarchy =
     [ "Crypt", "a00491.html", null ],
     [ "Dump", "a00503.html", null ],
     [ "DumpResource", "a00403.html", null ],
-    [ "Exception", "a01159.html", [
+    [ "Exception", "a01155.html", [
       [ "AccessDeniedException", "a00283.html", null ],
       [ "AutocompleteLengthException", "a00287.html", null ],
       [ "ConfigException", "a00291.html", null ],
@@ -69,7 +69,7 @@ var hierarchy =
     [ "Retcat_Wikidata", "a00579.html", null ],
     [ "RetcatResource", "a00443.html", null ],
     [ "RevisionsResource", "a00447.html", null ],
-    [ "Runnable", "a01163.html", [
+    [ "Runnable", "a01159.html", [
       [ "CSV", "a00495.html", null ],
       [ "LSDump", "a00507.html", null ]
     ] ],

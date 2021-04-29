@@ -6,6 +6,6 @@ var annotated_dup =
     [ "servlet", "a00250.html", "a00250" ],
     [ "test", "a00269.html", "a00269" ],
     [ "v1", "a00252.html", "a00252" ],
-    [ "Exception", "a01159.html", null ],
-    [ "Runnable", "a01163.html", null ]
+    [ "Exception", "a01155.html", null ],
+    [ "Runnable", "a01159.html", null ]
 ];

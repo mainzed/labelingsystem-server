@@ -1,4 +1,4 @@
-var namespaces =
+var namespaces_dup =
 [
     [ "exceptions", "a00248.html", null ],
     [ "info", "a00273.html", "a00273" ],
