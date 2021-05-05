@@ -6,6 +6,7 @@ The Labeling System offers experts the possibility to create concepts with conte
 
 The Labeling System consists of two components: the [server](https://github.com/mainzed/labelingsystem-server) and the [client wep-app](https://github.com/mainzed/labelingsystem-client). The [datamodel](https://github.com/mainzed/labelingsystem-ontology) used in the backend is represented in an ontology using linked data vocabularies. This repository represents the server component of the Labeling System.
 
+
 ## Server Components
 
 ### war-files
