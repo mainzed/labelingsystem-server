@@ -31,6 +31,7 @@ release-image:
     - docker run --rm -v "$PWD":/api -w /api maven:3-jdk-8 mvn clean install
     - cd ../item
     - docker run --rm -v "$PWD":/item -w /item maven:3-jdk-8 mvn clean install
+    - cd ..
     - docker build -t $CONTAINER_RELEASE_IMAGE .
     - docker push $CONTAINER_RELEASE_IMAGE
 #  tags:
