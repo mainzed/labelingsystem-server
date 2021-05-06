@@ -45,7 +45,7 @@ pages:
   before_script:
     - apt-get update
     - apt-get install doxygen -y
-    - apt-get install ttf-freefont graphviz -y
+    - apt-get install graphviz -y
   script:
   - cd api/docs
   - doxygen Doxyfile
