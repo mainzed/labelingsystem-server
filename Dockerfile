@@ -19,5 +19,7 @@ COPY --from=builder /root/.RDF4J/console/repositories/* /opt/eclipse-rdf4j-2.5.1
 
 COPY db/ls.sqlite /opt/db/
 
-COPY target/*.war /usr/local/tomcat/webapps/
+COPY api/target/*.war /usr/local/tomcat/webapps/
+
+COPY item/target/*.war /usr/local/tomcat/webapps/
 
